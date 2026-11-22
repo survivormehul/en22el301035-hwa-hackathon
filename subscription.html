@@ -3,32 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Subscription | Happy While Away</title>
+  <title>Subscription Plans | Happy While Away</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="site-header">
     <div class="container header-inner">
       <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
-      <nav class="main-nav">
-        <a href="shop.html">Shop</a>
-        <a href="subscription.html">Subscription</a>
-        <a href="cart.html" class="nav-cart" id="nav-cart">Cart <span id="cart-count">0</span></a>
-        <button class="nav-toggle" id="nav-toggle" aria-label="Open menu">&#9776;</button>
-      </nav>
+      <a href="subscription.html" class="btn btn-outline">Subscribe</a>
     </div>
   </header>
 
-  <section class="page-hero">
+  <section class="sub-hero">
     <div class="container">
-      <h1>Subscription</h1>
-      <p>A fresh enrichment box, delivered to your door every month.</p>
+      <h1>Choose Your Subscription</h1>
+      <p>Premium dog enrichment delivered every month. Subscription only — no one-off sales.</p>
     </div>
   </section>
 
   <section class="plans">
     <div class="container">
+      <div class="plan-toggle">
+        <button type="button" id="toggle-monthly" class="active" data-freq="monthly">Monthly</button>
+        <button type="button" id="toggle-yearly" data-freq="yearly">Yearly</button>
+      </div>
       <div class="plan-grid" id="plan-grid"></div>
+    </div>
+  </section>
+
+  <section class="build-your-own">
+    <div class="container">
+      <div class="byo-header">
+        <h2>Build Your Own Box</h2>
+        <p>₹3,499 fixed — pick your categories, we pick the surprise merchandise.</p>
+      </div>
+      <div class="byo-price" id="byo-price">₹3,499 <span class="byo-period" id="byo-period">/month</span></div>
+      <div class="byo-rules">Select <strong>at least 2</strong> and <strong>at most 3</strong> categories. You choose the category — the actual products are a surprise.</div>
+      <div id="byo-count" class="byo-count">0 categories selected</div>
+      <div class="categories" id="categories"></div>
+    </div>
+  </section>
+
+  <section class="profile">
+    <div class="container">
+      <div class="profile-card">
+        <form id="subscribe-form">
+          <div class="form-section">
+            <h3>👤 Your Details</h3>
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Full Name <span style="color:#d32f2f">*</span></label>
+                <input type="text" name="customerName" required placeholder="Rohan Sharma">
+              </div>
+              <div class="form-field">
+                <label>Email <span style="color:#d32f2f">*</span></label>
+                <input type="email" name="customerEmail" required placeholder="rohan@example.com">
+              </div>
+              <div class="form-field">
+                <label>Phone <span style="color:#d32f2f">*</span></label>
+                <input type="tel" name="customerPhone" required placeholder="+91 98765 43210">
+              </div>
+              <div class="form-field full">
+                <label>Address <span style="color:#d32f2f">*</span></label>
+                <input type="text" name="address" required placeholder="House no., street, locality, city">
+              </div>
+              <div class="form-field">
+                <label>Pincode <span style="color:#d32f2f">*</span></label>
+                <input type="text" name="pincode" required placeholder="400001">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>🐶 Your Dog's Profile</h3>
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Dog's Name <span style="color:#d32f2f">*</span></label>
+                <input type="text" name="dogName" required placeholder="Buddy">
+              </div>
+              <div class="form-field">
+                <label>Breed <span style="color:#d32f2f">*</span></label>
+                <input type="text" name="dogBreed" required placeholder="Labrador">
+              </div>
+              <div class="form-field">
+                <label>Age (years) <span style="color:#d32f2f">*</span></label>
+                <input type="number" name="dogAge" required min="0" max="25" placeholder="3">
+              </div>
+              <div class="form-field">
+                <label>Size <span style="color:#d32f2f">*</span></label>
+                <select name="dogSize" required>
+                  <option value="">Select size</option>
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>Allergies (if any)</label>
+                <input type="text" name="dogAllergies" placeholder="e.g. chicken, grains">
+              </div>
+              <div class="form-field full">
+                <label>Preferences / Notes</label>
+                <textarea name="dogNotes" placeholder="Anything we should know about your dog?"></textarea>
+                <div class="hint">Helps us personalise each box.</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="form-error" class="error-msg"></div>
+          <div class="submit-bar">
+            <button type="submit" class="btn btn-primary btn-large" id="subscribe-btn">Start Subscription</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="container cta-inner">
+      <h2>Questions?</h2>
+      <p>Every box is built around your dog's profile. Surprise enrichment, every month.</p>
+      <a href="#" class="btn btn-outline">Contact Us</a>
     </div>
   </section>
 
@@ -38,12 +133,6 @@
         <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
         <p>Premium dog enrichment, delivered regularly.</p>
       </div>
-      <div class="footer-links">
-        <div><a href="shop.html">Shop</a></div>
-        <div><a href="subscription.html">Subscription</a></div>
-        <div><a href="cart.html">Cart</a></div>
-        <div><a href="#">Contact</a></div>
-      </div>
       <div class="footer-copy">
         <p>&copy; 2026 Happy While Away. All rights reserved.</p>
       </div>
@@ -51,36 +140,216 @@
   </footer>
 
   <script>
-    const plans = [
-      { id: 'plan1', name: 'Monthly Box', emoji: '📦', color: '#e3f2fd', price: 999, desc: 'One enrichment box every month. Cancel anytime.', period: '/mo', btn: 'Start Monthly' },
-      { id: 'plan2', name: '3-Month Prepaid', emoji: '📦', color: '#fff3e0', price: 2699, desc: 'Three boxes delivered quarterly. Save ₹298.', period: '/3 mo', btn: 'Start 3-Month' },
-      { id: 'plan3', name: '6-Month Prepaid', emoji: '📦', color: '#fce4ec', price: 4999, desc: 'Six boxes delivered twice a year. Save ₹995.', period: '/6 mo', btn: 'Start 6-Month' }
+    const PLANS = [
+      { id: 'happy-box', name: 'Happy Box', price: 1999, desc: 'Our flagship curated enrichment box — toys, treats and puzzles for a happy pup.', features: ['Curated monthly box', 'Toys, treats & puzzles', 'Personalised to dog profile', 'Cancel anytime'] },
+      { id: 'food-club', name: 'The Food Club', price: 1499, desc: 'Vet-approved treats and chews delivered monthly. From ₹1,499.', features: ['Premium treats & chews', 'Vet-approved', 'Personalised to dog profile', 'Cancel anytime'] },
+      { id: 'style-club', name: 'The Style Club', price: 999, desc: 'Clothing and accessories for your dog, curated monthly.', features: ['Clothing & accessories', 'Size-matched to your dog', 'Personalised to dog profile', 'Cancel anytime'] },
+      { id: 'calm-box', name: 'The Calm Box', price: 1499, desc: 'Soothing toys and enrichment for anxious or senior dogs.', features: ['Calming toys & puzzles', 'Senior-friendly options', 'Personalised to dog profile', 'Cancel anytime'] }
     ];
-  </script>
-  <script src="js/main.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const grid = document.getElementById('plan-grid');
-      grid.innerHTML = plans.map(p => `
-        <article class="product-card plan-card">
-          <div class="product-image" style="background:${p.color}">${p.emoji}</div>
-          <div class="product-info">
-            <h3 class="product-title">${p.name}</h3>
-            <p class="product-desc">${p.desc}</p>
-            <div class="product-price"><strong>₹${p.price}</strong> <span style="font-size:0.9rem;opacity:0.8">${p.period}</span></div>
-            <button class="btn btn-primary add-to-cart" data-id="${p.id}">${p.btn}</button>
-          </div>
-        </article>
-      `).join('');
-      grid.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-id');
-          const p = plans.find(x => x.id === id);
-          addToCart({ id: p.id, name: p.name, emoji: p.emoji, color: p.color, desc: p.desc, price: p.price });
-          btn.textContent = 'Added ✓';
-          setTimeout(() => btn.textContent = p.btn, 1200);
-        });
+
+    const BYO_CATEGORIES = [
+      { id: 'toys', name: 'Toys & Enrichment', emoji: '🧩', desc: 'Brain-boosting toys and puzzles' },
+      { id: 'food', name: 'Food & Treats', emoji: '🦴', desc: 'Vet-approved food and treats' },
+      { id: 'clothing', name: 'Clothing & Accessories', emoji: '🧥', desc: 'Apparel and accessories' }
+    ];
+
+    const BYO_PRICE = 3499;
+    let selectedCategories = new Set();
+    let frequency = 'monthly';
+    let selectedPlanId = null;
+
+    const grid = document.getElementById('plan-grid');
+    const toggleMonthly = document.getElementById('toggle-monthly');
+    const toggleYearly = document.getElementById('toggle-yearly');
+    const byoPrice = document.getElementById('byo-price');
+    const byoPeriod = document.getElementById('byo-period');
+    const byoCount = document.getElementById('byo-count');
+    const categoriesContainer = document.getElementById('categories');
+    const form = document.getElementById('subscribe-form');
+    const formError = document.getElementById('form-error');
+    const subscribeBtn = document.getElementById('subscribe-btn');
+
+    function yearlyPrice(monthly) { return Math.round(monthly * 10); }
+
+    function renderPlans() {
+      grid.innerHTML = PLANS.map(p => {
+        const monthly = p.price;
+        const yearly = yearlyPrice(monthly);
+        const price = frequency === 'yearly' ? yearly : monthly;
+        const period = frequency === 'yearly' ? '/year' : '/month';
+        const isFeatured = p.id === 'happy-box';
+        return `
+          <article class="plan-card ${isFeatured ? 'featured' : ''}" data-id="${p.id}">
+            ${isFeatured ? '<span class="badge">Most popular</span>' : ''}
+            <div class="plan-header">
+              <div class="plan-name">${p.name}</div>
+              <div class="plan-price">₹${price.toLocaleString()}</div>
+              <div class="plan-period">${period}</div>
+            </div>
+            <div class="plan-desc">${p.desc}</div>
+            <ul class="plan-features">${p.features.map(f => `<li>${f}</li>`).join('')}</ul>
+            <button type="button" class="btn btn-primary plan-btn" onclick="selectPlan('${p.id}')">Choose ${p.name}</button>
+          </article>
+        `;
+      }).join('');
+    }
+
+    window.selectPlan = function(id) {
+      selectedPlanId = id;
+      document.querySelectorAll('.plan-card').forEach(c => {
+        c.style.borderColor = c.dataset.id === id ? 'var(--brand)' : 'var(--line)';
+        c.style.background = c.dataset.id === id ? '#eef6fb' : '#fff';
       });
+    };
+
+    toggleMonthly.addEventListener('click', () => { frequency = 'monthly'; toggleMonthly.classList.add('active'); toggleYearly.classList.remove('active'); renderPlans(); updateByo(); });
+    toggleYearly.addEventListener('click', () => { frequency = 'yearly'; toggleYearly.classList.add('active'); toggleMonthly.classList.remove('active'); renderPlans(); updateByo(); });
+
+    function updateByo() {
+      const price = frequency === 'yearly' ? yearlyPrice(BYO_PRICE) : BYO_PRICE;
+      const period = frequency === 'yearly' ? '/year' : '/month';
+      byoPrice.innerHTML = `₹${price.toLocaleString()} <span class="byo-period" id="byo-period">${period}</span>`;
+    }
+
+    function renderCategories() {
+      categoriesContainer.innerHTML = BYO_CATEGORIES.map(c => {
+        const checked = selectedCategories.has(c.id) ? 'checked' : '';
+        return `
+          <div class="category ${checked ? 'selected' : ''}" onclick="toggleCategory('${c.id}', this)">
+            <input type="checkbox" id="cat-${c.id}" ${checked} onchange="toggleCategory('${c.id}', this)" style="display:none;">
+            <span class="cat-icon">${c.emoji}</span>
+            <span class="cat-name">${c.name}</span>
+            <span class="cat-desc">${c.desc}</span>
+          </div>
+        `;
+      }).join('');
+      const n = selectedCategories.size;
+      byoCount.textContent = n + ' category' + (n !== 1 ? 'ies' : '') + ' selected';
+      byoCount.style.color = (n >= 2 && n <= 3) ? 'var(--success)' : 'var(--brand-dark)';
+      byoCount.style.fontWeight = '700';
+    }
+
+    window.toggleCategory = function(id, el) {
+      const input = el.querySelector('input');
+      if (selectedCategories.has(id)) {
+        selectedCategories.delete(id);
+      } else {
+        if (selectedCategories.size >= 3) {
+          formError.textContent = 'You can select at most 3 categories.';
+          formError.style.display = 'block';
+          setTimeout(() => formError.style.display = 'none', 2500);
+          return;
+        }
+        selectedCategories.add(id);
+      }
+      formError.textContent = '';
+      formError.style.display = 'none';
+      renderCategories();
+    };
+
+    renderPlans();
+    renderCategories();
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      formError.textContent = '';
+      formError.style.display = 'none';
+      subscribeBtn.textContent = 'Placing order…';
+      subscribeBtn.disabled = true;
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      const plan = PLANS.find(p => p.id === selectedPlanId);
+      let items = [];
+      let planType = '';
+      let total = 0;
+
+      if (selectedPlanId) {
+        planType = 'curated';
+        items = [{ plan: selectedPlanId, name: plan.name, price: frequency === 'yearly' ? yearlyPrice(plan.price) : plan.price }];
+        total = items[0].price;
+      } else if (selectedCategories.size >= 2 && selectedCategories.size <= 3) {
+        planType = 'build-your-own';
+        items = [{ plan: 'build-your-own', name: 'Build Your Own Box', categories: [...selectedCategories], price: frequency === 'yearly' ? yearlyPrice(BYO_PRICE) : BYO_PRICE }];
+        total = items[0].price;
+      } else {
+        formError.textContent = 'Please choose a plan, or select 2–3 categories for Build Your Own.';
+        formError.style.display = 'block';
+        subscribeBtn.textContent = 'Start Subscription';
+        subscribeBtn.disabled = false;
+        return;
+      }
+
+      if (selectedCategories.size > 0 && selectedCategories.size < 2 && !selectedPlanId) {
+        formError.textContent = 'For Build Your Own, please select at least 2 categories.';
+        formError.style.display = 'block';
+        subscribeBtn.textContent = 'Start Subscription';
+        subscribeBtn.disabled = false;
+        return;
+      }
+
+      const payload = {
+        frequency,
+        planType,
+        items,
+        total,
+        customer: {
+          name: data.customerName,
+          email: data.customerEmail,
+          phone: data.customerPhone,
+          address: data.address,
+          pincode: data.pincode
+        },
+        dog: {
+          name: data.dogName,
+          breed: data.dogBreed,
+          age: parseInt(data.dogAge) || 0,
+          size: data.dogSize,
+          allergies: data.dogAllergies,
+          notes: data.dogNotes
+        }
+      };
+
+      try {
+        const res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (!res.ok || !result.ok) throw new Error(result.error || 'Subscription failed');
+
+        form.reset();
+        selectedPlanId = null;
+        selectedCategories.clear();
+        document.querySelectorAll('.plan-card').forEach(c => { c.style.borderColor = 'var(--line)'; c.style.background = '#fff'; });
+        renderCategories();
+        renderPlans();
+
+        const hero = document.querySelector('.sub-hero');
+        hero.insertAdjacentHTML('afterend', `
+          <section class="order-success">
+            <span class="success-icon">🎉</span>
+            <h2>Subscription Active!</h2>
+            <p>Thank you ${data.customerName}. Your ${frequency} ${planType} subscription is confirmed.</p>
+            <div class="order-summary">
+              <div class="row"><span>Plan</span><span>${planType === 'curated' ? plan.name : 'Build Your Own Box'}</span></div>
+              ${planType === 'build-your-own' ? `<div class="row"><span>Categories</span><span>${[...selectedCategories].map(c => BYO_CATEGORIES.find(x => x.id === c).name).join(', ')}</span></div>` : ''}
+              <div class="row"><span>Frequency</span><span>${frequency.charAt(0).toUpperCase() + frequency.slice(1)}</span></div>
+              <div class="row"><span>Total</span><span>₹${total.toLocaleString()}</span></div>
+              <div class="row"><span>Dog</span><span>${data.dogName} (${data.dogBreed}, ${data.dogSize})</span></div>
+            </div>
+            <a href="index.html" class="btn btn-outline">Back to Home</a>
+          </section>
+        `);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        formError.textContent = err.message || 'Could not start subscription. Try again.';
+        formError.style.display = 'block';
+        subscribeBtn.textContent = 'Start Subscription';
+        subscribeBtn.disabled = false;
+      }
     });
   </script>
 </body>
