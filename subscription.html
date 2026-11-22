@@ -31,7 +31,7 @@
     </div>
   </section>
 
-  <section class="build-your-own">
+  <section class="build-your-own" id="build-your-own-section">
     <div class="container">
       <div class="byo-header">
         <h2>Build Your Own Box</h2>
@@ -271,8 +271,8 @@
       if (section) section.scrollIntoView({ behavior: 'smooth' });
     };
 
-    toggleMonthly.addEventListener('click', () => { frequency = 'monthly'; toggleMonthly.classList.add('active'); toggleYearly.classList.remove('active'); renderPlans(); updateByo(); });
-    toggleYearly.addEventListener('click', () => { frequency = 'yearly'; toggleYearly.classList.add('active'); toggleMonthly.classList.remove('active'); renderPlans(); updateByo(); });
+    toggleMonthly.addEventListener('click', () => { frequency = 'monthly'; toggleMonthly.classList.add('active'); toggleYearly.classList.remove('active'); renderPlans(); updateByo(); document.getElementById('build-your-own-section').style.display = 'block'; });
+    toggleYearly.addEventListener('click', () => { frequency = 'yearly'; toggleYearly.classList.add('active'); toggleMonthly.classList.remove('active'); renderPlans(); updateByo(); document.getElementById('build-your-own-section').style.display = 'none'; selectedCategories.clear(); renderCategories(); });
 
     function updateByo() {
       const price = frequency === 'yearly' ? yearlyPrice(BYO_PRICE) : BYO_PRICE;
