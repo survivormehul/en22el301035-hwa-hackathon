@@ -76,7 +76,8 @@
 
           <div class="form-section">
             <h3>🐶 Your Dog's Profile</h3>
-            <div class="form-grid">
+            <div id="dog-profiles">
+              <div class="form-grid" id="dog-profile-grid">
               <div class="form-field">
                 <label>Dog's Name <span style="color:#d32f2f">*</span></label>
                 <input type="text" name="dogName" required placeholder="Buddy" pattern="[A-Za-z\s]+" maxlength="50" title="Please enter only alphabetic characters and spaces">
@@ -135,7 +136,10 @@
                 <textarea name="dogNotes" placeholder="Anything we should know about your dog?"></textarea>
                 <div class="hint">Helps us personalise each box.</div>
               </div>
+              </div>
             </div>
+
+          <button type="button" class="btn btn-outline" id="add-dog-btn" style="margin-top:16px;">+ Add Another Dog</button>
           </div>
 
           <div id="form-error" class="error-msg"></div>
