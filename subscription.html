@@ -38,7 +38,7 @@
         <p>₹3,499 fixed — pick your categories, we pick the surprise merchandise.</p>
       </div>
       <div class="byo-price" id="byo-price">₹3,499 <span class="byo-period" id="byo-period">/month</span></div>
-      <div class="byo-rules">Select <strong>at least 2</strong> and <strong>at most 3</strong> categories. You choose the category — the actual products are a surprise.</div>
+      <div class="byo-rules">Pick <strong>2 to 4</strong> categories you love. We curate the actual products as a surprise — you never choose individual items.</div>
       <div id="byo-count" class="byo-count">0 categories selected</div>
       <div class="categories" id="categories"></div>
     </div>
@@ -145,7 +145,7 @@
         id: 'happy-box', name: 'Happy Box', emoji: '🎁', price: 1999,
         tagline: 'Flagship curation',
         desc: 'Our most-loved monthly box — a hand-picked mix of toys, treats and puzzles that keeps your dog happily occupied.',
-        benefits: ['Curated monthly enrichment box', 'Toys, treats & puzzles in every box', 'Personalised to your dog\\'s profile', 'Skip, pause or cancel anytime'],
+        benefits: ['Curated monthly enrichment box', 'Toys, treats & puzzles in every box', 'Personalised to your dog\'s profile', 'Skip, pause or cancel anytime'],
         experience: 'A surprise-filled celebration every month that turns routine into tail-wagging excitement.'
       },
       {
@@ -153,12 +153,12 @@
         tagline: 'Nourishment that tails wag for',
         desc: 'Vet-approved treats and chews delivered monthly. Pricing starts at ₹1,499 and can vary depending on the offering you select.',
         benefits: ['Vet-approved treats & chews', 'Rotating flavours and textures', 'Size-appropriate portions', 'Tailored to diet and allergies'],
-        experience: 'A monthly food curation matched to your dog\\'s taste, size and dietary needs.'
+        experience: 'A monthly food curation matched to your dog\'s taste, size and dietary needs.'
       },
       {
         id: 'style-club', name: 'The Style Club', emoji: '🧥', price: 999,
         tagline: 'Dress up the delight',
-        desc: 'Clothing and accessories curated monthly to match your dog\\'s size and the season.',
+        desc: 'Clothing and accessories curated monthly to match your dog\'s size and the season.',
         benefits: ['Clothing & accessories every month', 'Size-matched to your dog', 'Seasonal themes and colours', 'Personalised to measurements'],
         experience: 'A styled pick every month so your dog steps out looking and feeling their best.'
       },
@@ -195,6 +195,16 @@
 
     function yearlyPrice(monthly) { return Math.round(monthly * 10); }
 
+    function planIcon(id) {
+      const icons = {
+        'happy-box': `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 10a3.5 3.5 0 0 1-3.5 3.5h-5.5c-1.1 0-2-.9-2-2v-4.5a3.5 3.5 0 1 1 7 0z"/><path d="M17 14h2l-3.5-4L17 6"/></svg>`,
+        'food-club': `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h1a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H2a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3z"/><path d="M7 3v18"/><path d="M7 12h5"/><path d="M9 6V4l5 2"/></svg>`,
+        'style-club': `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M8 4v4"/><path d="M16 4v4"/><path d="M10 20H6a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1"/><path d="M18 20h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1"/></svg>`,
+        'calm-box': `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4v4a4 4 0 0 0 4 4 4 4 0 0 0 4-4V6a4 4 0 0 0-4-4z"/><path d="M12 18v-6"/><path d="M8 10s2-1 4-1 4 1 4 1"/><path d="M12 18c-3.3 0-5-1.5-5-4v0c0-2.5 1.7-4 5-4s5 1.5 5 4v0c0 2.5-1.7 4-5 4z"/></svg>`
+      };
+      return icons[id] || `<span style="font-size:2.2rem">${PLANS.find(p=>p.id===id)?.emoji||'📦'}</span>`;
+    }
+
     function renderPlans() {
       grid.innerHTML = PLANS.map(p => {
         const monthly = p.price;
@@ -207,7 +217,7 @@
         const from = p.id === 'food-club';
         return `
           <article class="plan-card ${isFeatured ? 'featured' : ''}" data-id="${p.id}">
-            <div class="plan-image ${p.id}">${p.emoji}</div>
+            <div class="plan-image ${p.id}">${planIcon(p.id)}</div>
             ${isFeatured ? '<span class="badge">Most popular</span>' : ''}
             <div class="plan-body">
               <span class="plan-tagline">${p.tagline}</span>
@@ -249,11 +259,12 @@
 
     function renderCategories() {
       categoriesContainer.innerHTML = BYO_CATEGORIES.map(c => {
-        const checked = selectedCategories.has(c.id) ? 'checked' : '';
+        const checked = selectedCategories.has(c.id);
         return `
-          <div class="category ${checked ? 'selected' : ''}" onclick="toggleCategory('${c.id}', this)">
-            <input type="checkbox" id="cat-${c.id}" ${checked} onchange="toggleCategory('${c.id}', this)" style="display:none;">
+          <div class="category ${checked ? 'selected' : ''}" onclick="toggleCategory('${c.id}', this)" role="checkbox" aria-checked="${checked}">
+            <input type="checkbox" id="cat-${c.id}" ${checked ? 'checked' : ''} onchange="toggleCategory('${c.id}', this)" style="display:none;" aria-hidden="true">
             <span class="cat-icon">${c.emoji}</span>
+            ${checked ? '<span class="cat-check">✓</span>' : ''}
             <span class="cat-name">${c.name}</span>
             <span class="cat-desc">${c.desc}</span>
           </div>
@@ -261,7 +272,7 @@
       }).join('');
       const n = selectedCategories.size;
       byoCount.textContent = n + ' category' + (n !== 1 ? 'ies' : '') + ' selected';
-      byoCount.style.color = (n >= 2 && n <= 3) ? 'var(--success)' : 'var(--brand-dark)';
+      byoCount.style.color = (n >= 2 && n <= 4) ? 'var(--success)' : 'var(--brand-dark)';
       byoCount.style.fontWeight = '700';
     }
 
@@ -270,8 +281,8 @@
       if (selectedCategories.has(id)) {
         selectedCategories.delete(id);
       } else {
-        if (selectedCategories.size >= 3) {
-          formError.textContent = 'You can select at most 3 categories.';
+        if (selectedCategories.size >= 4) {
+          formError.textContent = 'You can select at most 4 categories.';
           formError.style.display = 'block';
           setTimeout(() => formError.style.display = 'none', 2500);
           return;
@@ -305,12 +316,12 @@
         planType = 'curated';
         items = [{ plan: selectedPlanId, name: plan.name, price: frequency === 'yearly' ? yearlyPrice(plan.price) : plan.price }];
         total = items[0].price;
-      } else if (selectedCategories.size >= 2 && selectedCategories.size <= 3) {
+      } else if (selectedCategories.size >= 2 && selectedCategories.size <= 4) {
         planType = 'build-your-own';
         items = [{ plan: 'build-your-own', name: 'Build Your Own Box', categories: [...selectedCategories], price: frequency === 'yearly' ? yearlyPrice(BYO_PRICE) : BYO_PRICE }];
         total = items[0].price;
       } else {
-        formError.textContent = 'Please choose a plan, or select 2–3 categories for Build Your Own.';
+        formError.textContent = 'Please choose a plan, or select 2–4 categories for Build Your Own.';
         formError.style.display = 'block';
         subscribeBtn.textContent = 'Start Subscription';
         subscribeBtn.disabled = false;
@@ -356,6 +367,7 @@
         const result = await res.json();
         if (!res.ok || !result.ok) throw new Error(result.error || 'Subscription failed');
 
+        const chosenCategories = [...selectedCategories];
         form.reset();
         selectedPlanId = null;
         selectedCategories.clear();
@@ -371,7 +383,7 @@
             <p>Thank you ${data.customerName}. Your ${frequency} ${planType} subscription is confirmed.</p>
             <div class="order-summary">
               <div class="row"><span>Plan</span><span>${planType === 'curated' ? plan.name : 'Build Your Own Box'}</span></div>
-              ${planType === 'build-your-own' ? `<div class="row"><span>Categories</span><span>${[...selectedCategories].map(c => BYO_CATEGORIES.find(x => x.id === c).name).join(', ')}</span></div>` : ''}
+              ${planType === 'build-your-own' ? `<div class="row"><span>Categories</span><span>${chosenCategories.map(c => BYO_CATEGORIES.find(x => x.id === c).name).join(', ')}</span></div>` : ''}
               <div class="row"><span>Frequency</span><span>${frequency.charAt(0).toUpperCase() + frequency.slice(1)}</span></div>
               <div class="row"><span>Total</span><span>₹${total.toLocaleString()}</span></div>
               <div class="row"><span>Dog</span><span>${data.dogName} (${data.dogBreed}, ${data.dogSize})</span></div>
