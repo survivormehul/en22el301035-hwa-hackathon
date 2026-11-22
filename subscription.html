@@ -108,6 +108,10 @@
                   <option value="Pug">Pug</option>
                   <option value="Other">Other</option>
                 </select>
+                <div id="other-breed-field" style="display: none; margin-top: 8px;">
+                  <label>Please specify breed <span style="color:#d32f2f">*</span></label>
+                  <input type="text" name="dogBreedOther" placeholder="Enter your dog's breed" pattern="[A-Za-z\s]+" title="Please enter only alphabetic characters and spaces">
+                </div>
               </div>
               <div class="form-field">
                 <label>Age (years) <span style="color:#d32f2f">*</span></label>
@@ -298,6 +302,18 @@
     toggleMonthly.addEventListener('click', () => { frequency = 'monthly'; toggleMonthly.classList.add('active'); toggleYearly.classList.remove('active'); renderPlans(); updateByo(); document.getElementById('build-your-own-section').style.display = 'block'; });
     toggleYearly.addEventListener('click', () => { frequency = 'yearly'; toggleYearly.classList.add('active'); toggleMonthly.classList.remove('active'); renderPlans(); updateByo(); document.getElementById('build-your-own-section').style.display = 'none'; selectedCategories.clear(); renderCategories(); });
 
+    const breedSelect = document.querySelector('select[name="dogBreed"]');
+    const otherBreedField = document.getElementById('other-breed-field');
+    breedSelect.addEventListener('change', () => {
+      if (breedSelect.value === 'Other') {
+        otherBreedField.style.display = 'block';
+        otherBreedField.querySelector('input').required = true;
+      } else {
+        otherBreedField.style.display = 'none';
+        otherBreedField.querySelector('input').required = false;
+      }
+    });
+
     function updateByo() {
       const price = frequency === 'yearly' ? yearlyPrice(BYO_PRICE) : BYO_PRICE;
       const period = frequency === 'yearly' ? '/year' : '/month';
@@ -379,6 +395,24 @@
         subscribeBtn.textContent = 'Start Subscription';
         subscribeBtn.disabled = false;
         return;
+      }
+
+      // Validate breed: when "Other" is selected, the custom breed field is required
+      if (data.dogBreed === 'Other') {
+        if (!data.dogBreedOther) {
+          formError.textContent = 'Please specify the breed when "Other" is selected.';
+          formError.style.display = 'block';
+          subscribeBtn.textContent = 'Start Subscription';
+          subscribeBtn.disabled = false;
+          return;
+        }
+        if (!/^[A-Za-z\s]+$/.test(data.dogBreedOther)) {
+          formError.textContent = 'Breed should contain only alphabetic characters and spaces.';
+          formError.style.display = 'block';
+          subscribeBtn.textContent = 'Start Subscription';
+          subscribeBtn.disabled = false;
+          return;
+        }
       }
 
       // Validate age: only numeric digits
