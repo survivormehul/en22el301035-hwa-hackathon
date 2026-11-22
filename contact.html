@@ -80,7 +80,7 @@
     const btn = document.getElementById('contact-btn');
     const error = document.getElementById('contact-error');
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       error.textContent = '';
       error.style.display = 'none';
@@ -90,12 +90,25 @@
       const formData = new FormData(form);
       const data = Object.fromEntries(formData.entries());
 
-      setTimeout(() => {
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok || !result.ok) throw new Error(result.error || 'Could not send message');
+
         form.reset();
         btn.textContent = 'Message Sent ✓';
         btn.disabled = false;
         setTimeout(() => { btn.textContent = 'Send Message'; }, 2000);
-      }, 800);
+      } catch (err) {
+        error.textContent = err.message || 'Could not send message. Try again.';
+        error.style.display = 'block';
+        btn.textContent = 'Send Message';
+        btn.disabled = false;
+      }
     });
   </script>
 </body>
