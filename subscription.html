@@ -44,7 +44,7 @@
     </div>
   </section>
 
-  <section class="profile">
+  <section class="profile" id="profile">
     <div class="container">
       <div class="profile-card">
         <form id="subscribe-form">
@@ -141,10 +141,34 @@
 
   <script>
     const PLANS = [
-      { id: 'happy-box', name: 'Happy Box', price: 1999, desc: 'Our flagship curated enrichment box — toys, treats and puzzles for a happy pup.', features: ['Curated monthly box', 'Toys, treats & puzzles', 'Personalised to dog profile', 'Cancel anytime'] },
-      { id: 'food-club', name: 'The Food Club', price: 1499, desc: 'Vet-approved treats and chews delivered monthly. From ₹1,499.', features: ['Premium treats & chews', 'Vet-approved', 'Personalised to dog profile', 'Cancel anytime'] },
-      { id: 'style-club', name: 'The Style Club', price: 999, desc: 'Clothing and accessories for your dog, curated monthly.', features: ['Clothing & accessories', 'Size-matched to your dog', 'Personalised to dog profile', 'Cancel anytime'] },
-      { id: 'calm-box', name: 'The Calm Box', price: 1499, desc: 'Soothing toys and enrichment for anxious or senior dogs.', features: ['Calming toys & puzzles', 'Senior-friendly options', 'Personalised to dog profile', 'Cancel anytime'] }
+      {
+        id: 'happy-box', name: 'Happy Box', emoji: '🎁', price: 1999,
+        tagline: 'Flagship curation',
+        desc: 'Our most-loved monthly box — a hand-picked mix of toys, treats and puzzles that keeps your dog happily occupied.',
+        benefits: ['Curated monthly enrichment box', 'Toys, treats & puzzles in every box', 'Personalised to your dog\\'s profile', 'Skip, pause or cancel anytime'],
+        experience: 'A surprise-filled celebration every month that turns routine into tail-wagging excitement.'
+      },
+      {
+        id: 'food-club', name: 'The Food Club', emoji: '🍖', price: 1499,
+        tagline: 'Nourishment that tails wag for',
+        desc: 'Vet-approved treats and chews delivered monthly. Pricing starts at ₹1,499 and can vary depending on the offering you select.',
+        benefits: ['Vet-approved treats & chews', 'Rotating flavours and textures', 'Size-appropriate portions', 'Tailored to diet and allergies'],
+        experience: 'A monthly food curation matched to your dog\\'s taste, size and dietary needs.'
+      },
+      {
+        id: 'style-club', name: 'The Style Club', emoji: '🧥', price: 999,
+        tagline: 'Dress up the delight',
+        desc: 'Clothing and accessories curated monthly to match your dog\\'s size and the season.',
+        benefits: ['Clothing & accessories every month', 'Size-matched to your dog', 'Seasonal themes and colours', 'Personalised to measurements'],
+        experience: 'A styled pick every month so your dog steps out looking and feeling their best.'
+      },
+      {
+        id: 'calm-box', name: 'The Calm Box', emoji: '🌿', price: 1499,
+        tagline: 'Peace for paws and minds',
+        desc: 'Soothing toys and gentle enrichment for anxious, senior or restful dogs who need calm stimulation.',
+        benefits: ['Calming toys and puzzles', 'Senior- and anxiety-friendly', 'Gentle, low-arousal enrichment', 'Personalised to temperament'],
+        experience: 'A soothing monthly box that helps anxious or older dogs feel safe, settled and content.'
+      }
     ];
 
     const BYO_CATEGORIES = [
@@ -175,20 +199,31 @@
       grid.innerHTML = PLANS.map(p => {
         const monthly = p.price;
         const yearly = yearlyPrice(monthly);
-        const price = frequency === 'yearly' ? yearly : monthly;
-        const period = frequency === 'yearly' ? '/year' : '/month';
+        const showYearly = frequency === 'yearly';
+        const price = showYearly ? yearly : monthly;
+        const period = showYearly ? '/year' : '/month';
+        const alt = showYearly ? `₹${monthly.toLocaleString()}/mo billed annually` : `₹${yearly.toLocaleString()}/yr billed upfront`;
         const isFeatured = p.id === 'happy-box';
+        const from = p.id === 'food-club';
         return `
           <article class="plan-card ${isFeatured ? 'featured' : ''}" data-id="${p.id}">
+            <div class="plan-image ${p.id}">${p.emoji}</div>
             ${isFeatured ? '<span class="badge">Most popular</span>' : ''}
-            <div class="plan-header">
-              <div class="plan-name">${p.name}</div>
-              <div class="plan-price">₹${price.toLocaleString()}</div>
-              <div class="plan-period">${period}</div>
+            <div class="plan-body">
+              <span class="plan-tagline">${p.tagline}</span>
+              <div class="plan-header">
+                <div class="plan-name">${p.name}${from ? ' <span style="font-size:0.8rem;color:var(--muted);font-weight:600">from</span>' : ''}</div>
+              </div>
+              <div class="plan-price-wrap">
+                <div class="plan-price">₹${price.toLocaleString()}</div>
+                <div class="plan-period">${period}</div>
+              </div>
+              <div class="plan-yearly">${alt}</div>
+              <div class="plan-desc">${p.desc}</div>
+              <div class="plan-experience">${p.experience}</div>
+              <ul class="plan-benefits">${p.benefits.map(b => `<li>${b}</li>`).join('')}</ul>
+              <button type="button" class="btn btn-primary plan-choose" onclick="selectPlan('${p.id}')">Choose ${p.name}</button>
             </div>
-            <div class="plan-desc">${p.desc}</div>
-            <ul class="plan-features">${p.features.map(f => `<li>${f}</li>`).join('')}</ul>
-            <button type="button" class="btn btn-primary plan-btn" onclick="selectPlan('${p.id}')">Choose ${p.name}</button>
           </article>
         `;
       }).join('');
@@ -197,9 +232,10 @@
     window.selectPlan = function(id) {
       selectedPlanId = id;
       document.querySelectorAll('.plan-card').forEach(c => {
-        c.style.borderColor = c.dataset.id === id ? 'var(--brand)' : 'var(--line)';
-        c.style.background = c.dataset.id === id ? '#eef6fb' : '#fff';
+        c.classList.toggle('selected', c.dataset.id === id);
       });
+      const section = document.getElementById('profile');
+      if (section) section.scrollIntoView({ behavior: 'smooth' });
     };
 
     toggleMonthly.addEventListener('click', () => { frequency = 'monthly'; toggleMonthly.classList.add('active'); toggleYearly.classList.remove('active'); renderPlans(); updateByo(); });
