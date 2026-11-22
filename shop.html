@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop | Happy While Away</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
+      <nav class="main-nav">
+        <a href="shop.html">Shop</a>
+        <a href="subscription.html">Subscription</a>
+        <a href="cart.html" class="nav-cart" id="nav-cart">Cart <span id="cart-count">0</span></a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Open menu">&#9776;</button>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <h1>Shop</h1>
+      <p>One-off enrichment boxes, treats and toys — no subscription needed.</p>
+    </div>
+  </section>
+
+  <section class="shop-section">
+    <div class="container">
+      <div id="product-grid"></div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="container cta-inner">
+      <h2>Prefer a regular delivery?</h2>
+      <p>Get a fresh enrichment box every month with our subscription.</p>
+      <a href="subscription.html" class="btn btn-outline btn-large">View Subscription Plans</a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
+        <p>Premium dog enrichment, delivered regularly.</p>
+      </div>
+      <div class="footer-links">
+        <div><a href="shop.html">Shop</a></div>
+        <div><a href="subscription.html">Subscription</a></div>
+        <div><a href="cart.html">Cart</a></div>
+        <div><a href="#">Contact</a></div>
+      </div>
+      <div class="footer-copy">
+        <p>&copy; 2026 Happy While Away. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const products = [
+      { id: 'p1', name: 'Puzzle Starter Box', emoji: '🧩', color: '#e3f2fd', desc: 'Introductory puzzle toys for curious minds.', price: 899.00 },
+      { id: 'p2', name: 'Chew Delight Pack', emoji: '🦴', color: '#fff3e0', desc: 'Long-lasting natural chews for happy jaws.', price: 649.00 },
+      { id: 'p3', name: 'Treat Assortment', emoji: '🍪', color: '#fce4ec', desc: 'Vet-approved baked treats in assorted flavours.', price: 549.00 },
+      { id: 'p4', name: 'Tug & Play Set', emoji: '🪢', color: '#e8f5e9', desc: 'Rope toys for interactive play with your dog.', price: 749.00 },
+      { id: 'p5', name: 'Snuffle Mat', emoji: '🌿', color: '#f1f8e9', desc: 'Forage mat that slows eating and engages the nose.', price: 799.00 },
+      { id: 'p6', name: 'Senior Comfort Box', emoji: '🛏️', color: '#f3e5f5', desc: 'Gentle toys and soft treats for older dogs.', price: 849.00 }
+    ];
+  </script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initShop(products);
+    });
+  </script>
+</body>
+</html>

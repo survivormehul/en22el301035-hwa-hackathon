@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscription | Happy While Away</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
+      <nav class="main-nav">
+        <a href="shop.html">Shop</a>
+        <a href="subscription.html">Subscription</a>
+        <a href="cart.html" class="nav-cart" id="nav-cart">Cart <span id="cart-count">0</span></a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Open menu">&#9776;</button>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <h1>Subscription</h1>
+      <p>A fresh enrichment box, delivered to your door every month.</p>
+    </div>
+  </section>
+
+  <section class="plans">
+    <div class="container">
+      <div class="plan-grid" id="plan-grid"></div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
+        <p>Premium dog enrichment, delivered regularly.</p>
+      </div>
+      <div class="footer-links">
+        <div><a href="shop.html">Shop</a></div>
+        <div><a href="subscription.html">Subscription</a></div>
+        <div><a href="cart.html">Cart</a></div>
+        <div><a href="#">Contact</a></div>
+      </div>
+      <div class="footer-copy">
+        <p>&copy; 2026 Happy While Away. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const plans = [
+      { id: 'plan1', name: 'Monthly Box', emoji: '📦', color: '#e3f2fd', price: 999, desc: 'One enrichment box every month. Cancel anytime.', period: '/mo', btn: 'Start Monthly' },
+      { id: 'plan2', name: '3-Month Prepaid', emoji: '📦', color: '#fff3e0', price: 2699, desc: 'Three boxes delivered quarterly. Save ₹298.', period: '/3 mo', btn: 'Start 3-Month' },
+      { id: 'plan3', name: '6-Month Prepaid', emoji: '📦', color: '#fce4ec', price: 4999, desc: 'Six boxes delivered twice a year. Save ₹995.', period: '/6 mo', btn: 'Start 6-Month' }
+    ];
+  </script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('plan-grid');
+      grid.innerHTML = plans.map(p => `
+        <article class="product-card plan-card">
+          <div class="product-image" style="background:${p.color}">${p.emoji}</div>
+          <div class="product-info">
+            <h3 class="product-title">${p.name}</h3>
+            <p class="product-desc">${p.desc}</p>
+            <div class="product-price"><strong>₹${p.price}</strong> <span style="font-size:0.9rem;opacity:0.8">${p.period}</span></div>
+            <button class="btn btn-primary add-to-cart" data-id="${p.id}">${p.btn}</button>
+          </div>
+        </article>
+      `).join('');
+      grid.querySelectorAll('.add-to-cart').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          const p = plans.find(x => x.id === id);
+          addToCart({ id: p.id, name: p.name, emoji: p.emoji, color: p.color, desc: p.desc, price: p.price });
+          btn.textContent = 'Added ✓';
+          setTimeout(() => btn.textContent = p.btn, 1200);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
