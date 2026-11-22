@@ -79,7 +79,7 @@
             <div class="form-grid">
               <div class="form-field">
                 <label>Dog's Name <span style="color:#d32f2f">*</span></label>
-                <input type="text" name="dogName" required placeholder="Buddy">
+                <input type="text" name="dogName" required placeholder="Buddy" pattern="[A-Za-z\s]+" maxlength="50" title="Please enter only alphabetic characters and spaces">
               </div>
               <div class="form-field">
                 <label>Breed <span style="color:#d32f2f">*</span></label>
@@ -348,6 +348,24 @@
         return;
       }
 
+      // Validate dog's name: only alphabetic characters and spaces
+      if (!/^[A-Za-z\s]+$/.test(data.dogName)) {
+        formError.textContent = "Dog's Name should contain only alphabetic characters and spaces.";
+        formError.style.display = 'block';
+        subscribeBtn.textContent = 'Start Subscription';
+        subscribeBtn.disabled = false;
+        return;
+      }
+
+      // Validate age: only numeric digits
+      if (!/^[0-9]+$/.test(data.dogAge)) {
+        formError.textContent = 'Age should contain only numeric digits.';
+        formError.style.display = 'block';
+        subscribeBtn.textContent = 'Start Subscription';
+        subscribeBtn.disabled = false;
+        return;
+      }
+
       // Validate pincode: exactly 6 numeric digits
       if (!/^[0-9]{6}$/.test(data.pincode)) {
         formError.textContent = 'Pincode must be exactly 6 numeric digits.';
@@ -356,8 +374,6 @@
         subscribeBtn.disabled = false;
         return;
       }
-
-      const plan = PLANS.find(p => p.id === selectedPlanId);
       let items = [];
       let planType = '';
       let total = 0;
