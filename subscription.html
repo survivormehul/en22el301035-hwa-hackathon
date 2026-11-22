@@ -61,7 +61,7 @@
               </div>
               <div class="form-field">
                 <label>Phone <span style="color:#d32f2f">*</span></label>
-                <input type="tel" name="customerPhone" required placeholder="+91 98765 43210" pattern="[0-9]+" maxlength="15" title="Please enter only numeric digits">
+                <input type="tel" name="customerPhone" required placeholder="+91 98765 43210" pattern="[0-9]{10}" minlength="10" maxlength="10" title="Please enter exactly 10 numeric digits">
               </div>
               <div class="form-field full">
                 <label>Address <span style="color:#d32f2f">*</span></label>
@@ -339,9 +339,9 @@
         return;
       }
 
-      // Validate phone: only numeric digits
-      if (!/^[0-9]+$/.test(data.customerPhone)) {
-        formError.textContent = 'Phone number should contain only numeric digits.';
+      // Validate phone: exactly 10 numeric digits
+      if (!/^[0-9]{10}$/.test(data.customerPhone)) {
+        formError.textContent = 'Phone number must be exactly 10 numeric digits.';
         formError.style.display = 'block';
         subscribeBtn.textContent = 'Start Subscription';
         subscribeBtn.disabled = false;
