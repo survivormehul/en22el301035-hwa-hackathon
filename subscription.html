@@ -194,8 +194,8 @@
     const subscribeBtn = document.getElementById('subscribe-btn');
 
     function yearlyPrice(planId, monthly) {
-      const twelveX = ['happy-box', 'food-club', 'style-club', 'calm-box'].includes(planId);
-      return Math.round(monthly * (twelveX ? 12 : 10));
+      // Discounted yearly price = monthly × 10 (2 months free equivalent)
+      return Math.round(monthly * 10);
     }
 
     function planIcon(id) {
@@ -215,9 +215,16 @@
         const showYearly = frequency === 'yearly';
         const price = showYearly ? yearly : monthly;
         const period = showYearly ? '/year' : '/month';
-        const alt = showYearly ? `₹${monthly.toLocaleString()}/mo billed annually` : `₹${yearly.toLocaleString()}/yr billed upfront`;
+        const alt = showYearly ? `₹${yearly.toLocaleString()}/yr billed upfront` : `₹${monthly.toLocaleString()}/mo`;
         const isFeatured = p.id === 'happy-box';
         const from = p.id === 'food-club';
+        const discountEligible = ['happy-box', 'food-club', 'style-club', 'calm-box'].includes(p.id);
+        const monthly12 = monthly * 12;
+        const discountAmount = monthly12 - yearly;
+        const discountPercent = Math.round((discountAmount / monthly12) * 100);
+        const savingHtml = showYearly && discountEligible
+          ? `<div class="plan-saving">Save ₹${discountAmount.toLocaleString()} (${discountPercent}%) vs paying monthly for 12 months</div>`
+          : '';
         return `
           <article class="plan-card ${isFeatured ? 'featured' : ''}" data-id="${p.id}">
             <div class="plan-image ${p.id}">${planIcon(p.id)}</div>
@@ -232,6 +239,7 @@
                 <div class="plan-period">${period}</div>
               </div>
               <div class="plan-yearly">${alt}</div>
+              ${savingHtml}
               <div class="plan-desc">${p.desc}</div>
               <div class="plan-experience">${p.experience}</div>
               <ul class="plan-benefits">${p.benefits.map(b => `<li>${b}</li>`).join('')}</ul>
