@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | Happy While Away</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
+      <a href="subscription.html" class="btn btn-outline">Subscribe</a>
+    </div>
+  </header>
+
+  <section class="sub-hero">
+    <div class="container">
+      <h1>Get in Touch</h1>
+      <p>Have a question about your dog's enrichment box? We're here to help.</p>
+    </div>
+  </section>
+
+  <section class="contact-page" style="padding: 64px 0;">
+    <div class="container">
+      <div class="contact-layout">
+        <div class="contact-info">
+          <div class="info-card">
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--ink); margin-bottom: 20px;">Reach Us</h2>
+            <p class="contact-line" style="margin-bottom: 14px;"><strong>📞 Dummy Mobile Number:</strong> +91 90000 00000</p>
+            <p class="contact-line" style="margin-bottom: 14px;"><strong>✉️ Dummy Email Address:</strong> support@happywhileaway.example</p>
+            <p style="color: var(--muted); font-size: 0.95rem;">We respond to every message within 24 hours. Your dog's happiness is our priority.</p>
+          </div>
+        </div>
+        <div class="contact-form-wrap">
+          <div class="profile-card">
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--ink); margin-bottom: 20px;">Send Us a Message</h2>
+            <form id="contact-form" novalidate>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label>Full Name <span style="color:#d32f2f">*</span></label>
+                  <input type="text" name="name" required placeholder="Rohan Sharma">
+                </div>
+                <div class="form-field">
+                  <label>Mobile Number <span style="color:#d32f2f">*</span></label>
+                  <input type="tel" name="mobile" required placeholder="+91 98765 43210">
+                </div>
+                <div class="form-field">
+                  <label>Email Address <span style="color:#d32f2f">*</span></label>
+                  <input type="email" name="email" required placeholder="rohan@example.com">
+                </div>
+                <div class="form-field full">
+                  <label>Your Concern <span style="color:#d32f2f">*</span></label>
+                  <textarea name="concern" required rows="4" placeholder="Tell us how we can help you and your dog..."></textarea>
+                </div>
+              </div>
+              <div id="contact-error" class="error-msg" style="margin-top: 10px;"></div>
+              <button type="submit" class="btn btn-primary btn-large" id="contact-btn">Send Message</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
+        <p>Premium dog enrichment, delivered regularly.</p>
+      </div>
+      <div class="footer-copy">
+        <p>&copy; 2026 Happy While Away. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById('contact-form');
+    const btn = document.getElementById('contact-btn');
+    const error = document.getElementById('contact-error');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      error.textContent = '';
+      error.style.display = 'none';
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      setTimeout(() => {
+        form.reset();
+        btn.textContent = 'Message Sent ✓';
+        btn.disabled = false;
+        setTimeout(() => { btn.textContent = 'Send Message'; }, 2000);
+      }, 800);
+    });
+  </script>
+</body>
+</html>

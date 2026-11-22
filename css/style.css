@@ -112,6 +112,9 @@ a { color: inherit; text-decoration: none; }
 /* Profile form */
 .profile { padding: 64px 0; }
 .profile-card { max-width: 700px; margin: 0 auto; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); }
+.contact-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.info-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 26px; box-shadow: var(--shadow); }
+.contact-line { font-size: 1rem; color: var(--ink); }
 .form-section { margin-bottom: 28px; }
 .form-section h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 16px; color: var(--ink); display: flex; align-items: center; gap: 8px; }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
@@ -139,6 +142,7 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 768px) {
   .hero h1 { font-size: 2rem; }
   .plan-grid { grid-template-columns: 1fr; }
+  .contact-layout { grid-template-columns: 1fr; }
   .footer-inner { grid-template-columns: 1fr; gap: 28px; text-align: center; }
   .footer-brand { text-align: center; }
 }
