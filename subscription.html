@@ -194,7 +194,7 @@
     const subscribeBtn = document.getElementById('subscribe-btn');
 
     function yearlyPrice(planId, monthly) {
-      const twelveX = ['happy-box', 'food-club', 'style-club'].includes(planId);
+      const twelveX = ['happy-box', 'food-club', 'style-club', 'calm-box'].includes(planId);
       return Math.round(monthly * (twelveX ? 12 : 10));
     }
 
