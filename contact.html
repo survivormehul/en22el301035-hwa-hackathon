@@ -3,113 +3,176 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact Us | Happy While Away</title>
+  <meta name="theme-color" content="#fbf6ee">
+  <meta name="description" content="Contact Happy While Away about dog enrichment subscriptions, orders or delivery.">
+  <title>Contact | Happy While Away</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/cart.js"></script>
+  <script src="js/ui.js" defer></script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
-      <a href="subscription.html" class="btn btn-outline">Subscribe</a>
+      <a class="brand" href="index.html" aria-label="Happy While Away home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+        <span class="brand-text">Happy <em>While Away</em></span>
+      </a>
+      <nav class="main-nav" id="mainNav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="products.html">Boxes</a>
+        <a href="subscription.html">Plans</a>
+        <a href="account.html">My account</a>
+        <a href="contact.html" class="active">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <button class="cart-open-btn" id="cartOpenBtn" type="button" aria-label="Open shopping cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1.2 10.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+          <span class="cart-label">Cart</span>
+          <span class="cart-badge" id="hwaCartBadge">0</span>
+        </button>
+        <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Open menu"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </header>
 
-  <section class="sub-hero">
-    <div class="container">
-      <h1>Get in Touch</h1>
-      <p>Have a question about your dog's enrichment box? We're here to help.</p>
-    </div>
-  </section>
-
-  <section class="contact-page" style="padding: 64px 0;">
-    <div class="container">
-      <div class="contact-layout">
-        <div class="contact-info">
-          <div class="info-card">
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--ink); margin-bottom: 20px;">Reach Us</h2>
-<p class="contact-line" style="margin-bottom: 14px;"><strong>📞 Mobile Number:</strong> +91 90000 00000</p>
-<p class="contact-line" style="margin-bottom: 14px;"><strong>✉️ Email Address:</strong> support@happywhileaway.example</p>
-            <p style="color: var(--muted); font-size: 0.95rem;">We respond to every message within 24 hours. Your dog's happiness is our priority.</p>
-          </div>
+  <main id="main">
+    <section class="page-hero page-hero-contact">
+      <div class="container page-hero-inner">
+        <div class="page-hero-copy">
+          <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> Say hello</span>
+          <h1>Let's talk about your dog.</h1>
+          <p>Questions about a box, a delivery or a subscription? Send us a note and we will point you in the right direction.</p>
         </div>
+      </div>
+    </section>
+
+    <section class="section contact-section">
+      <div class="container contact-layout">
+        <aside class="contact-info">
+          <div class="info-card">
+            <span class="info-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg></span>
+            <h2>Reach us</h2>
+            <p class="contact-line"><strong>Email</strong><span>support@happywhileaway.example</span></p>
+            <p class="contact-line"><strong>Phone</strong><span>+91 90000 00000</span></p>
+            <p class="info-note">These are demo contact details. This storefront records messages through its contact endpoint, but no real support inbox is connected and no reply will be sent.</p>
+          </div>
+          <div class="info-card info-card-soft">
+            <h3>Quick answers</h3>
+            <p>Payments and OTP checks are simulated, orders are created with payment pending, and every box is a subscription.</p>
+            <a class="text-link" href="subscription.html#faq">Read the FAQs <span aria-hidden="true">&rarr;</span></a>
+          </div>
+          <div class="contact-doodle" aria-hidden="true">
+            <svg viewBox="0 0 240 140" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M48 74c0-21 16-38 37-38s37 17 37 38v18c0 18-15 33-33 33h-8c-18 0-33-15-33-33V74z"/>
+              <circle cx="72" cy="76" r="2.6" fill="currentColor" stroke="none"/>
+              <circle cx="98" cy="76" r="2.6" fill="currentColor" stroke="none"/>
+              <path d="M81 88c3 4 6 5 9 1"/>
+              <path d="M62 61c5-7 15-9 22-4"/>
+              <path d="M148 64c18-8 36 1 42 18 5 15-3 31-18 37"/>
+              <path d="M183 106c8 2 16 0 22-6"/>
+              <circle cx="205" cy="52" r="7"/>
+              <path d="M30 110l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+        </aside>
+
         <div class="contact-form-wrap">
           <div class="profile-card">
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--ink); margin-bottom: 20px;">Send Us a Message</h2>
+            <span class="eyebrow">Send a note</span>
+            <h2>How can we help?</h2>
             <form id="contact-form" novalidate>
               <div class="form-grid">
                 <div class="form-field">
-                  <label>Full Name <span style="color:#d32f2f">*</span></label>
-                  <input type="text" name="name" required placeholder="Rohan Sharma">
+                  <label for="contactName">Full name</label>
+                  <input id="contactName" type="text" name="name" required placeholder="Rohan Sharma" autocomplete="name">
                 </div>
                 <div class="form-field">
-                  <label>Mobile Number <span style="color:#d32f2f">*</span></label>
-                  <input type="tel" name="mobile" required placeholder="+91 98765 43210">
-                </div>
-                <div class="form-field">
-                  <label>Email Address <span style="color:#d32f2f">*</span></label>
-                  <input type="email" name="email" required placeholder="rohan@example.com">
+                  <label for="contactMobile">Mobile number</label>
+                  <input id="contactMobile" type="tel" name="mobile" required placeholder="9876543210" maxlength="10" inputmode="numeric" autocomplete="tel">
                 </div>
                 <div class="form-field full">
-                  <label>Your Concern <span style="color:#d32f2f">*</span></label>
-                  <textarea name="concern" required rows="4" placeholder="Tell us how we can help you and your dog..."></textarea>
+                  <label for="contactEmail">Email address</label>
+                  <input id="contactEmail" type="email" name="email" required placeholder="rohan@example.com" autocomplete="email">
+                </div>
+                <div class="form-field full">
+                  <label for="contactConcern">Your question</label>
+                  <textarea id="contactConcern" name="concern" required rows="5" placeholder="Tell us about your dog and how we can help..."></textarea>
                 </div>
               </div>
-              <div id="contact-error" class="error-msg" style="margin-top: 10px;"></div>
-              <button type="submit" class="btn btn-primary btn-large" id="contact-btn">Send Message</button>
+              <div class="error-msg" id="contact-error" style="display:none;"></div>
+              <div class="success-msg" id="contact-success" style="display:none;"></div>
+              <button type="submit" class="btn btn-primary btn-large" id="contact-btn">Send message</button>
+              <p class="hint">Demo form: your message is saved through the contact endpoint. No real support inbox is connected.</p>
             </form>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <footer class="site-footer">
-    <div class="container footer-inner">
+    <div class="container footer-grid">
       <div class="footer-brand">
-        <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
-        <p>Premium dog enrichment, delivered regularly.</p>
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+          <span class="brand-text">Happy <em>While Away</em></span>
+        </a>
+        <p>Thoughtful enrichment boxes for good dogs and the people who love them.</p>
+        <p class="footer-note">Demo storefront. Payments, OTP checks and email notifications are simulated; orders are created with payment pending.</p>
       </div>
-      <div class="footer-copy">
-        <p>&copy; 2026 Happy While Away. All rights reserved.</p>
-      </div>
+      <div class="footer-col"><h4>Shop</h4><a href="products.html">All boxes</a><a href="subscription.html">Plans &amp; pricing</a><a href="product.html?id=build-your-own">Build your own</a></div>
+      <div class="footer-col"><h4>Account</h4><a href="account.html">My account</a><a href="subscriptions.html">Manage subscriptions</a><a href="checkout.html">Checkout</a></div>
+      <div class="footer-col"><h4>Help</h4><a href="contact.html">Contact us</a><a href="subscription.html#faq">FAQs</a><a href="contact.html">Shipping questions</a></div>
     </div>
+    <div class="container footer-bottom"><p>&copy; 2026 Happy While Away. All rights reserved.</p><p>Made for wagging tails.</p></div>
   </footer>
 
   <script>
-    const form = document.getElementById('contact-form');
-    const btn = document.getElementById('contact-btn');
-    const error = document.getElementById('contact-error');
+    (function () {
+      var form = document.getElementById("contact-form");
+      var btn = document.getElementById("contact-btn");
+      var error = document.getElementById("contact-error");
+      var success = document.getElementById("contact-success");
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      error.textContent = '';
-      error.style.display = 'none';
-      btn.textContent = 'Sending…';
-      btn.disabled = true;
-
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
-
-      try {
-        const res = await fetch('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        if (!res.ok || !result.ok) throw new Error(result.error || 'Could not send message');
-
-        form.reset();
-        btn.textContent = 'Message Sent ✓';
-        btn.disabled = false;
-        setTimeout(() => { btn.textContent = 'Send Message'; }, 2000);
-      } catch (err) {
-        error.textContent = err.message || 'Could not send message. Try again.';
-        error.style.display = 'block';
-        btn.textContent = 'Send Message';
-        btn.disabled = false;
+      function showError(message) {
+        error.textContent = message;
+        error.style.display = "block";
+        success.style.display = "none";
       }
-    });
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        error.style.display = "none";
+        var data = Object.fromEntries(new FormData(form).entries());
+        if (!/^[A-Za-z\s]{2,50}$/.test(String(data.name || "").trim())) { showError("Please enter a name using letters and spaces."); return; }
+        if (!/^[0-9]{10}$/.test(String(data.mobile || "").trim())) { showError("Please enter a 10-digit mobile number."); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.email || "").trim())) { showError("Please enter a valid email address."); return; }
+        if (String(data.concern || "").trim().length < 10) { showError("Please tell us a little more so we can help."); return; }
+
+        btn.textContent = "Sending...";
+        btn.disabled = true;
+        fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        })
+          .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+          .then(function (result) {
+            if (!result.ok || !result.json.ok) { throw new Error(result.json.error || "Could not send message"); }
+            form.reset();
+            success.textContent = "Your note was recorded in the demo contact log. No real inbox is connected, so this is not a live support request.";
+            success.style.display = "block";
+            btn.textContent = "Send message";
+            btn.disabled = false;
+          })
+          .catch(function (err) {
+            showError(err.message || "Could not send message. Please try again.");
+            btn.textContent = "Send message";
+            btn.disabled = false;
+          });
+      });
+    })();
   </script>
 </body>
 </html>

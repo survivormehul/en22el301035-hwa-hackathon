@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
     contacts.push(record);
     saveContacts();
 
-    res.status(200).json({ ok: true, message: 'Your message has been received. We will get back to you soon.' });
+    res.status(200).json({ ok: true, message: 'Message recorded in the demo contact log. No real support inbox is connected.' });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message || 'Server error' });
   }

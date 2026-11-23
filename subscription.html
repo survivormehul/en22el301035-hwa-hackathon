@@ -3,532 +3,264 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Subscription Plans | Happy While Away</title>
+  <meta name="theme-color" content="#fbf6ee">
+  <meta name="description" content="Compare Happy While Away dog enrichment subscription plans, choose monthly or yearly billing, or build your own box.">
+  <title>Plans &amp; Pricing | Happy While Away</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/cart.js"></script>
+  <script src="js/ui.js" defer></script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
-      <a href="subscription.html" class="btn btn-outline">Subscribe</a>
+      <a class="brand" href="index.html" aria-label="Happy While Away home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+        <span class="brand-text">Happy <em>While Away</em></span>
+      </a>
+      <nav class="main-nav" id="mainNav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="products.html">Boxes</a>
+        <a href="subscription.html" class="active">Plans</a>
+        <a href="account.html">My account</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <button class="cart-open-btn" id="cartOpenBtn" type="button" aria-label="Open shopping cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1.2 10.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+          <span class="cart-label">Cart</span>
+          <span class="cart-badge" id="hwaCartBadge">0</span>
+        </button>
+        <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Open menu"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </header>
 
-  <section class="sub-hero">
-    <div class="container">
-      <h1>Choose Your Subscription</h1>
-      <p>Premium dog enrichment delivered every month. Subscription only — no one-off sales.</p>
-    </div>
-  </section>
-
-  <section class="plans">
-    <div class="container">
-      <div class="plan-toggle">
-        <button type="button" id="toggle-monthly" class="active" data-freq="monthly">Monthly</button>
-        <button type="button" id="toggle-yearly" data-freq="yearly">Yearly</button>
+  <main id="main">
+    <section class="page-hero page-hero-plans">
+      <div class="container page-hero-inner">
+        <div class="page-hero-copy">
+          <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> Plans &amp; pricing</span>
+          <h1>One happy habit, every month.</h1>
+          <p>Choose a curated box or build your own. Every plan is a subscription, and every subscription is built around one very important dog.</p>
+        </div>
+        <div class="plans-summary">
+          <div><strong>5</strong><span>ways to happy</span></div>
+          <div><strong>2&ndash;3</strong><span>categories in BYO</span></div>
+          <div><strong>0</strong><span>lock-in contracts</span></div>
+        </div>
       </div>
-      <div class="plan-grid" id="plan-grid"></div>
-    </div>
-  </section>
+    </section>
 
-  <section class="build-your-own" id="build-your-own-section">
-    <div class="container">
-      <div class="byo-header">
-        <h2>Build Your Own Box</h2>
-        <p>₹3,499 fixed — pick your categories, we pick the surprise merchandise.</p>
+    <section class="section plans-section">
+      <div class="container">
+        <div class="billing-bar reveal">
+          <div class="plan-toggle" role="group" aria-label="Billing frequency">
+            <button type="button" id="toggle-monthly" class="active" data-freq="monthly">Monthly</button>
+            <button type="button" id="toggle-yearly" data-freq="yearly">Yearly</button>
+          </div>
+          <p class="billing-note" id="billingNote">Pay month by month. Switch billing in the cart any time before checkout.</p>
+        </div>
+        <div class="plan-grid" id="plan-grid"></div>
       </div>
-      <div class="byo-price" id="byo-price">₹3,499 <span class="byo-period" id="byo-period">/month</span></div>
-      <div class="byo-rules">Pick <strong>2 to 4</strong> categories you love. We curate the actual products as a surprise — you never choose individual items.</div>
-      <div id="byo-count" class="byo-count">0 categories selected</div>
-      <div class="categories" id="categories"></div>
-    </div>
-  </section>
+    </section>
 
-  <section class="profile" id="profile">
-    <div class="container">
-      <div class="profile-card">
-        <form id="subscribe-form">
-          <div class="form-section">
-            <h3>👤 Your Details</h3>
-            <div class="form-grid">
-              <div class="form-field">
-                <label>Full Name <span style="color:#d32f2f">*</span></label>
-                <input type="text" name="customerName" required placeholder="Rohan Sharma" pattern="[A-Za-z\s]+" maxlength="50" title="Please enter only alphabetic characters and spaces">
-              </div>
-              <div class="form-field">
-                <label>Email <span style="color:#d32f2f">*</span></label>
-                <input type="email" name="customerEmail" required placeholder="rohan@example.com">
-              </div>
-              <div class="form-field">
-                <label>Phone <span style="color:#d32f2f">*</span></label>
-                <input type="tel" name="customerPhone" required placeholder="+91 98765 43210" pattern="[0-9]{10}" minlength="10" maxlength="10" title="Please enter exactly 10 numeric digits">
-              </div>
-              <div class="form-field full">
-                <label>Address <span style="color:#d32f2f">*</span></label>
-                <input type="text" name="address" required placeholder="House no., street, locality, city">
-              </div>
-              <div class="form-field">
-                <label>Pincode <span style="color:#d32f2f">*</span></label>
-                <input type="text" name="pincode" required placeholder="400001" pattern="[0-9]{6}" minlength="6" maxlength="6" title="Please enter exactly 6 numeric digits">
-              </div>
+    <section class="section section-cream byo-section" id="build-your-own-section">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Make it theirs</span>
+          <h2>Build your own happy box</h2>
+          <p>Pick at least two of our three collections and we will curate the actual products as a surprise. Fixed at <span id="byo-price">&#8377;3499 <span class="byo-period" id="byo-period">/month</span></span>.</p>
+        </div>
+        <div class="byo-layout">
+          <div class="byo-picker">
+            <div id="categories" class="categories"></div>
+            <p class="byo-count" id="byo-count">0 categories selected</p>
+            <div class="byo-action">
+              <button type="button" class="btn btn-primary btn-large" id="byoAddBtn">Add your box to cart</button>
+              <p class="hint">Minimum two categories. Maximum three available; you can change your picks on future boxes.</p>
             </div>
+            <div class="error-msg" id="byoError" style="display:none;">Please select at least two categories.</div>
           </div>
-
-          <div class="form-section">
-            <h3>🐶 Your Dog's Profile</h3>
-            <div id="dog-profiles">
-              <div class="form-grid" id="dog-profile-grid">
-              <div class="form-field">
-                <label>Dog's Name <span style="color:#d32f2f">*</span></label>
-                <input type="text" name="dogName" required placeholder="Buddy" pattern="[A-Za-z\s]+" maxlength="50" title="Please enter only alphabetic characters and spaces">
-              </div>
-              <div class="form-field">
-                <label>Breed <span style="color:#d32f2f">*</span></label>
-                <select name="dogBreed" required>
-                  <option value="">Select breed</option>
-                  <option value="Labrador Retriever">Labrador Retriever</option>
-                  <option value="German Shepherd">German Shepherd</option>
-                  <option value="Golden Retriever">Golden Retriever</option>
-                  <option value="French Bulldog">French Bulldog</option>
-                  <option value="Bulldog">Bulldog</option>
-                  <option value="Poodle">Poodle</option>
-                  <option value="Beagle">Beagle</option>
-                  <option value="Rottweiler">Rottweiler</option>
-                  <option value="German Shorthaired Pointer">German Shorthaired Pointer</option>
-                  <option value="Dachshund">Dachshund</option>
-                  <option value="Pembroke Welsh Corgi">Pembroke Welsh Corgi</option>
-                  <option value="Australian Shepherd">Australian Shepherd</option>
-                  <option value="Yorkshire Terrier">Yorkshire Terrier</option>
-                  <option value="Boxer">Boxer</option>
-                  <option value="Siberian Husky">Siberian Husky</option>
-                  <option value="Shih Tzu">Shih Tzu</option>
-                  <option value="Chihuahua">Chihuahua</option>
-                  <option value="Great Dane">Great Dane</option>
-                  <option value="Doberman Pinscher">Doberman Pinscher</option>
-                  <option value="Miniature Schnauzer">Miniature Schnauzer</option>
-                  <option value="Pug">Pug</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div class="form-field" id="other-breed-field" style="display: none; margin-top: 8px;">
-                <label>Please specify breed <span style="color:#d32f2f">*</span></label>
-                <input type="text" name="dogBreedOther" placeholder="Enter your dog's breed" pattern="[A-Za-z\s]+" title="Please enter only alphabetic characters and spaces">
-              </div>
-              <div class="form-field">
-                <label>Age (years) <span style="color:#d32f2f">*</span></label>
-                <input type="number" name="dogAge" required min="0" max="25" placeholder="3">
-              </div>
-              <div class="form-field">
-                <label>Size <span style="color:#d32f2f">*</span></label>
-                <select name="dogSize" required>
-                  <option value="">Select size</option>
-                  <option value="small">Small</option>
-                  <option value="medium">Medium</option>
-                  <option value="large">Large</option>
-                </select>
-              </div>
-              <div class="form-field">
-                <label>Allergies (if any)</label>
-                <input type="text" name="dogAllergies" placeholder="e.g. chicken, grains">
-              </div>
-              <div class="form-field full">
-                <label>Preferences / Notes</label>
-                <textarea name="dogNotes" placeholder="Anything we should know about your dog?"></textarea>
-                <div class="hint">Helps us personalise each box.</div>
-              </div>
-              </div>
-            </div>
-
-          <button type="button" class="btn btn-outline" id="add-dog-btn" style="margin-top:16px;">+ Add Another Dog</button>
-          </div>
-
-          <div id="form-error" class="error-msg"></div>
-          <div class="submit-bar">
-            <button type="submit" class="btn btn-primary btn-large" id="subscribe-btn">Start Subscription</button>
-          </div>
-        </form>
+          <aside class="byo-side">
+            <span class="byo-side-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 18l16-8 16 8v16l-16 8-16-8V18z"/><path d="M8 18l16 8 16-8M24 26v16"/><path d="M16 14l16 8"/></svg></span>
+            <h3>Why build your own?</h3>
+            <p>Some dogs are toy people. Some are treat people. Some want both and a new bandana. Your box, your call - our curators handle the delightful details.</p>
+            <ul class="mini-list">
+              <li>Fixed subscription price</li>
+              <li>Surprise products, chosen for your dog</li>
+              <li>Monthly or yearly billing</li>
+            </ul>
+          </aside>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="cta-band">
-    <div class="container cta-inner">
-      <h2>Questions?</h2>
-      <p>Every box is built around your dog's profile. Surprise enrichment, every month.</p>
-      <a href="contact.html" class="btn btn-outline">Contact Us</a>
-    </div>
-  </section>
+    <section class="section how-section">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Simple by design</span>
+          <h2>From cart to doorstep</h2>
+        </div>
+        <div class="steps-grid">
+          <div class="step-card reveal"><span class="step-num">01</span><h3>Pick their plan</h3><p>Add a curated box or build your own. Set monthly or yearly billing in the cart.</p></div>
+          <div class="step-card reveal"><span class="step-num">02</span><h3>Share the details</h3><p>At checkout, add your dog's profile, delivery address and pincode for shipping.</p></div>
+          <div class="step-card reveal"><span class="step-num">03</span><h3>We confirm the start</h3><p>Your order is created with payment pending in this demo. No real payment or email is sent.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-cream" id="faq">
+      <div class="container faq-wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Good to know</span>
+          <h2>Questions, answered</h2>
+        </div>
+        <div class="faq-list reveal">
+          <details class="faq"><summary>Is this a one-off box or a subscription?</summary><p>Every box is a subscription. You choose monthly or yearly billing, and you can pause, resume or cancel from your account.</p></details>
+          <details class="faq"><summary>Can I change my box or billing frequency later?</summary><p>You can change quantity, dog assignment and delivery preferences. The box type and billing frequency stay locked after purchase to keep billing clear; yearly subscriptions can skip an upcoming delivery.</p></details>
+          <details class="faq"><summary>How is shipping calculated?</summary><p>Shipping is based on your delivery pincode with metro, standard and remote zones. The exact amount is shown at checkout before the order is placed.</p></details>
+          <details class="faq"><summary>Are payments, OTPs and emails real?</summary><p>No. This is a demo storefront. Verification codes are shown on screen, emails are recorded as simulated notifications, and every order is created with payment pending. No real charge is made.</p></details>
+          <details class="faq"><summary>Do you offer coupons?</summary><p>Yes - a first-order discount coupon and a free-delivery coupon are available at checkout. Both are demo coupons and one can be used at a time.</p></details>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <footer class="site-footer">
-    <div class="container footer-inner">
+    <div class="container footer-grid">
       <div class="footer-brand">
-        <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
-        <p>Premium dog enrichment, delivered regularly.</p>
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+          <span class="brand-text">Happy <em>While Away</em></span>
+        </a>
+        <p>Thoughtful enrichment boxes for good dogs and the people who love them.</p>
+        <p class="footer-note">Demo storefront. Payments, OTP checks and email notifications are simulated; orders are created with payment pending.</p>
       </div>
-      <div class="footer-copy">
-        <p>&copy; 2026 Happy While Away. All rights reserved.</p>
-      </div>
+      <div class="footer-col"><h4>Shop</h4><a href="products.html">All boxes</a><a href="subscription.html">Plans &amp; pricing</a><a href="product.html?id=build-your-own">Build your own</a></div>
+      <div class="footer-col"><h4>Account</h4><a href="account.html">My account</a><a href="subscriptions.html">Manage subscriptions</a><a href="checkout.html">Checkout</a></div>
+      <div class="footer-col"><h4>Help</h4><a href="contact.html">Contact us</a><a href="subscription.html#faq">FAQs</a><a href="contact.html">Shipping questions</a></div>
     </div>
+    <div class="container footer-bottom"><p>&copy; 2026 Happy While Away. All rights reserved.</p><p>Made for wagging tails.</p></div>
   </footer>
 
   <script>
-    const PLANS = [
-      {
-        id: 'happy-box', name: 'Happy Box', emoji: '🎁', price: 1999,
-        tagline: 'Flagship curation',
-        desc: 'Our most-loved monthly box — a hand-picked mix of toys, treats and puzzles that keeps your dog happily occupied.',
-        benefits: ['Curated monthly enrichment box', 'Toys, treats & puzzles in every box', 'Personalised to your dog\'s profile', 'Skip, pause or cancel anytime'],
-        experience: 'A surprise-filled celebration every month that turns routine into tail-wagging excitement.'
-      },
-      {
-        id: 'food-club', name: 'The Food Club', emoji: '🍖', price: 1499,
-        tagline: 'Nourishment that tails wag for',
-        desc: 'Vet-approved treats and chews delivered monthly. Pricing starts at ₹1,499 and can vary depending on the offering you select.',
-        benefits: ['Vet-approved treats & chews', 'Rotating flavours and textures', 'Size-appropriate portions', 'Tailored to diet and allergies'],
-        experience: 'A monthly food curation matched to your dog\'s taste, size and dietary needs.'
-      },
-      {
-        id: 'style-club', name: 'The Style Club', emoji: '🧥', price: 999,
-        tagline: 'Dress up the delight',
-        desc: 'Clothing and accessories curated monthly to match your dog\'s size and the season.',
-        benefits: ['Clothing & accessories every month', 'Size-matched to your dog', 'Seasonal themes and colours', 'Personalised to measurements'],
-        experience: 'A styled pick every month so your dog steps out looking and feeling their best.'
-      },
-      {
-        id: 'calm-box', name: 'The Calm Box', emoji: '🌿', price: 1499,
-        tagline: 'Peace for paws and minds',
-        desc: 'Soothing toys and gentle enrichment for anxious, senior or restful dogs who need calm stimulation.',
-        benefits: ['Calming toys and puzzles', 'Senior- and anxiety-friendly', 'Gentle, low-arousal enrichment', 'Personalised to temperament'],
-        experience: 'A soothing monthly box that helps anxious or older dogs feel safe, settled and content.'
+    (function () {
+      var PLANS = [
+        { id: "happy-box", name: "The Happy Box", tagline: "Flagship curation", image: "The%20Happy%20box.webp", price: 1999, desc: "Our most-loved box: a hand-picked mix of toys, treats and puzzles that keeps a curious dog happily occupied.", benefits: ["Enrichment toys and puzzles", "Treats and games", "Personalised to your dog", "Pause or cancel anytime"] },
+        { id: "food-club", name: "The Food Club", tagline: "Chef-crafted happiness", image: "the%20food%20club.webp", price: 1499, desc: "Small-batch treats, chews and rotating flavours selected for your dog's size, taste and dietary needs.", benefits: ["Fresh-baked treats", "Rotating flavours", "Size-appropriate portions", "Diet and allergy aware"] },
+        { id: "style-club", name: "The Style Club", tagline: "Cozy comfort wear", image: "The%20style%20club.webp", price: 999, desc: "Comfort-first apparel and accessories that fit real dogs and make the everyday feel a little more fun.", benefits: ["Monthly apparel or accessory", "Size-matched picks", "Seasonal themes", "Comfort-first designs"] },
+        { id: "calm-box", name: "The Calm Box", tagline: "Peace for paws", image: "the%20calm%20box.webp", price: 1499, desc: "Gentle enrichment, snuffle toys and soothing routines for anxious, senior or restful dogs.", benefits: ["Calming enrichment", "Snuffle and soothe toys", "Low-arousal activities", "Anxiety-friendly picks"] }
+      ];
+      var BYO_CATEGORIES = [
+        { id: "toys-enrichment", name: "Toys & Enrichment", desc: "Brain-boosting toys and puzzles", icon: "M8 18l16-8 16 8v16l-16 8-16-8V18z" },
+        { id: "food-treats", name: "Food & Treats", desc: "Treats and chews chosen with care", icon: "M12 6c8 0 14 6 14 14H8L12 6z" },
+        { id: "clothing-accessories", name: "Clothing & Accessories", desc: "Comfort-first apparel and accessories", icon: "M10 6l6 2 2 6-4 2-2-2-2 2-4-2 2-6 6-2z" }
+      ];
+      var BYO_PRICE = 3499;
+      var frequency = "monthly";
+      var selected = [];
+
+      function money(n) { return "\u20B9" + Math.round(Number(n) || 0).toLocaleString("en-IN"); }
+      function yearlyTotal(price) {
+        var d = window.HWA_CONFIG && typeof window.HWA_CONFIG.annualDiscountPercent === "number" ? window.HWA_CONFIG.annualDiscountPercent : 0;
+        var months = window.HWA_CONFIG && window.HWA_CONFIG.yearlyMonths ? window.HWA_CONFIG.yearlyMonths : 12;
+        return Math.round(price * months * (1 - Math.max(0, d) / 100));
       }
-    ];
+      function priceFor(price) { return frequency === "yearly" ? yearlyTotal(price) : price; }
+      function periodFor() { return frequency === "yearly" ? "/year, upfront" : "/month"; }
 
-    const BYO_CATEGORIES = [
-      { id: 'toys', name: 'Toys & Enrichment', emoji: '🧩', desc: 'Brain-boosting toys and puzzles' },
-      { id: 'food', name: 'Food & Treats', emoji: '🦴', desc: 'Vet-approved food and treats' },
-      { id: 'clothing', name: 'Clothing & Accessories', emoji: '🧥', desc: 'Apparel and accessories' }
-    ];
-
-    const BYO_PRICE = 3499;
-    let selectedCategories = new Set();
-    let frequency = 'monthly';
-    let selectedPlanId = null;
-
-    const grid = document.getElementById('plan-grid');
-    const toggleMonthly = document.getElementById('toggle-monthly');
-    const toggleYearly = document.getElementById('toggle-yearly');
-    const byoPrice = document.getElementById('byo-price');
-    const byoPeriod = document.getElementById('byo-period');
-    const byoCount = document.getElementById('byo-count');
-    const categoriesContainer = document.getElementById('categories');
-    const form = document.getElementById('subscribe-form');
-    const formError = document.getElementById('form-error');
-    const subscribeBtn = document.getElementById('subscribe-btn');
-
-    function yearlyPrice(planId, monthly) {
-      // Discounted yearly price = monthly × 10 (2 months free equivalent)
-      const gross = monthly * 12;
-      const discount = (window.HWA_CONFIG && typeof window.HWA_CONFIG.annualDiscountPercent === 'number') ? window.HWA_CONFIG.annualDiscountPercent : 0;
-      return Math.round(gross * (1 - discount / 100));
-    }
-
-    function planIcon(id) {
-      if (id === 'happy-box') {
-        return `<img src="The%20Happy%20box.webp" alt="Happy Box" class="plan-img" loading="lazy">`;
-      }
-      if (id === 'style-club') {
-        return `<img src="The%20style%20club.webp" alt="Style Club" class="plan-img" loading="lazy">`;
-      }
-      if (id === 'food-club') {
-        return `<img src="the%20food%20club.webp" alt="Food Club" class="plan-img" loading="lazy">`;
-      }
-      if (id === 'calm-box') {
-        return `<img src="the%20calm%20box.webp" alt="Calm Box" class="plan-img" loading="lazy">`;
-      }
-      const icons = {
-        'happy-box': `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 10a3.5 3.5 0 0 1-3.5 3.5h-5.5c-1.1 0-2-.9-2-2v-4.5a3.5 3.5 0 1 1 7 0z"/><path d="M17 14h2l-3.5-4L17 6"/></svg>`,
-        'food-club': `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h1a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H2a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3z"/><path d="M7 3v18"/><path d="M7 12h5"/><path d="M9 6V4l5 2"/></svg>`,
-        'style-club': `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M8 4v4"/><path d="M16 4v4"/><path d="M10 20H6a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1"/><path d="M18 20h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1"/></svg>`,
-        'calm-box': `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4v4a4 4 0 0 0 4 4 4 4 0 0 0 4-4V6a4 4 0 0 0-4-4z"/><path d="M12 18v-6"/><path d="M8 10s2-1 4-1 4 1 4 1"/><path d="M12 18c-3.3 0-5-1.5-5-4v0c0-2.5 1.7-4 5-4s5 1.5 5 4v0c0 2.5-1.7 4-5 4z"/></svg>`
-      };
-      return icons[id] || `<span style="font-size:2.2rem">${PLANS.find(p=>p.id===id)?.emoji||'📦'}</span>`;
-    }
-
-    function renderPlans() {
-      grid.innerHTML = PLANS.map(p => {
-        const monthly = p.price;
-        const yearly = yearlyPrice(p.id, monthly);
-        const showYearly = frequency === 'yearly';
-        const price = showYearly ? yearly : monthly;
-        const period = showYearly ? '/year' : '/month';
-        const alt = showYearly ? `₹${yearly.toLocaleString()}/yr billed upfront` : `₹${monthly.toLocaleString()}/mo`;
-        const isFeatured = p.id === 'happy-box';
-        const from = p.id === 'food-club';
-        const discountEligible = ['happy-box', 'food-club', 'style-club', 'calm-box'].includes(p.id);
-        const monthly12 = monthly * 12;
-        const discountAmount = monthly12 - yearly;
-        const discountPercent = Math.round((discountAmount / monthly12) * 100);
-        const savingHtml = showYearly && discountEligible && discountAmount > 0
-          ? `<div class="plan-saving">Save ₹${discountAmount.toLocaleString()} (${discountPercent}%) vs paying monthly for 12 months</div>`
-          : '';
-        return `
-          <article class="plan-card ${isFeatured ? 'featured' : ''}" data-id="${p.id}">
-            <div class="plan-image ${p.id}">${planIcon(p.id)}</div>
-            ${isFeatured ? '<span class="badge">Most popular</span>' : ''}
-            <div class="plan-body">
-              <span class="plan-tagline">${p.tagline}</span>
-              <div class="plan-header">
-                <div class="plan-name">${p.name}${from ? ' <span style="font-size:0.8rem;color:var(--muted);font-weight:600">from</span>' : ''}</div>
-              </div>
-              <div class="plan-price-wrap">
-                <div class="plan-price">₹${price.toLocaleString()}</div>
-                <div class="plan-period">${period}</div>
-              </div>
-              <div class="plan-yearly">${alt}</div>
-              ${savingHtml}
-              <div class="plan-desc">${p.desc}</div>
-              <div class="plan-experience">${p.experience}</div>
-              <ul class="plan-benefits">${p.benefits.map(b => `<li>${b}</li>`).join('')}</ul>
-              <button type="button" class="btn btn-primary plan-choose" onclick="selectPlan('${p.id}')">Choose ${p.name}</button>
-            </div>
-          </article>
-        `;
-      }).join('');
-    }
-
-    window.selectPlan = function(id) {
-      selectedPlanId = id;
-      document.querySelectorAll('.plan-card').forEach(c => {
-        c.classList.toggle('selected', c.dataset.id === id);
-      });
-      const section = document.getElementById('profile');
-      if (section) section.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    toggleMonthly.addEventListener('click', () => { frequency = 'monthly'; toggleMonthly.classList.add('active'); toggleYearly.classList.remove('active'); renderPlans(); updateByo(); document.getElementById('build-your-own-section').style.display = 'block'; });
-    toggleYearly.addEventListener('click', () => { frequency = 'yearly'; toggleYearly.classList.add('active'); toggleMonthly.classList.remove('active'); renderPlans(); updateByo(); document.getElementById('build-your-own-section').style.display = 'none'; selectedCategories.clear(); renderCategories(); });
-
-    const breedSelect = document.querySelector('select[name="dogBreed"]');
-    const otherBreedField = document.getElementById('other-breed-field');
-    breedSelect.addEventListener('change', () => {
-      if (breedSelect.value === 'Other') {
-        otherBreedField.style.display = 'block';
-        otherBreedField.querySelector('input').required = true;
-      } else {
-        otherBreedField.style.display = 'none';
-        otherBreedField.querySelector('input').required = false;
-      }
-    });
-
-    function updateByo() {
-      const price = frequency === 'yearly' ? yearlyPrice(BYO_PRICE) : BYO_PRICE;
-      const period = frequency === 'yearly' ? '/year' : '/month';
-      byoPrice.innerHTML = `₹${price.toLocaleString()} <span class="byo-period" id="byo-period">${period}</span>`;
-    }
-
-    function renderCategories() {
-      categoriesContainer.innerHTML = BYO_CATEGORIES.map(c => {
-        const checked = selectedCategories.has(c.id);
-        return `
-          <div class="category ${checked ? 'selected' : ''}" onclick="toggleCategory('${c.id}', this)" role="checkbox" aria-checked="${checked}">
-            <input type="checkbox" id="cat-${c.id}" ${checked ? 'checked' : ''} onchange="toggleCategory('${c.id}', this)" style="display:none;" aria-hidden="true">
-            <span class="cat-icon">${c.emoji}</span>
-            ${checked ? '<span class="cat-check">✓</span>' : ''}
-            <span class="cat-name">${c.name}</span>
-            <span class="cat-desc">${c.desc}</span>
-          </div>
-        `;
-      }).join('');
-      const n = selectedCategories.size;
-      byoCount.textContent = n + ' category' + (n !== 1 ? 'ies' : '') + ' selected';
-      byoCount.style.color = (n >= 2 && n <= 4) ? 'var(--success)' : 'var(--brand-dark)';
-      byoCount.style.fontWeight = '700';
-    }
-
-    window.toggleCategory = function(id, el) {
-      const input = el.querySelector('input');
-      if (selectedCategories.has(id)) {
-        selectedCategories.delete(id);
-      } else {
-        if (selectedCategories.size >= 4) {
-          formError.textContent = 'You can select at most 4 categories.';
-          formError.style.display = 'block';
-          setTimeout(() => formError.style.display = 'none', 2500);
-          return;
-        }
-        selectedCategories.add(id);
-      }
-      formError.textContent = '';
-      formError.style.display = 'none';
-      renderCategories();
-    };
-
-    renderPlans();
-    renderCategories();
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      formError.textContent = '';
-      formError.style.display = 'none';
-      subscribeBtn.textContent = 'Placing order…';
-      subscribeBtn.disabled = true;
-
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
-
-      // Validate full name: only alphabetic characters and spaces
-      if (!/^[A-Za-z\s]+$/.test(data.customerName)) {
-        formError.textContent = 'Full Name should contain only alphabetic characters and spaces.';
-        formError.style.display = 'block';
-        subscribeBtn.textContent = 'Start Subscription';
-        subscribeBtn.disabled = false;
-        return;
-      }
-
-      // Validate phone: exactly 10 numeric digits
-      if (!/^[0-9]{10}$/.test(data.customerPhone)) {
-        formError.textContent = 'Phone number must be exactly 10 numeric digits.';
-        formError.style.display = 'block';
-        subscribeBtn.textContent = 'Start Subscription';
-        subscribeBtn.disabled = false;
-        return;
-      }
-
-      // Validate dog's name: only alphabetic characters and spaces
-      if (!/^[A-Za-z\s]+$/.test(data.dogName)) {
-        formError.textContent = "Dog's Name should contain only alphabetic characters and spaces.";
-        formError.style.display = 'block';
-        subscribeBtn.textContent = 'Start Subscription';
-        subscribeBtn.disabled = false;
-        return;
-      }
-
-      // Validate breed: when "Other" is selected, the custom breed field is required
-      if (data.dogBreed === 'Other') {
-        if (!data.dogBreedOther) {
-          formError.textContent = 'Please specify the breed when "Other" is selected.';
-          formError.style.display = 'block';
-          subscribeBtn.textContent = 'Start Subscription';
-          subscribeBtn.disabled = false;
-          return;
-        }
-        if (!/^[A-Za-z\s]+$/.test(data.dogBreedOther)) {
-          formError.textContent = 'Breed should contain only alphabetic characters and spaces.';
-          formError.style.display = 'block';
-          subscribeBtn.textContent = 'Start Subscription';
-          subscribeBtn.disabled = false;
-          return;
-        }
-      }
-
-      // Validate age: only numeric digits
-      if (!/^[0-9]+$/.test(data.dogAge)) {
-        formError.textContent = 'Age should contain only numeric digits.';
-        formError.style.display = 'block';
-        subscribeBtn.textContent = 'Start Subscription';
-        subscribeBtn.disabled = false;
-        return;
-      }
-
-      // Validate pincode: exactly 6 numeric digits
-      if (!/^[0-9]{6}$/.test(data.pincode)) {
-        formError.textContent = 'Pincode must be exactly 6 numeric digits.';
-        formError.style.display = 'block';
-        subscribeBtn.textContent = 'Start Subscription';
-        subscribeBtn.disabled = false;
-        return;
-      }
-      let items = [];
-      let planType = '';
-      let total = 0;
-
-      if (selectedPlanId) {
-        planType = 'curated';
-        items = [{ plan: selectedPlanId, name: plan.name, price: frequency === 'yearly' ? yearlyPrice(plan.price) : plan.price }];
-        total = items[0].price;
-      } else if (selectedCategories.size >= 2 && selectedCategories.size <= 4) {
-        planType = 'build-your-own';
-        items = [{ plan: 'build-your-own', name: 'Build Your Own Box', categories: [...selectedCategories], price: frequency === 'yearly' ? yearlyPrice(BYO_PRICE) : BYO_PRICE }];
-        total = items[0].price;
-      } else {
-        formError.textContent = 'Please choose a plan, or select 2–4 categories for Build Your Own.';
-        formError.style.display = 'block';
-        subscribeBtn.textContent = 'Start Subscription';
-        subscribeBtn.disabled = false;
-        return;
-      }
-
-      if (selectedCategories.size > 0 && selectedCategories.size < 2 && !selectedPlanId) {
-        formError.textContent = 'For Build Your Own, please select at least 2 categories.';
-        formError.style.display = 'block';
-        subscribeBtn.textContent = 'Start Subscription';
-        subscribeBtn.disabled = false;
-        return;
-      }
-
-      const payload = {
-        frequency,
-        planType,
-        items,
-        total,
-        customer: {
-          name: data.customerName,
-          email: data.customerEmail,
-          phone: data.customerPhone,
-          address: data.address,
-          pincode: data.pincode
-        },
-        dog: {
-          name: data.dogName,
-          breed: data.dogBreed,
-          age: parseInt(data.dogAge) || 0,
-          size: data.dogSize,
-          allergies: data.dogAllergies,
-          notes: data.dogNotes
-        }
-      };
-
-      try {
-        const res = await fetch('/api/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+      function renderPlans() {
+        var grid = document.getElementById("plan-grid");
+        grid.innerHTML = PLANS.map(function (p) {
+          var featured = p.id === "happy-box";
+          var price = priceFor(p.price);
+          var saving = p.price * 12 - yearlyTotal(p.price);
+          return '<article class="plan-card' + (featured ? ' featured' : '') + '">' +
+            (featured ? '<span class="plan-badge">Most popular</span>' : '') +
+            '<a class="plan-media" href="product.html?id=' + p.id + '" aria-label="View ' + p.name + '"><img src="' + p.image + '" alt="" loading="lazy"></a>' +
+            '<div class="plan-body">' +
+              '<span class="plan-tagline">' + p.tagline + '</span>' +
+              '<h2 class="plan-name">' + p.name + '</h2>' +
+              '<div class="plan-price-wrap"><span class="plan-price">' + money(price) + '</span><span class="plan-period">' + periodFor() + '</span></div>' +
+              (frequency === "yearly" && saving > 0 ? '<p class="plan-saving">Save ' + money(saving) + ' versus 12 monthly payments.</p>' : '') +
+              '<p class="plan-desc">' + p.desc + '</p>' +
+              '<ul class="plan-benefits">' + p.benefits.map(function (b) { return '<li>' + b + '</li>'; }).join("") + '</ul>' +
+              '<div class="plan-actions">' +
+                '<button type="button" class="btn btn-primary plan-add" data-plan="' + p.id + '">Add to cart</button>' +
+                '<a class="text-link" href="product.html?id=' + p.id + '">Details <span aria-hidden="true">&rarr;</span></a>' +
+              '</div>' +
+            '</div>' +
+          '</article>';
+        }).join("");
+        grid.querySelectorAll(".plan-add").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            window.HWA.addToCart(btn.getAttribute("data-plan"), { freq: frequency, qty: 1 });
+          });
         });
-        const result = await res.json();
-        if (!res.ok || !result.ok) throw new Error(result.error || 'Subscription failed');
-
-        const chosenCategories = [...selectedCategories];
-        form.reset();
-        selectedPlanId = null;
-        selectedCategories.clear();
-        document.querySelectorAll('.plan-card').forEach(c => { c.style.borderColor = 'var(--line)'; c.style.background = '#fff'; });
-        renderCategories();
-        renderPlans();
-
-        const hero = document.querySelector('.sub-hero');
-        hero.insertAdjacentHTML('afterend', `
-          <section class="order-success">
-            <span class="success-icon">🎉</span>
-            <h2>Subscription Active!</h2>
-            <p>Thank you ${data.customerName}. Your ${frequency} ${planType} subscription is confirmed.</p>
-            <div class="order-summary">
-              <div class="row"><span>Plan</span><span>${planType === 'curated' ? plan.name : 'Build Your Own Box'}</span></div>
-              ${planType === 'build-your-own' ? `<div class="row"><span>Categories</span><span>${chosenCategories.map(c => BYO_CATEGORIES.find(x => x.id === c).name).join(', ')}</span></div>` : ''}
-              <div class="row"><span>Frequency</span><span>${frequency.charAt(0).toUpperCase() + frequency.slice(1)}</span></div>
-              <div class="row"><span>Total</span><span>₹${total.toLocaleString()}</span></div>
-              <div class="row"><span>Dog</span><span>${data.dogName} (${data.dogBreed}, ${data.dogSize})</span></div>
-            </div>
-            <a href="index.html" class="btn btn-outline">Back to Home</a>
-          </section>
-        `);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } catch (err) {
-        formError.textContent = err.message || 'Could not start subscription. Try again.';
-        formError.style.display = 'block';
-        subscribeBtn.textContent = 'Start Subscription';
-        subscribeBtn.disabled = false;
+        var note = document.getElementById("billingNote");
+        if (note) {
+          note.textContent = frequency === "yearly"
+            ? "Yearly billing charges 12 months upfront and includes 12 monthly deliveries."
+            : "Pay month by month. Switch billing in the cart any time before checkout.";
+        }
       }
-    });
+
+      function renderCategories() {
+        var wrap = document.getElementById("categories");
+        wrap.innerHTML = BYO_CATEGORIES.map(function (c) {
+          var isOn = selected.indexOf(c.id) !== -1;
+          return '<label class="category' + (isOn ? ' selected' : '') + '">' +
+            '<input type="checkbox" value="' + c.id + '"' + (isOn ? ' checked' : '') + '>' +
+            '<span class="cat-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/></svg></span>' +
+            '<span class="cat-text"><strong>' + c.name + '</strong><small>' + c.desc + '</small></span>' +
+          '</label>';
+        }).join("");
+        wrap.querySelectorAll("input[type='checkbox']").forEach(function (cb) {
+          cb.addEventListener("change", function () {
+            var v = cb.value;
+            var idx = selected.indexOf(v);
+            if (cb.checked && idx === -1) { selected.push(v); }
+            if (!cb.checked && idx !== -1) { selected.splice(idx, 1); }
+            renderCategories();
+            updateByoState();
+          });
+        });
+        var count = document.getElementById("byo-count");
+        if (count) { count.textContent = selected.length + (selected.length === 1 ? " category selected" : " categories selected"); }
+      }
+      function updateByoState() {
+        var err = document.getElementById("byoError");
+        if (err && selected.length >= 2) { err.style.display = "none"; }
+      }
+      function updateByoPrice() {
+        var priceEl = document.getElementById("byo-price");
+        if (priceEl) { priceEl.innerHTML = money(priceFor(BYO_PRICE)) + ' <span class="byo-period" id="byo-period">' + periodFor() + '</span>'; }
+      }
+      function setFrequency(f) {
+        frequency = f;
+        document.getElementById("toggle-monthly").classList.toggle("active", f === "monthly");
+        document.getElementById("toggle-yearly").classList.toggle("active", f === "yearly");
+        renderPlans();
+        updateByoPrice();
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        renderPlans();
+        renderCategories();
+        updateByoPrice();
+        document.getElementById("toggle-monthly").addEventListener("click", function () { setFrequency("monthly"); });
+        document.getElementById("toggle-yearly").addEventListener("click", function () { setFrequency("yearly"); });
+        document.getElementById("byoAddBtn").addEventListener("click", function () {
+          if (selected.length < 2) {
+            var err = document.getElementById("byoError");
+            if (err) { err.style.display = "block"; }
+            return;
+          }
+          window.HWA.addToCart("build-your-own", { freq: frequency, qty: 1, config: { categories: selected.slice() } });
+        });
+      });
+    })();
   </script>
 </body>
 </html>

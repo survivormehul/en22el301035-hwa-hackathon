@@ -6,26 +6,45 @@
   <title>Happy While Away - Checkout</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/cart.js"></script>
+  <script src="js/ui.js" defer></script>
 </head>
-<body>
+<body id="checkoutPage">
 
+    <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="logo">Happy While Away</a>
-      <nav class="main-nav" id="mainNav">
+      <a class="brand" href="index.html" aria-label="Happy While Away home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+        <span class="brand-text">Happy <em>While Away</em></span>
+      </a>
+      <nav class="main-nav" id="mainNav" aria-label="Primary navigation">
         <a href="index.html">Home</a>
-        <a href="products.html" class="active">Boxes</a>
-        <a href="subscription.html">Subscription</a>
-        <a href="account.html">My Account</a>
+        <a href="products.html">Boxes</a>
+        <a href="subscription.html">Plans</a>
+        <a href="account.html">My account</a>
         <a href="contact.html">Contact</a>
       </nav>
-      <button class="btn btn-outline cart-open-btn" id="cartOpenBtn">Cart <span id="hwaCartBadge">0</span></button>
+      <div class="header-actions">
+        <button class="cart-open-btn" id="cartOpenBtn" type="button" aria-label="Open shopping cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1.2 10.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+          <span class="cart-label">Cart</span>
+          <span class="cart-badge" id="hwaCartBadge">0</span>
+        </button>
+        <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Open menu"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </header>
 
-  <main class="section">
+    <main id="main" class="section checkout-section">
     <div class="container">
-      <h1>Checkout</h1>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a><span aria-hidden="true">/</span><a href="products.html">Boxes</a><span aria-hidden="true">/</span><span>Checkout</span>
+      </nav>
+      <div class="checkout-heading">
+        <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> Secure demo checkout</span>
+        <h1>Almost theirs.</h1>
+        <p>One last step before the happy mail. Add your details, choose a delivery pincode and place a pending-payment order.</p>
+      </div>
       <form id="checkoutForm">
         <div class="checkout-grid">
           <div class="checkout-left">
@@ -67,7 +86,8 @@
               <h3>Promo Code</h3>
               <div class="lookup-form">
                 <div class="form-field"><label for="promoInput">Promo code</label><input id="promoInput" placeholder="Enter code"></div>
-                <button type="button" class="btn btn-outline" id="applyPromoBtn">Apply</button>
+                <button type="button" class="btn btn-primary" id="applyPromoBtn">Apply</button>
+                <button type="button" class="btn btn-ghost" id="clearPromoBtn">Clear</button>
               </div>
               <p class="hint" id="promoStatus">Demo coupons: <strong>FIRST10</strong> (first order, 10% off) and <strong>FREESHIP</strong> (free delivery).</p>
             </section>
@@ -113,7 +133,7 @@
       <button type="button" class="btn btn-outline" id="sendCodeBtn">Send Verification Code</button>
       <div class="verify-code-box" id="verifyCodeBox" style="display:none;">
         <p class="hint" id="demoCodeNotice"></p>
-        <div class="form-field"><label>Enter 6-digit code</label><input id="verifyCodeInput" maxlength="6"></div>
+        <div class="form-field"><label for="verifyCodeInput">Enter 6-digit code</label><input id="verifyCodeInput" maxlength="6"></div>
         <button type="button" class="btn btn-primary" id="verifyBtn">Verify</button>
       </div>
       <div class="error-msg" id="verifyError" style="display:none;"></div>
@@ -121,24 +141,29 @@
     </div>
   </div>
 
-  <footer class="site-footer">
-    <div class="container">
-      <p>&copy; 2026 Happy While Away. Happiness, delivered monthly.</p>
+    <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+          <span class="brand-text">Happy <em>While Away</em></span>
+        </a>
+        <p>Thoughtful enrichment boxes for good dogs and the people who love them.</p>
+        <p class="footer-note">Demo storefront. Payments, OTP checks and email notifications are simulated; orders are created with payment pending.</p>
+      </div>
+      <div class="footer-col"><h4>Shop</h4><a href="products.html">All boxes</a><a href="subscription.html">Plans &amp; pricing</a><a href="product.html?id=build-your-own">Build your own</a></div>
+      <div class="footer-col"><h4>Account</h4><a href="account.html">My account</a><a href="subscriptions.html">Manage subscriptions</a><a href="checkout.html">Checkout</a></div>
+      <div class="footer-col"><h4>Help</h4><a href="contact.html">Contact us</a><a href="subscription.html#faq">FAQs</a><a href="contact.html">Shipping questions</a></div>
     </div>
+    <div class="container footer-bottom"><p>&copy; 2026 Happy While Away. All rights reserved.</p><p>Made for wagging tails.</p></div>
   </footer>
 
 
   <script>
     (function () {
-      var COUPONS = {
-        "FIRST10": { type: "first_time", percent: 10, label: "10% off your first order" },
-        "FREESHIP": { type: "free_delivery", label: "Free delivery" }
-      };
-      var SHIPPING_ZONES = [
-        { prefixes: ["110", "400", "560", "600", "700"], rate: 49, label: "Metro" },
-        { prefixes: ["18", "19", "78", "79"], rate: 149, label: "Remote" }
-      ];
-      var DEFAULT_SHIPPING_RATE = 99;
+      var COUPONS = (window.HWA_CONFIG && window.HWA_CONFIG.coupons) || {};
+      var SHIPPING_ZONES = [];
+      var DEFAULT_SHIPPING_RATE = 0;
 
       var dogSeq = 0;
       var promo = { code: null, type: null, percent: 0 };
@@ -148,6 +173,7 @@
       function newDogId() { dogSeq += 1; return "dog-" + Date.now() + "-" + dogSeq; }
       function fmt(n) { return "\u20B9" + Math.round(n).toLocaleString("en-IN"); }
       function amountFor(item) {
+        if (window.HWA && window.HWA.Cart && typeof window.HWA.Cart.amountFor === "function") { return window.HWA.Cart.amountFor(item); }
         var gross = item.price;
         if (item.freq === "yearly") {
           var d = window.HWA_CONFIG && typeof window.HWA_CONFIG.annualDiscountPercent === "number" ? window.HWA_CONFIG.annualDiscountPercent : 0;
@@ -156,14 +182,10 @@
         return gross;
       }
       function shippingFor(pincode) {
-        if (!/^[0-9]{6}$/.test(pincode)) { return { known: false, rate: 0, zone: null }; }
-        for (var i = 0; i < SHIPPING_ZONES.length; i++) {
-          var z = SHIPPING_ZONES[i];
-          for (var j = 0; j < z.prefixes.length; j++) {
-            if (pincode.indexOf(z.prefixes[j]) === 0) { return { known: true, rate: z.rate, zone: z.label }; }
-          }
-        }
-        return { known: true, rate: DEFAULT_SHIPPING_RATE, zone: "Standard" };
+        if (window.HWA && typeof window.HWA.shippingFor === "function") { return window.HWA.shippingFor(pincode); }
+        var pin = String(pincode || "").trim();
+        if (!/^[0-9]{6}$/.test(pin)) { return { known: false, rate: 0, zone: null }; }
+        return { known: true, rate: Number(window.HWA_CONFIG && window.HWA_CONFIG.defaultShippingRate) || 99, zone: "Standard" };
       }
       function addDog() {
         var id = newDogId();
@@ -171,14 +193,16 @@
         wrap.className = "dog-row form-grid";
         wrap.setAttribute("data-dog-id", id);
         wrap.innerHTML =
-          '<div class="form-field"><label>Dog Name</label><input class="dog-name"></div>' +
-          '<div class="form-field"><label>Breed</label><input class="dog-breed"></div>' +
-          '<div class="form-field"><label>Size</label><select class="dog-size"><option>Small</option><option selected>Medium</option><option>Large</option></select></div>' +
+          '<div class="form-field"><label for="' + id + '-name">Dog Name</label><input id="' + id + '-name" class="dog-name"></div>' +
+          '<div class="form-field"><label for="' + id + '-breed">Breed</label><input id="' + id + '-breed" class="dog-breed"></div>' +
+          '<div class="form-field"><label for="' + id + '-size">Size</label><select id="' + id + '-size" class="dog-size"><option>Small</option><option selected>Medium</option><option>Large</option></select></div>' +
           '<div class="form-field"><label>&nbsp;</label><button type="button" class="btn btn-outline remove-dog">Remove</button></div>';
         wrap.querySelector(".remove-dog").addEventListener("click", function () {
           wrap.parentNode.removeChild(wrap);
           renderItems();
         });
+        wrap.querySelector(".dog-name").addEventListener("input", renderItems);
+        wrap.querySelector(".dog-size").addEventListener("change", renderItems);
         document.getElementById("dogList").appendChild(wrap);
         renderItems();
       }
@@ -207,11 +231,11 @@
               '<div class="checkout-item-sub">Qty ' + it.qty + ' &middot; ' + fmt(amountFor(it) * it.qty) + (it.freq === "yearly" ? ' upfront' : ' / month') + '</div>' +
             '</div>' +
             '<div class="checkout-item-controls">' +
-              '<select class="checkout-freq" data-index="' + i + '">' +
+              '<select class="checkout-freq" aria-label="Billing frequency for ' + it.name + '" data-index="' + i + '">' +
                 '<option value="monthly"' + (it.freq === "monthly" ? " selected" : "") + '>Monthly</option>' +
                 '<option value="yearly"' + (it.freq === "yearly" ? " selected" : "") + '>Yearly (12 months upfront)</option>' +
               '</select>' +
-              '<select class="checkout-dog" data-index="' + i + '">' +
+              '<select class="checkout-dog" aria-label="Assign dog for ' + it.name + '" data-index="' + i + '">' +
                 '<option value="">Assign dog (optional)</option>' +
                 dogList.map(function (d) { return '<option value="' + d.id + '"' + (it.dogId === d.id ? " selected" : "") + '>' + d.name + '</option>'; }).join("") +
               '</select>' +
@@ -349,8 +373,9 @@
         try { localStorage.setItem("hwa_accounts", JSON.stringify(store)); } catch (e) {}
         return acc;
       }
-      function sendOrder(order) {
+      function sendOrder(order, subscriptionIds) {
         var payload = {
+          orderId: order.orderId, subscriptionIds: subscriptionIds || [],
           customer: order.customer, deliveryAddress: order.deliveryAddress, dogs: order.dogs,
           items: order.items.map(function (it) { return { productId: it.productId, name: it.name, price: it.unitAmount, qty: it.qty, freq: it.freq, config: it.config, dogId: it.dogId, amount: it.unitAmount }; }),
           paymentMethod: order.paymentMethod, promoCode: order.couponCode, promoDiscount: order.couponDiscount,
@@ -396,7 +421,8 @@
         var btn = document.getElementById("payNowBtn");
         btn.disabled = true;
         var acc = saveAccount(order);
-        sendOrder(order).then(function (backend) {
+        var localSubs = acc.subscriptions.filter(function (s) { return s.orderId === order.orderId; });
+        sendOrder(order, localSubs.map(function (s) { return s.id; })).then(function (backend) {
           notify("order_confirmation", order, { paymentStatus: "pending" }).then(function (resp) {
             if (resp && resp.notification) {
               acc.notifications = acc.notifications || [];
@@ -422,6 +448,18 @@
         ["addrPincode", "custEmail"].forEach(function (id) { document.getElementById(id).addEventListener("input", renderTotals); });
         renderTotals();
         document.getElementById("applyPromoBtn").addEventListener("click", applyPromo);
+        document.getElementById("clearPromoBtn").addEventListener("click", function () {
+          promo = { code: null, type: null, percent: 0 };
+          document.getElementById("promoInput").value = "";
+          document.getElementById("promoStatus").textContent = "Demo coupons: FIRST10 (first order, 10% off) and FREESHIP (free delivery).";
+          renderTotals();
+        });
+        document.addEventListener("hwa:cart-updated", function () {
+          if (document.getElementById("checkoutItems")) { renderItems(); }
+        });
+        ["custEmail", "custPhone"].forEach(function (id) {
+          document.getElementById(id).addEventListener("input", function () { verified = false; });
+        });
         document.querySelectorAll("input[name='verifyMethod']").forEach(function (r) { r.addEventListener("change", function () { document.getElementById("verifyCodeBox").style.display = "none"; }); });
         document.getElementById("sendCodeBtn").addEventListener("click", function () {
           var target = verifyTarget();

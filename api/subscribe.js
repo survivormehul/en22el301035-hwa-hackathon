@@ -81,6 +81,13 @@ module.exports = async (req, res) => {
         if (record.billing) record.billing.amount = record.total;
       }
       else if (action === 'setDog') { record.dog = payload.dog || null; }
+      else if (action === 'setDeliveryAddress') {
+        record.deliveryAddress = payload.deliveryAddress || record.deliveryAddress;
+        if (record.deliveryAddress && record.customer) {
+          record.customer.address = record.deliveryAddress.address;
+          record.customer.pincode = record.deliveryAddress.pincode;
+        }
+      }
       else if (action === 'setDeliveryPreferences') { record.deliveryPreferences = payload.deliveryPreferences || {}; }
       else if (action === 'skipDelivery') {
         if (record.frequency !== 'yearly') {
@@ -151,7 +158,11 @@ module.exports = async (req, res) => {
     }
 
     const now = new Date();
-    const orderId = 'HWA-ORD-' + now.getTime();
+    const orderId = typeof sub.orderId === 'string' && /^HWA-ORD-[0-9]+$/.test(sub.orderId)
+      ? sub.orderId
+      : 'HWA-ORD-' + now.getTime();
+    const requestedIds = Array.isArray(sub.subscriptionIds) ? sub.subscriptionIds : [];
+    const usedIds = new Set(subs.map((s) => s.id));
     let orderInitial = 0;
     for (const item of items) orderInitial += Math.round(computeUnit(item) * (Number(item.qty) || 1));
 
@@ -163,8 +174,14 @@ module.exports = async (req, res) => {
       const dog = (sub.dogs || []).find((d) => d.id && item.dogId && d.id === item.dogId) || (sub.dog || null);
       const renewal = item.freq === 'yearly' ? addMonths(now, 12) : addMonths(now, 1);
       const nextDelivery = addMonths(now, 1);
+      let recordId = typeof requestedIds[idx] === 'string' && /^HWA-SUB-/.test(requestedIds[idx])
+        ? requestedIds[idx]
+        : 'HWA-SUB-' + now.getTime() + '-' + (idx + 1);
+      if (usedIds.has(recordId)) recordId = 'HWA-SUB-' + now.getTime() + '-' + (idx + 1) + '-r';
+      while (usedIds.has(recordId)) recordId += 'r';
+      usedIds.add(recordId);
       const record = {
-        id: 'HWA-SUB-' + now.getTime() + '-' + (idx + 1),
+        id: recordId,
         orderId: orderId,
         createdAt: now.toISOString(),
         frequency: item.freq,

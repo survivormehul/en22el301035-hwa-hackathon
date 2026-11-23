@@ -3,157 +3,235 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Happy While Away - Subscription Boxes</title>
+  <meta name="theme-color" content="#fbf6ee">
+  <meta name="description" content="Explore all five Happy While Away dog enrichment subscription boxes, from The Happy Box to The Calm Box and Build Your Own.">
+  <title>The Happy Collection | Happy While Away</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/cart.js"></script>
+  <script src="js/ui.js" defer></script>
 </head>
 <body>
-
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="logo">Happy While Away</a>
-      <nav class="main-nav" id="mainNav">
+      <a class="brand" href="index.html" aria-label="Happy While Away home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+        <span class="brand-text">Happy <em>While Away</em></span>
+      </a>
+      <nav class="main-nav" id="mainNav" aria-label="Primary navigation">
         <a href="index.html">Home</a>
         <a href="products.html" class="active">Boxes</a>
-        <a href="subscription.html">Subscription</a>
-        <a href="subscriptions.html">My Subscriptions</a>
-        <a href="account.html">My Account</a>
+        <a href="subscription.html">Plans</a>
+        <a href="account.html">My account</a>
         <a href="contact.html">Contact</a>
       </nav>
-      <button class="btn btn-outline cart-open-btn" id="cartOpenBtn">Cart <span id="hwaCartBadge">0</span></button>
+      <div class="header-actions">
+        <button class="cart-open-btn" id="cartOpenBtn" type="button" aria-label="Open shopping cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1.2 10.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+          <span class="cart-label">Cart</span>
+          <span class="cart-badge" id="hwaCartBadge">0</span>
+        </button>
+        <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Open menu"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </header>
 
-  <main>
-    <section class="section products-hero">
-      <div class="container">
-        <h1>Choose Your Happy</h1>
-        <p class="section-sub">Every box is a little happiness delivery for your dog. Pick a curated box or build your own.</p>
+  <main id="main">
+    <section class="page-hero">
+      <div class="container page-hero-inner">
+        <div class="page-hero-copy">
+          <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> The happy collection</span>
+          <h1>Choose their kind of happy.</h1>
+          <p>Five thoughtful subscriptions, one very good dog. Every box is curated around their size and personality - no filler, no one-off purchases.</p>
+        </div>
+        <div class="page-hero-note">
+          <span class="note-paw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+          <p><strong>Subscription only.</strong> Add as many boxes as you like, switch between monthly and yearly billing in the cart, and manage everything from your account.</p>
+        </div>
       </div>
     </section>
 
-    <section class="section">
+    <section class="section section-products">
       <div class="container">
         <div class="product-grid" id="productGrid">
-          <article class="product-card" data-product="happy-box">
-            <div class="product-media"><img src="The%20Happy%20box.webp" alt="The Happy Box"><span class="product-flag">Most Popular</span></div>
+          <article class="product-card reveal" data-product="happy-box">
+            <div class="product-media">
+              <a href="product.html?id=happy-box" class="product-media-link" aria-label="View The Happy Box details"><img src="The%20Happy%20box.webp" alt="The Happy Box subscription" loading="lazy"></a>
+              <span class="product-flag">Most popular</span>
+            </div>
             <div class="product-body">
-              <h2 class="product-name">The Happy Box</h2>
-              <p class="product-tagline">Fun that keeps wagging.</p>
-              <div class="product-price">?1999 <span>/month</span></div>
+              <div>
+                <h2 class="product-name">The Happy Box</h2>
+                <p class="product-tagline">Fun that keeps wagging.</p>
+              </div>
+              <div class="product-price"><span class="price-now">&#8377;1999</span><span class="price-period">/month</span></div>
               <ul class="product-benefits">
-                <li>Daily enrichment toys</li>
-                <li>Treats &amp; games</li>
+                <li>Enrichment toys and puzzles</li>
+                <li>Treats and games</li>
                 <li>Mixed-age friendly</li>
               </ul>
               <div class="product-buy">
-                <div class="hwa-qty-stepper">
-                  <button class="hwa-qty-btn" data-action="qty-down" data-product="happy-box">-</button>
-                  <span class="hwa-qty-val" data-product="happy-box">1</span>
-                  <button class="hwa-qty-btn" data-action="qty-up" data-product="happy-box">+</button>
+                <div class="hwa-qty-stepper" aria-label="Quantity">
+                  <button class="hwa-qty-btn" type="button" data-action="qty-down" data-product="happy-box" aria-label="Decrease quantity">-</button>
+                  <span class="hwa-qty-val" data-product="happy-box" aria-live="polite">1</span>
+                  <button class="hwa-qty-btn" type="button" data-action="qty-up" data-product="happy-box" aria-label="Increase quantity">+</button>
                 </div>
-                <button class="btn btn-primary" data-action="add" data-product="happy-box">Add to Cart</button>
+                <button class="btn btn-primary" type="button" data-action="add" data-product="happy-box">Add to cart</button>
               </div>
+              <a class="product-link" href="product.html?id=happy-box">View box details <span aria-hidden="true">&rarr;</span></a>
             </div>
           </article>
 
-          <article class="product-card" data-product="food-club">
-            <div class="product-media"><img src="the%20food%20club.webp" alt="The Food Club"></div>
+          <article class="product-card reveal" data-product="food-club">
+            <div class="product-media">
+              <a href="product.html?id=food-club" class="product-media-link" aria-label="View The Food Club details"><img src="the%20food%20club.webp" alt="The Food Club subscription" loading="lazy"></a>
+            </div>
             <div class="product-body">
-              <h2 class="product-name">The Food Club</h2>
-              <p class="product-tagline">Chef-crafted happiness.</p>
-              <div class="product-price">?1499 <span>/month</span></div>
+              <div>
+                <h2 class="product-name">The Food Club</h2>
+                <p class="product-tagline">Chef-crafted happiness.</p>
+              </div>
+              <div class="product-price"><span class="price-now">&#8377;1499</span><span class="price-period">/month</span></div>
               <ul class="product-benefits">
                 <li>Fresh-baked treats monthly</li>
                 <li>Small-batch recipes</li>
                 <li>Dog-safe ingredients</li>
               </ul>
               <div class="product-buy">
-                <div class="hwa-qty-stepper">
-                  <button class="hwa-qty-btn" data-action="qty-down" data-product="food-club">-</button>
-                  <span class="hwa-qty-val" data-product="food-club">1</span>
-                  <button class="hwa-qty-btn" data-action="qty-up" data-product="food-club">+</button>
+                <div class="hwa-qty-stepper" aria-label="Quantity">
+                  <button class="hwa-qty-btn" type="button" data-action="qty-down" data-product="food-club" aria-label="Decrease quantity">-</button>
+                  <span class="hwa-qty-val" data-product="food-club" aria-live="polite">1</span>
+                  <button class="hwa-qty-btn" type="button" data-action="qty-up" data-product="food-club" aria-label="Increase quantity">+</button>
                 </div>
-                <button class="btn btn-primary" data-action="add" data-product="food-club">Add to Cart</button>
+                <button class="btn btn-primary" type="button" data-action="add" data-product="food-club">Add to cart</button>
               </div>
+              <a class="product-link" href="product.html?id=food-club">View box details <span aria-hidden="true">&rarr;</span></a>
             </div>
           </article>
 
-          <article class="product-card" data-product="style-club">
-            <div class="product-media"><img src="The%20style%20club.webp" alt="The Style Club"></div>
+          <article class="product-card reveal" data-product="style-club">
+            <div class="product-media">
+              <a href="product.html?id=style-club" class="product-media-link" aria-label="View The Style Club details"><img src="The%20style%20club.webp" alt="The Style Club subscription" loading="lazy"></a>
+            </div>
             <div class="product-body">
-              <h2 class="product-name">The Style Club</h2>
-              <p class="product-tagline">Cozy comfort wear.</p>
-              <div class="product-price">?999 <span>/month</span></div>
+              <div>
+                <h2 class="product-name">The Style Club</h2>
+                <p class="product-tagline">Cozy comfort wear.</p>
+              </div>
+              <div class="product-price"><span class="price-now">&#8377;999</span><span class="price-period">/month</span></div>
               <ul class="product-benefits">
-                <li>Apparel &amp; accessories monthly</li>
-                <li>Fitted for size &amp; breed</li>
+                <li>Apparel and accessories</li>
+                <li>Fitted for size and breed</li>
                 <li>Comfort-first designs</li>
               </ul>
               <div class="product-buy">
-                <div class="hwa-qty-stepper">
-                  <button class="hwa-qty-btn" data-action="qty-down" data-product="style-club">-</button>
-                  <span class="hwa-qty-val" data-product="style-club">1</span>
-                  <button class="hwa-qty-btn" data-action="qty-up" data-product="style-club">+</button>
+                <div class="hwa-qty-stepper" aria-label="Quantity">
+                  <button class="hwa-qty-btn" type="button" data-action="qty-down" data-product="style-club" aria-label="Decrease quantity">-</button>
+                  <span class="hwa-qty-val" data-product="style-club" aria-live="polite">1</span>
+                  <button class="hwa-qty-btn" type="button" data-action="qty-up" data-product="style-club" aria-label="Increase quantity">+</button>
                 </div>
-                <button class="btn btn-primary" data-action="add" data-product="style-club">Add to Cart</button>
+                <button class="btn btn-primary" type="button" data-action="add" data-product="style-club">Add to cart</button>
               </div>
+              <a class="product-link" href="product.html?id=style-club">View box details <span aria-hidden="true">&rarr;</span></a>
             </div>
           </article>
 
-          <article class="product-card" data-product="calm-box">
-            <div class="product-media"><img src="the%20calm%20box.webp" alt="The Calm Box"></div>
+          <article class="product-card reveal" data-product="calm-box">
+            <div class="product-media">
+              <a href="product.html?id=calm-box" class="product-media-link" aria-label="View The Calm Box details"><img src="the%20calm%20box.webp" alt="The Calm Box subscription" loading="lazy"></a>
+            </div>
             <div class="product-body">
-              <h2 class="product-name">The Calm Box</h2>
-              <p class="product-tagline">Serenity in a box.</p>
-              <div class="product-price">?1499 <span>/month</span></div>
+              <div>
+                <h2 class="product-name">The Calm Box</h2>
+                <p class="product-tagline">Serenity in a box.</p>
+              </div>
+              <div class="product-price"><span class="price-now">&#8377;1499</span><span class="price-period">/month</span></div>
               <ul class="product-benefits">
-                <li>Calming aids &amp; enrichment</li>
-                <li>Snuffle &amp; soothe toys</li>
+                <li>Calming aids and enrichment</li>
+                <li>Snuffle and soothe toys</li>
                 <li>Anxiety-friendly routines</li>
               </ul>
               <div class="product-buy">
-                <div class="hwa-qty-stepper">
-                  <button class="hwa-qty-btn" data-action="qty-down" data-product="calm-box">-</button>
-                  <span class="hwa-qty-val" data-product="calm-box">1</span>
-                  <button class="hwa-qty-btn" data-action="qty-up" data-product="calm-box">+</button>
+                <div class="hwa-qty-stepper" aria-label="Quantity">
+                  <button class="hwa-qty-btn" type="button" data-action="qty-down" data-product="calm-box" aria-label="Decrease quantity">-</button>
+                  <span class="hwa-qty-val" data-product="calm-box" aria-live="polite">1</span>
+                  <button class="hwa-qty-btn" type="button" data-action="qty-up" data-product="calm-box" aria-label="Increase quantity">+</button>
                 </div>
-                <button class="btn btn-primary" data-action="add" data-product="calm-box">Add to Cart</button>
+                <button class="btn btn-primary" type="button" data-action="add" data-product="calm-box">Add to cart</button>
               </div>
+              <a class="product-link" href="product.html?id=calm-box">View box details <span aria-hidden="true">&rarr;</span></a>
             </div>
           </article>
 
-          <article class="product-card" data-product="build-your-own">
-            <div class="product-media"><img src="The%20Happy%20box.webp" alt="Build Your Own Happy Box"></div>
+          <article class="product-card product-card-byo reveal" data-product="build-your-own">
+            <div class="product-media">
+              <a href="product.html?id=build-your-own" class="product-media-link" aria-label="Build Your Own Happy Box details"><img src="The%20Happy%20box.webp" alt="Build Your Own Happy Box" loading="lazy"></a>
+              <span class="product-flag product-flag-sun">Made by you</span>
+            </div>
             <div class="product-body">
-              <h2 class="product-name">Build Your Own Happy Box</h2>
-              <p class="product-tagline">Curate your own happiness.</p>
-              <div class="product-price">?3499 <span>/month</span></div>
+              <div>
+                <h2 class="product-name">Build Your Own Happy Box</h2>
+                <p class="product-tagline">Curate your own happiness.</p>
+              </div>
+              <div class="product-price"><span class="price-now">&#8377;3499</span><span class="price-period">/month</span></div>
               <ul class="product-benefits">
-                <li>Pick 2-4 categories</li>
-                <li>Toys, food, apparel</li>
-                <li>Surprise merchandise</li>
+                <li>Pick at least two categories</li>
+                <li>Toys, food, style and more</li>
+                <li>Surprise merchandise inside</li>
               </ul>
               <div class="product-buy">
-                <div class="hwa-qty-stepper">
-                  <button class="hwa-qty-btn" data-action="qty-down" data-product="build-your-own">-</button>
-                  <span class="hwa-qty-val" data-product="build-your-own">1</span>
-                  <button class="hwa-qty-btn" data-action="qty-up" data-product="build-your-own">+</button>
+                <div class="hwa-qty-stepper" aria-label="Quantity">
+                  <button class="hwa-qty-btn" type="button" data-action="qty-down" data-product="build-your-own" aria-label="Decrease quantity">-</button>
+                  <span class="hwa-qty-val" data-product="build-your-own" aria-live="polite">1</span>
+                  <button class="hwa-qty-btn" type="button" data-action="qty-up" data-product="build-your-own" aria-label="Increase quantity">+</button>
                 </div>
-                <button class="btn btn-primary" data-action="add" data-product="build-your-own">Add to Cart</button>
+                <a class="btn btn-sun" href="product.html?id=build-your-own">Configure box</a>
               </div>
+              <a class="product-link" href="product.html?id=build-your-own">View box details <span aria-hidden="true">&rarr;</span></a>
             </div>
           </article>
+        </div>
+        <div class="collection-note">
+          <p><strong>A note on billing:</strong> prices shown are monthly. Yearly billing charges 12 months upfront and is available in the cart or at checkout.</p>
+          <p><strong>Demo storefront:</strong> no real payment is processed; orders are created with payment pending.</p>
         </div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="container">
-      <p>&copy; 2026 Happy While Away. Happiness, delivered monthly.</p>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+          <span class="brand-text">Happy <em>While Away</em></span>
+        </a>
+        <p>Thoughtful enrichment boxes for good dogs and the people who love them.</p>
+        <p class="footer-note">Demo storefront. Payments, OTP checks and email notifications are simulated; orders are created with payment pending.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="products.html">All boxes</a>
+        <a href="subscription.html">Plans &amp; pricing</a>
+        <a href="product.html?id=build-your-own">Build your own</a>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <a href="account.html">My account</a>
+        <a href="subscriptions.html">Manage subscriptions</a>
+        <a href="checkout.html">Checkout</a>
+      </div>
+      <div class="footer-col">
+        <h4>Help</h4>
+        <a href="contact.html">Contact us</a>
+        <a href="subscription.html#faq">FAQs</a>
+        <a href="contact.html">Shipping questions</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Happy While Away. All rights reserved.</p>
+      <p>Made for wagging tails.</p>
     </div>
   </footer>
-
 </body>
 </html>

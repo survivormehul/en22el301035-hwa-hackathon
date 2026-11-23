@@ -1,12 +1,29 @@
 (function () {
   "use strict";
   var STORAGE_KEY = "hwa_cart";
-  var FREE_SHIPPING_THRESHOLD = 2999;
-  var SHIPPING_FEE = 99;
-  var YEARLY_MONTHS = 12;
 
-  if (!window.HWA_CONFIG) { window.HWA_CONFIG = { annualDiscountPercent: 0 }; }
-  if (typeof window.HWA_CONFIG.annualDiscountPercent !== "number") { window.HWA_CONFIG.annualDiscountPercent = 0; }
+  var DEFAULTS = {
+    annualDiscountPercent: 0,
+    yearlyMonths: 12,
+    defaultShippingRate: 99,
+    shippingZones: [
+      { label: "Metro", prefixes: ["110", "400", "560", "600", "700"], rate: 49 },
+      { label: "Remote", prefixes: ["18", "19", "78", "79"], rate: 149 }
+    ],
+    coupons: {
+      FIRST10: { code: "FIRST10", type: "first_time", percent: 10, label: "10% off your first order" },
+      FREESHIP: { code: "FREESHIP", type: "free_delivery", percent: 0, label: "Free delivery" }
+    }
+  };
+
+  window.HWA_CONFIG = window.HWA_CONFIG || {};
+  Object.keys(DEFAULTS).forEach(function (key) {
+    if (window.HWA_CONFIG[key] === undefined || window.HWA_CONFIG[key] === null) {
+      window.HWA_CONFIG[key] = DEFAULTS[key];
+    }
+  });
+  window.HWA_CONFIG.yearlyMonths = Number(window.HWA_CONFIG.yearlyMonths) || 12;
+  window.HWA_CONFIG.annualDiscountPercent = typeof window.HWA_CONFIG.annualDiscountPercent === "number" ? window.HWA_CONFIG.annualDiscountPercent : 0;
 
   var PRODUCTS = {
     "happy-box": { id: "happy-box", name: "The Happy Box", price: 1999, image: "The%20Happy%20box.webp" },
@@ -22,13 +39,35 @@
   }
 
   function yearlyUpfront(item) {
-    var gross = item.price * YEARLY_MONTHS;
-    var net = gross * (1 - discountPercent() / 100);
-    return Math.round(net);
+    var months = window.HWA_CONFIG.yearlyMonths || 12;
+    var gross = item.price * months;
+    return Math.round(gross * (1 - discountPercent() / 100));
   }
 
   function effectivePrice(item) {
     return item.freq === "yearly" ? yearlyUpfront(item) : item.price;
+  }
+
+  function shippingFor(pincode) {
+    var pin = String(pincode || "").trim();
+    if (!/^[0-9]{6}$/.test(pin)) { return { known: false, rate: 0, zone: null }; }
+    var zones = window.HWA_CONFIG.shippingZones || [];
+    for (var i = 0; i < zones.length; i++) {
+      var zone = zones[i];
+      var prefixes = zone.prefixes || [];
+      for (var j = 0; j < prefixes.length; j++) {
+        if (pin.indexOf(String(prefixes[j])) === 0) {
+          return { known: true, rate: Number(zone.rate) || 0, zone: zone.label || "Zone" };
+        }
+      }
+    }
+    return { known: true, rate: Number(window.HWA_CONFIG.defaultShippingRate) || 0, zone: "Standard" };
+  }
+
+  function couponFor(code) {
+    var key = String(code || "").trim().toUpperCase();
+    var coupons = window.HWA_CONFIG.coupons || {};
+    return coupons[key] || null;
   }
 
   function computeTotals(items) {
@@ -52,7 +91,9 @@
     if (!raw) { this.items = []; return; }
     try { this.items = JSON.parse(raw) || []; } catch (e) { this.items = []; }
   };
-  Cart.prototype.save = function () { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.items)); } catch (e) {} };
+  Cart.prototype.save = function () {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.items)); } catch (e) {}
+  };
   Cart.prototype.add = function (productId, opts) {
     opts = opts || {};
     var p = PRODUCTS[productId];
@@ -65,8 +106,20 @@
       var sameFreq = (it.freq || "monthly") === (opts.freq || "monthly");
       if (sameProduct && sameConfig && sameFreq) { existing = it; break; }
     }
-    if (existing) { existing.qty = (existing.qty || 1) + (opts.qty || 1); }
-    else { this.items.push({ productId: productId, name: p.name, price: p.price, image: p.image, qty: opts.qty || 1, freq: opts.freq || "monthly", dogId: opts.dogId || null, config: opts.config || null }); }
+    if (existing) {
+      existing.qty = (existing.qty || 1) + (opts.qty || 1);
+    } else {
+      this.items.push({
+        productId: productId,
+        name: p.name,
+        price: p.price,
+        image: p.image,
+        qty: opts.qty || 1,
+        freq: opts.freq || "monthly",
+        dogId: opts.dogId || null,
+        config: opts.config || null
+      });
+    }
     this.save();
     return this.items.length;
   };
@@ -84,57 +137,85 @@
   function removeItem(index) { cart.remove(index); }
 
   function itemLabel(item) {
-    if (item.productId === "build-your-own" && item.config && item.config.categories) { return item.name + " [BYO: " + item.config.categories.join(", ") + "]"; }
+    if (item.productId === "build-your-own" && item.config && item.config.categories) {
+      return item.name + " <span>[" + item.config.categories.join(", ") + "]</span>";
+    }
     return item.name;
   }
 
-  function fmt(n) { return "\u20B9" + n.toLocaleString("en-IN"); }
+  function fmt(n) { return "\u20B9" + Math.round(Number(n) || 0).toLocaleString("en-IN"); }
+
+  var drawerBuilt = false;
+  var drawerOpen = false;
 
   function renderCart() {
-    var drawer = document.getElementById("hwaCartDrawer");
-    if (!drawer) { return; }
+    if (!drawerBuilt) { return; }
     var itemsEl = document.getElementById("hwaCartItems");
     var summaryEl = document.getElementById("hwaCartSummary");
     if (!itemsEl || !summaryEl) { return; }
     itemsEl.innerHTML = "";
-    if (cart.items.length === 0) { itemsEl.innerHTML = '<div class="hwa-cart-empty">Your cart is empty. Add a happy box!</div>'; }
-    for (var i = 0; i < cart.items.length; i++) {
-      var it = cart.items[i];
-      var ep = effectivePrice(it);
-      var priceLine = it.freq === "yearly" ? fmt(ep) + " / 12 months upfront" : fmt(ep) + " / month";
-      var row = document.createElement("div");
-      row.className = "hwa-cart-item";
-      row.innerHTML =
-        '<div class="hwa-cart-item-img"><img src="' + it.image + '" alt="' + it.name + '"></div>' +
-        '<div class="hwa-cart-item-info">' +
-          '<div class="hwa-cart-item-name">' + itemLabel(it) + '</div>' +
-          '<div class="hwa-cart-item-controls">' +
-            '<button class="hwa-qty-btn" data-action="qty-down" data-index="' + i + '">-</button>' +
-            '<span class="hwa-qty-val" data-index="' + i + '">' + it.qty + '</span>' +
-            '<button class="hwa-qty-btn" data-action="qty-up" data-index="' + i + '">+</button>' +
-            '<button class="hwa-remove-btn" data-action="remove" data-index="' + i + '">Remove</button>' +
+    if (cart.items.length === 0) {
+      itemsEl.innerHTML =
+        '<div class="hwa-cart-empty">' +
+          '<span class="cart-empty-art" aria-hidden="true">' +
+            '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M32 51c-8 0-15-5.5-15-13 0-6.6 5.6-11 11-11 2.4 0 4.6.7 6.3 2 1.7-1.3 3.9-2 6.3-2 5.4 0 11 4.4 11 11 0 7.5-7 13-15 13z"/><circle cx="20" cy="17" r="4"/><circle cx="32" cy="11" r="4"/><circle cx="44" cy="17" r="4"/></svg>' +
+          '</span>' +
+          '<p>Your cart is feeling a little empty.</p>' +
+          '<a class="btn btn-primary btn-sm" href="products.html">Browse the boxes</a>' +
+        '</div>';
+    } else {
+      for (var i = 0; i < cart.items.length; i++) {
+        var it = cart.items[i];
+        var ep = effectivePrice(it);
+        var priceLine = it.freq === "yearly"
+          ? fmt(ep) + '<span class="hwa-cart-period"> / 12 months upfront</span>'
+          : fmt(ep) + '<span class="hwa-cart-period"> / month</span>';
+        var row = document.createElement("div");
+        row.className = "hwa-cart-item";
+        row.innerHTML =
+          '<div class="hwa-cart-item-img"><img src="' + it.image + '" alt="" loading="lazy"></div>' +
+          '<div class="hwa-cart-item-info">' +
+            '<div class="hwa-cart-item-name">' + itemLabel(it) + '</div>' +
+            '<div class="hwa-cart-item-controls">' +
+              '<div class="hwa-qty-stepper hwa-qty-stepper-sm">' +
+                '<button class="hwa-qty-btn" type="button" data-action="qty-down" data-index="' + i + '" aria-label="Decrease quantity">-</button>' +
+                '<span class="hwa-qty-val" data-index="' + i + '" aria-live="polite">' + it.qty + '</span>' +
+                '<button class="hwa-qty-btn" type="button" data-action="qty-up" data-index="' + i + '" aria-label="Increase quantity">+</button>' +
+              '</div>' +
+              '<button class="hwa-remove-btn" type="button" data-action="remove" data-index="' + i + '">Remove</button>' +
+            '</div>' +
+            '<label class="hwa-freq-label">Billing' +
+              '<select class="hwa-freq-select" data-action="freq" data-index="' + i + '">' +
+                '<option value="monthly"' + (it.freq === "monthly" ? " selected" : "") + '>Monthly</option>' +
+                '<option value="yearly"' + (it.freq === "yearly" ? " selected" : "") + '>Yearly - 12 months upfront</option>' +
+              '</select>' +
+            '</label>' +
           '</div>' +
-          '<select class="hwa-freq-select" data-action="freq" data-index="' + i + '">' +
-            '<option value="monthly"' + (it.freq === "monthly" ? " selected" : "") + '>Monthly</option>' +
-            '<option value="yearly"' + (it.freq === "yearly" ? " selected" : "") + '>Yearly (12 months upfront)</option>' +
-          '</select>' +
-        '</div>' +
-        '<div class="hwa-cart-item-price">' + priceLine + (it.qty > 1 ? '<br>x ' + it.qty : '') + '</div>';
-      itemsEl.appendChild(row);
+          '<div class="hwa-cart-item-price">' + priceLine + (it.qty > 1 ? '<span class="hwa-cart-qty-note">x ' + it.qty + '</span>' : '') + '</div>';
+        itemsEl.appendChild(row);
+      }
     }
+
     var t = computeTotals(cart.items);
+    var yearlyTotal = window.HWA_CONFIG.yearlyMonths || 12;
+    var notes = [];
+    if (t.yearlyCount > 0) { notes.push("Yearly boxes are billed for " + yearlyTotal + " months upfront and delivered monthly."); }
+    if (t.monthlyCount > 1) { notes.push(t.monthlyCount + " monthly boxes renew independently."); }
     summaryEl.innerHTML =
       '<div class="hwa-cart-row"><span>Subtotal</span><span>' + fmt(t.subtotal) + '</span></div>' +
-      '<div class="hwa-cart-row"><span>Shipping</span><span>Calculated at checkout</span></div>' +
-      '<div class="hwa-cart-row hwa-cart-total"><span>Estimated Total</span><span>' + fmt(t.subtotal) + '</span></div>' +
-      (t.yearlyCount > 0 ? '<div class="hwa-cart-note">Yearly items are charged for 12 months upfront and delivered monthly.</div>' : '') +
-      (t.monthlyCount > 1 ? '<div class="hwa-cart-note">' + t.monthlyCount + ' monthly subscriptions renew independently.</div>' : '');
+      '<div class="hwa-cart-row"><span>Shipping</span><span class="hwa-muted-strong">Calculated at checkout</span></div>' +
+      '<div class="hwa-cart-row hwa-cart-total"><span>Estimated total</span><span>' + fmt(t.subtotal) + '</span></div>' +
+      notes.map(function (note) { return '<p class="hwa-cart-note">' + note + '</p>'; }).join("");
+
     var badge = document.getElementById("hwaCartBadge");
     if (badge) { badge.textContent = String(t.count); }
+    var checkoutBtn = document.getElementById("hwaCartCheckoutBtn");
+    if (checkoutBtn) { checkoutBtn.disabled = cart.items.length === 0; }
+    document.dispatchEvent(new CustomEvent("hwa:cart-updated", { detail: { count: t.count } }));
   }
 
   function ensureDrawer() {
-    if (document.getElementById("hwaCartDrawer")) { return; }
+    if (drawerBuilt) { return; }
     var overlay = document.createElement("div");
     overlay.id = "hwaCartOverlay";
     overlay.className = "hwa-cart-overlay";
@@ -142,29 +223,47 @@
     var drawer = document.createElement("aside");
     drawer.id = "hwaCartDrawer";
     drawer.className = "hwa-cart-drawer";
+    drawer.setAttribute("role", "dialog");
+    drawer.setAttribute("aria-modal", "true");
+    drawer.setAttribute("aria-label", "Shopping cart");
+    drawer.setAttribute("aria-hidden", "true");
     drawer.innerHTML =
-      '<div class="hwa-cart-header"><h2>Your Cart</h2><button id="hwaCartCloseBtn" class="hwa-cart-close" aria-label="Close cart">&times;</button></div>' +
-      '<div class="hwa-cart-items" id="hwaCartItems"></div>' +
-      '<div class="hwa-cart-summary" id="hwaCartSummary"></div>' +
-      '<div class="hwa-cart-actions">' +
-        '<button id="hwaCartContinueBtn" class="btn btn-outline">Continue Shopping</button>' +
-        '<button id="hwaCartCheckoutBtn" class="btn btn-primary">Proceed to Checkout</button>' +
+      '<div class="hwa-cart-header">' +
+        '<div><span class="eyebrow">Your happy stack</span><h2>Shopping cart</h2></div>' +
+        '<button id="hwaCartCloseBtn" class="hwa-cart-close" type="button" aria-label="Close cart">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+        '</button>' +
+      '</div>' +
+      '<div class="hwa-cart-items" id="hwaCartItems" aria-live="polite"></div>' +
+      '<div class="hwa-cart-footer">' +
+        '<div class="hwa-cart-summary" id="hwaCartSummary"></div>' +
+        '<div class="hwa-cart-actions">' +
+          '<button id="hwaCartContinueBtn" class="btn btn-outline" type="button">Keep browsing</button>' +
+          '<button id="hwaCartCheckoutBtn" class="btn btn-primary" type="button">Checkout</button>' +
+        '</div>' +
+        '<p class="hwa-cart-demo-note">Demo store: shipping, coupons and the final total are confirmed at checkout. No real payment is taken.</p>' +
       '</div>';
     overlay.appendChild(drawer);
     document.body.appendChild(overlay);
+    drawerBuilt = true;
+
     document.getElementById("hwaCartCloseBtn").addEventListener("click", closeCart);
     document.getElementById("hwaCartContinueBtn").addEventListener("click", closeCart);
-    document.getElementById("hwaCartCheckoutBtn").addEventListener("click", function () { closeCart(); window.location.href = "checkout.html"; });
-    document.getElementById("hwaCartDrawer").addEventListener("click", function (e) {
-      e.stopPropagation();
+    document.getElementById("hwaCartCheckoutBtn").addEventListener("click", function () {
+      if (!cart.items.length) { return; }
+      closeCart();
+      window.location.href = "checkout.html";
+    });
+    drawer.addEventListener("click", function (e) {
       var btn = e.target.closest("[data-action]");
       if (!btn || btn.tagName === "SELECT") { return; }
       var idx = parseInt(btn.getAttribute("data-index"), 10);
+      if (isNaN(idx)) { return; }
       if (btn.getAttribute("data-action") === "qty-up") { updateQty(idx, (cart.items[idx].qty || 1) + 1); }
       else if (btn.getAttribute("data-action") === "qty-down") { updateQty(idx, (cart.items[idx].qty || 1) - 1); }
       else if (btn.getAttribute("data-action") === "remove") { removeItem(idx); }
     });
-    document.getElementById("hwaCartDrawer").addEventListener("change", function (e) {
+    drawer.addEventListener("change", function (e) {
       var sel = e.target.closest("[data-action='freq']");
       if (!sel) { return; }
       cart.setFreq(parseInt(sel.getAttribute("data-index"), 10), sel.value);
@@ -172,13 +271,56 @@
     renderCart();
   }
 
-  function openCart() { ensureDrawer(); var o = document.getElementById("hwaCartOverlay"); var d = document.getElementById("hwaCartDrawer"); if (o) { o.classList.add("open"); } if (d) { d.classList.add("open"); } }
-  function closeCart() { var o = document.getElementById("hwaCartOverlay"); var d = document.getElementById("hwaCartDrawer"); if (o) { o.classList.remove("open"); } if (d) { d.classList.remove("open"); } }
+  function bumpBadge() {
+    var badge = document.getElementById("hwaCartBadge");
+    if (!badge) { return; }
+    badge.classList.remove("is-bumped");
+    void badge.offsetWidth;
+    badge.classList.add("is-bumped");
+  }
 
-  function addToCart(productId, opts) { var n = cart.add(productId, opts || {}); if (n) { renderCart(); openCart(); } return n; }
+  function openCart() {
+    ensureDrawer();
+    drawerOpen = true;
+    var o = document.getElementById("hwaCartOverlay");
+    var d = document.getElementById("hwaCartDrawer");
+    if (o) { o.classList.add("open"); }
+    if (d) { d.classList.add("open"); d.setAttribute("aria-hidden", "false"); }
+    document.body.classList.add("cart-open");
+    var closeBtn = document.getElementById("hwaCartCloseBtn");
+    if (closeBtn) { closeBtn.focus(); }
+  }
+  function closeCart() {
+    drawerOpen = false;
+    var o = document.getElementById("hwaCartOverlay");
+    var d = document.getElementById("hwaCartDrawer");
+    if (o) { o.classList.remove("open"); }
+    if (d) { d.classList.remove("open"); d.setAttribute("aria-hidden", "true"); }
+    document.body.classList.remove("cart-open");
+  }
+
+  function addToCart(productId, opts) {
+    var n = cart.add(productId, opts || {});
+    if (n) { renderCart(); bumpBadge(); openCart(); }
+    return n;
+  }
 
   window.HWA = window.HWA || {};
-  window.HWA.Cart = { get: getCart, add: addToCart, updateQty: updateQty, removeItem: removeItem, setFreq: function (i, f) { cart.setFreq(i, f); }, setDog: function (i, d) { cart.setDog(i, d); }, clear: function () { cart.clear(); }, totals: computeTotals, products: PRODUCTS };
+  window.HWA.Cart = {
+    get: getCart,
+    add: addToCart,
+    updateQty: updateQty,
+    removeItem: removeItem,
+    setFreq: function (i, f) { cart.setFreq(i, f); },
+    setDog: function (i, d) { cart.setDog(i, d); },
+    clear: function () { cart.clear(); },
+    totals: computeTotals,
+    amountFor: effectivePrice,
+    products: PRODUCTS
+  };
+  window.HWA.shippingFor = shippingFor;
+  window.HWA.couponFor = couponFor;
+  window.HWA.coupons = window.HWA_CONFIG.coupons;
   window.HWA.addToCart = addToCart;
   window.HWA.openCart = openCart;
   window.HWA.closeCart = closeCart;
@@ -187,29 +329,25 @@
     ensureDrawer();
     var openBtn = document.getElementById("cartOpenBtn");
     if (openBtn) { openBtn.addEventListener("click", openCart); }
-    var closeBtn = document.getElementById("hwaCartCloseBtn");
-    if (closeBtn) { closeBtn.addEventListener("click", closeCart); }
-    var contBtn = document.getElementById("hwaCartContinueBtn");
-    if (contBtn) { contBtn.addEventListener("click", closeCart); }
-    var chkBtn = document.getElementById("hwaCartCheckoutBtn");
-    if (chkBtn) { chkBtn.addEventListener("click", function () { closeCart(); window.location.href = "checkout.html"; }); }
-
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && drawerOpen) { closeCart(); }
+    });
     document.addEventListener("click", function (e) {
       if (e.target.closest && e.target.closest("#hwaCartDrawer")) { return; }
       var addBtn = e.target.closest("[data-action='add']");
       if (addBtn) {
-        var card = addBtn.closest("[data-product]");
-        var cardQty = card ? card.querySelector(".hwa-qty-val") : null;
+        var addPid = addBtn.getAttribute("data-product");
+        var cardQty = addPid ? document.querySelector(".hwa-qty-val[data-product='" + addPid + "']") : null;
         var q = cardQty ? parseInt(cardQty.textContent, 10) : parseInt(addBtn.getAttribute("data-qty") || "1", 10);
         if (isNaN(q) || q < 1) { q = 1; }
-        addToCart(addBtn.getAttribute("data-product"), { qty: q });
+        addToCart(addPid, { qty: q });
         if (cardQty) { cardQty.textContent = "1"; }
         return;
       }
       var stepper = e.target.closest("[data-action='qty-up'], [data-action='qty-down']");
       if (stepper) {
-        var card2 = stepper.closest("[data-product]");
-        var qtyEl = card2 ? card2.querySelector(".hwa-qty-val") : null;
+        var stepPid = stepper.getAttribute("data-product");
+        var qtyEl = stepPid ? document.querySelector(".hwa-qty-val[data-product='" + stepPid + "']") : null;
         if (qtyEl) {
           var v = parseInt(qtyEl.textContent, 10);
           if (isNaN(v) || v < 1) { v = 1; }
@@ -217,7 +355,6 @@
           if (v < 1) { v = 1; }
           qtyEl.textContent = String(v);
         }
-        return;
       }
     });
   });

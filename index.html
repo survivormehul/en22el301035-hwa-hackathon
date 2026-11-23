@@ -3,68 +3,272 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#fbf6ee">
+  <meta name="description" content="Happy While Away creates thoughtful monthly enrichment boxes for dogs - curated toys, treats, puzzles and comfort, delivered with care.">
   <title>Happy While Away | Dog Enrichment Subscription</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/cart.js"></script>
+  <script src="js/ui.js" defer></script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
-      <a href="subscription.html" class="btn btn-outline">Subscribe</a>
+      <a class="brand" href="index.html" aria-label="Happy While Away home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+        <span class="brand-text">Happy <em>While Away</em></span>
+      </a>
+      <nav class="main-nav" id="mainNav" aria-label="Primary navigation">
+        <a href="index.html" class="active">Home</a>
+        <a href="products.html">Boxes</a>
+        <a href="subscription.html">Plans</a>
+        <a href="account.html">My account</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <button class="cart-open-btn" id="cartOpenBtn" type="button" aria-label="Open shopping cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1.2 10.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+          <span class="cart-label">Cart</span>
+          <span class="cart-badge" id="hwaCartBadge">0</span>
+        </button>
+        <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Open menu"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="container hero-inner">
-      <h1>Happiness &amp; enrichment for dogs, delivered regularly.</h1>
-      <p class="hero-sub">A premium dog-enrichment box every month — toys, treats, puzzles and chews, curated for your pup. Subscription only.</p>
-      <a href="subscription.html" class="btn btn-primary btn-large">Choose Your Plan</a>
-      <div class="hero-stats">
-        <div><strong>Subscription only</strong><span>no one-off sales</span></div>
-        <div><strong>Monthly or yearly</strong><span>your choice</span></div>
-        <div><strong>Cancel anytime</strong><span>no commitment</span></div>
+  <main id="main">
+    <section class="home-hero">
+      <div class="container home-hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> Premium enrichment, delivered</span>
+          <h1>A little joy for your <span class="underline-word">best friend</span>, every month.</h1>
+          <p class="hero-lede">Thoughtful dog-enrichment boxes curated for their size, personality and stage of life. New toys, treats and surprises arrive monthly - because happy dogs make for a happy home.</p>
+          <div class="hero-cta">
+            <a class="btn btn-primary btn-large" href="products.html">Explore the boxes</a>
+            <a class="btn btn-outline btn-large" href="subscription.html">See the plans</a>
+          </div>
+          <ul class="hero-trust">
+            <li><span class="trust-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>Subscription only, always</li>
+            <li><span class="trust-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>Pause or cancel anytime</li>
+            <li><span class="trust-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>Monthly or yearly billing</li>
+          </ul>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-shape" aria-hidden="true"></div>
+          <figure class="hero-photo">
+            <img src="The%20Happy%20box.webp" alt="The Happy Box, a curated dog enrichment subscription box" width="640" height="640">
+          </figure>
+          <div class="float-card float-card-top">
+            <span class="float-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+            <span><strong>Curated for your dog</strong><small>Size, taste and temperament</small></span>
+          </div>
+          <div class="float-card float-card-bottom">
+            <span class="float-spark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg></span>
+            <span><strong>Monthly surprise</strong><small>New enrichment every box</small></span>
+          </div>
+          <span class="hero-doodle hero-doodle-paw" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+          <span class="hero-doodle hero-doodle-bone" aria-hidden="true"><svg viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 8a4 4 0 1 0 0 8c2 0 3-1 4-2h22c1 1 2 2 4 2a4 4 0 1 0 0-8c-2 0-3 1-4 2H13c-1-1-2-2-4-2z"/></svg></span>
+        </div>
       </div>
-    </div>
-  </section>
+      <div class="container">
+        <p class="demo-strip">Demo storefront: orders are created with payment pending. OTP checks and email notifications are simulated.</p>
+      </div>
+    </section>
 
-  <section class="features">
-    <div class="container">
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-icon">🐾</div>
-          <h3>Personalised for your dog</h3>
-          <p>We collect your dog's profile so every box fits their size, age and tastes.</p>
+    <section class="section section-cream">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">The happy difference</span>
+          <h2>Enrichment with real personality</h2>
+          <p>Every box is put together by people who know that a bored dog is a busy dog. We balance play, comfort and calm so there is always something to look forward to.</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">🎁</div>
-          <h3>Curated surprise</h3>
-          <p>New enrichment every month — pick your categories, we pick the merchandise.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🚚</div>
-          <p>Delivered to your door every month. Pause or cancel anytime.</p>
+        <div class="feature-grid">
+          <article class="feature-card reveal">
+            <span class="feature-icon feature-icon-coral" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 8.5c-2.5-2.5-5 0-2.5 2.5l5 5c2.5 2.5 5 0 2.5-2.5"/><path d="M14.5 8.5c2.5-2.5 5 0 2.5 2.5l-5 5c-2.5 2.5-5 0-2.5-2.5"/><path d="M4 20l3-3M20 20l-3-3"/></svg></span>
+            <h3>Made for your dog</h3>
+            <p>Tell us their size, age and quirks. We shape each delivery around the dog in front of us, not a one-size-fits-all template.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-icon feature-icon-sage" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5.3L19.5 10 14 12l-2 5.3L10 12 4.5 10 10 8.3 12 3z"/><path d="M18.5 16l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z"/></svg></span>
+            <h3>Kept as a surprise</h3>
+            <p>Pick a ready-curated box or choose your favourite categories. We take care of the actual merchandise so the unboxing stays exciting.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-icon feature-icon-sky" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v10H3z"/><path d="M14 10h4l3 3v4h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="17.5" cy="18" r="2"/></svg></span>
+            <h3>Delivered with care</h3>
+            <p>Monthly happiness at your door, with pincode-based shipping and a delivery address that follows every subscription.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-icon feature-icon-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <h3>Easy to live with</h3>
+            <p>Pause, resume or cancel from your dashboard. Yearly boxes can even skip a delivery when life gets busy.</p>
+          </article>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="cta-band">
-    <div class="container cta-inner">
-      <h2>Ready for a happier dog?</h2>
-      <p>Join the subscription. Your pup gets enriched every month.</p>
-      <a href="subscription.html" class="btn btn-primary btn-large">Get Started</a>
-    </div>
-  </section>
+    <section class="section">
+      <div class="container">
+        <div class="section-head section-head-split reveal">
+          <div>
+            <span class="eyebrow">The collection</span>
+            <h2>Find their flavour of happy</h2>
+          </div>
+          <a class="text-link" href="products.html">View all boxes <span aria-hidden="true">&rarr;</span></a>
+        </div>
+        <div class="home-box-grid">
+          <a class="mini-box reveal" href="product.html?id=happy-box">
+            <span class="mini-box-media"><img src="The%20Happy%20box.webp" alt="The Happy Box" loading="lazy"></span>
+            <span class="mini-box-body">
+              <span class="mini-box-tag">Most popular</span>
+              <strong>The Happy Box</strong>
+              <span class="mini-box-copy">Our signature mix of toys, treats and puzzles.</span>
+              <span class="mini-box-foot"><span>&#8377;1999 <small>/month</small></span><span aria-hidden="true">&rarr;</span></span>
+            </span>
+          </a>
+          <a class="mini-box reveal" href="product.html?id=food-club">
+            <span class="mini-box-media"><img src="the%20food%20club.webp" alt="The Food Club" loading="lazy"></span>
+            <span class="mini-box-body">
+              <span class="mini-box-tag">Small batch</span>
+              <strong>The Food Club</strong>
+              <span class="mini-box-copy">Chef-crafted treats and chews, chosen for your dog.</span>
+              <span class="mini-box-foot"><span>&#8377;1499 <small>/month</small></span><span aria-hidden="true">&rarr;</span></span>
+            </span>
+          </a>
+          <a class="mini-box reveal" href="product.html?id=style-club">
+            <span class="mini-box-media"><img src="The%20style%20club.webp" alt="The Style Club" loading="lazy"></span>
+            <span class="mini-box-body">
+              <span class="mini-box-tag">Comfort first</span>
+              <strong>The Style Club</strong>
+              <span class="mini-box-copy">Seasonal apparel and accessories that actually fit.</span>
+              <span class="mini-box-foot"><span>&#8377;999 <small>/month</small></span><span aria-hidden="true">&rarr;</span></span>
+            </span>
+          </a>
+          <a class="mini-box reveal" href="product.html?id=calm-box">
+            <span class="mini-box-media"><img src="the%20calm%20box.webp" alt="The Calm Box" loading="lazy"></span>
+            <span class="mini-box-body">
+              <span class="mini-box-tag">Gentle days</span>
+              <strong>The Calm Box</strong>
+              <span class="mini-box-copy">Soothing enrichment for anxious or older dogs.</span>
+              <span class="mini-box-foot"><span>&#8377;1499 <small>/month</small></span><span aria-hidden="true">&rarr;</span></span>
+            </span>
+          </a>
+        </div>
+        <div class="byo-banner reveal">
+          <div class="byo-banner-copy">
+            <span class="eyebrow eyebrow-light">Build your own</span>
+            <h3>Their box. Their rules.</h3>
+            <p>Choose at least two of our three collections and we will curate the surprises around your dog's tastes. Fixed at &#8377;3499 per month.</p>
+          </div>
+          <div class="byo-banner-action">
+            <div class="byo-chips" aria-hidden="true"><span>Toys</span><span>Treats</span><span>Style</span></div>
+            <a class="btn btn-sun" href="product.html?id=build-your-own">Build their box</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-cream">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">How it works</span>
+          <h2>Three little steps to a happier month</h2>
+        </div>
+        <div class="steps-grid">
+          <div class="step-card reveal">
+            <span class="step-num">01</span>
+            <h3>Choose their happy</h3>
+            <p>Pick a curated box or build your own from our three collections.</p>
+          </div>
+          <div class="step-card reveal">
+            <span class="step-num">02</span>
+            <h3>Tell us about them</h3>
+            <p>Add a dog profile, delivery address and billing rhythm at checkout.</p>
+          </div>
+          <div class="step-card reveal">
+            <span class="step-num">03</span>
+            <h3>Wait for the wiggle</h3>
+            <p>We confirm the order, keep the payment pending in this demo, and your subscription begins.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="story-band">
+      <div class="container story-inner">
+        <div class="story-copy reveal">
+          <span class="eyebrow eyebrow-light">Made for the good ones</span>
+          <h2>For the dogs who make our days.</h2>
+          <p>Happy While Away began with a simple idea: the little things we do for our dogs should feel as thoughtful as the joy they give us back. Our boxes are designed to be opened together - a small ritual of play, curiosity and calm.</p>
+          <a class="btn btn-outline btn-on-dark" href="contact.html">Talk to us <span aria-hidden="true">&rarr;</span></a>
+        </div>
+        <div class="story-art reveal" aria-hidden="true">
+          <svg viewBox="0 0 300 260" fill="none">
+            <circle cx="160" cy="124" r="96" fill="#f4c96b" opacity="0.16"/>
+            <path d="M96 117c0-34 27-62 61-62s61 28 61 62v35c0 30-24 54-54 54h-14c-30 0-54-24-54-54v-35z" fill="#fbf6ee" opacity="0.12"/>
+            <path d="M111 108c0-31 24-56 55-56s55 25 55 56v34c0 27-22 49-49 49h-12c-27 0-49-22-49-49v-34z" stroke="#fbf6ee" stroke-width="3" stroke-linejoin="round"/>
+            <circle cx="145" cy="112" r="4" fill="#fbf6ee"/>
+            <circle cx="188" cy="112" r="4" fill="#fbf6ee"/>
+            <path d="M158 132c4 5 10 7 16 3" stroke="#fbf6ee" stroke-width="3" stroke-linecap="round"/>
+            <path d="M139 87c8-10 23-13 34-6" stroke="#fbf6ee" stroke-width="3" stroke-linecap="round"/>
+            <path d="M101 129c-17 0-29-12-29-28 0-9 4-17 11-22" stroke="#fbf6ee" stroke-width="3" stroke-linecap="round"/>
+            <path d="M221 129c17 0 29-12 29-28 0-9-4-17-11-22" stroke="#fbf6ee" stroke-width="3" stroke-linecap="round"/>
+            <path d="M98 83c-6-23 3-39 19-45 7 19 2 35-11 46" fill="#fbf6ee" opacity="0.2"/>
+            <path d="M216 75c8-20 23-29 38-26-1 20-12 33-29 37" fill="#fbf6ee" opacity="0.2"/>
+            <circle cx="62" cy="195" r="4" fill="#f4c96b"/>
+            <circle cx="244" cy="190" r="6" fill="#f4c96b" opacity="0.7"/>
+            <circle cx="226" cy="54" r="4" fill="#f4c96b" opacity="0.8"/>
+            <path d="M48 164l3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8z" fill="#f4c96b" opacity="0.7"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="container cta-inner reveal">
+        <span class="eyebrow">The good stuff, on repeat</span>
+        <h2>Ready to make their month?</h2>
+        <p>Start a subscription, share a little about your dog, and let the happy mail begin.</p>
+        <div class="cta-actions">
+          <a class="btn btn-primary btn-large" href="products.html">Shop the boxes</a>
+          <a class="btn btn-outline btn-large" href="subscription.html">Compare plans</a>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <footer class="site-footer">
-    <div class="container footer-inner">
+    <div class="container footer-grid">
       <div class="footer-brand">
-        <a href="index.html" class="brand">Happy <span class="brand-accent">While Away</span></a>
-        <p>Premium dog enrichment, delivered regularly.</p>
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+          <span class="brand-text">Happy <em>While Away</em></span>
+        </a>
+        <p>Thoughtful enrichment boxes for good dogs and the people who love them.</p>
+        <p class="footer-note">Demo storefront. Payments, OTP checks and email notifications are simulated; orders are created with payment pending.</p>
       </div>
-      <div class="footer-copy">
-        <p>&copy; 2026 Happy While Away. All rights reserved.</p>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="products.html">All boxes</a>
+        <a href="subscription.html">Plans &amp; pricing</a>
+        <a href="product.html?id=build-your-own">Build your own</a>
       </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <a href="account.html">My account</a>
+        <a href="subscriptions.html">Manage subscriptions</a>
+        <a href="checkout.html">Checkout</a>
+      </div>
+      <div class="footer-col">
+        <h4>Help</h4>
+        <a href="contact.html">Contact us</a>
+        <a href="subscription.html#faq">FAQs</a>
+        <a href="contact.html">Shipping questions</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Happy While Away. All rights reserved.</p>
+      <p>Made for wagging tails.</p>
     </div>
   </footer>
 </body>

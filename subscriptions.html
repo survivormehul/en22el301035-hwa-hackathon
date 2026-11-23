@@ -3,58 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Happy While Away - My Subscriptions</title>
+  <meta name="theme-color" content="#fbf6ee">
+  <meta name="description" content="Look up and manage your Happy While Away subscriptions by email.">
+  <title>Manage Subscriptions | Happy While Away</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/cart.js"></script>
+  <script src="js/ui.js" defer></script>
 </head>
 <body>
-
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="logo">Happy While Away</a>
-      <nav class="main-nav" id="mainNav">
+      <a class="brand" href="index.html" aria-label="Happy While Away home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+        <span class="brand-text">Happy <em>While Away</em></span>
+      </a>
+      <nav class="main-nav" id="mainNav" aria-label="Primary navigation">
         <a href="index.html">Home</a>
         <a href="products.html">Boxes</a>
-        <a href="subscription.html">Subscription</a>
-        <a href="subscriptions.html" class="active">My Subscriptions</a>
-        <a href="account.html">My Account</a>
+        <a href="subscription.html">Plans</a>
+        <a href="account.html">My account</a>
         <a href="contact.html">Contact</a>
       </nav>
-      <button class="btn btn-outline cart-open-btn" id="cartOpenBtn">Cart <span id="hwaCartBadge">0</span></button>
+      <div class="header-actions">
+        <button class="cart-open-btn" id="cartOpenBtn" type="button" aria-label="Open shopping cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1.2 10.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+          <span class="cart-label">Cart</span>
+          <span class="cart-badge" id="hwaCartBadge">0</span>
+        </button>
+        <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Open menu"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </header>
 
-  <main class="section">
-    <div class="container">
-      <h1>My Subscriptions</h1>
-      <form id="lookupForm" class="lookup-form">
-        <div class="form-field">
-          <label for="lookupEmail">Email used at checkout</label>
-          <input id="lookupEmail" type="email" required placeholder="you@example.com">
+  <main id="main">
+    <section class="page-hero page-hero-compact">
+      <div class="container page-hero-inner">
+        <div class="page-hero-copy">
+          <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> Subscription lookup</span>
+          <h1>Your boxes, in one place.</h1>
+          <p>Enter the email you used at checkout to find the subscriptions created in this demo store. For the full dashboard, sign in on the account page.</p>
         </div>
-        <button type="submit" class="btn btn-primary">View Subscriptions</button>
-      </form>
-      <div class="error-msg" id="lookupError" style="display:none;"></div>
-      <div id="subsList"></div>
-    </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container lookup-wrap">
+        <div class="lookup-card">
+          <form id="lookupForm" class="lookup-form">
+            <div class="form-field">
+              <label for="lookupEmail">Email used at checkout</label>
+              <input id="lookupEmail" type="email" required placeholder="you@example.com" autocomplete="email">
+            </div>
+            <button type="submit" class="btn btn-primary" id="lookupBtn">View subscriptions</button>
+          </form>
+          <p class="hint">Server records are best-effort in this serverless demo. Your browser account dashboard holds the most complete copy.</p>
+        </div>
+        <div class="error-msg" id="lookupError" style="display:none;"></div>
+        <div id="subsList" class="subs-list"></div>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
-    <div class="container">
-      <p>&copy; 2026 Happy While Away. Happiness, delivered monthly.</p>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="6.8" cy="8.2" rx="1.9" ry="2.5"/><ellipse cx="12" cy="6.4" rx="1.9" ry="2.5"/><ellipse cx="17.2" cy="8.2" rx="1.9" ry="2.5"/><path d="M12 11.4c-3.1 0-5.7 2.1-5.7 4.7 0 2 1.8 3.4 4.2 3.4h3c2.4 0 4.2-1.4 4.2-3.4 0-2.6-2.6-4.7-5.7-4.7z"/></svg></span>
+          <span class="brand-text">Happy <em>While Away</em></span>
+        </a>
+        <p>Thoughtful enrichment boxes for good dogs and the people who love them.</p>
+        <p class="footer-note">Demo storefront. Payments, OTP checks and email notifications are simulated; orders are created with payment pending.</p>
+      </div>
+      <div class="footer-col"><h4>Shop</h4><a href="products.html">All boxes</a><a href="subscription.html">Plans &amp; pricing</a><a href="product.html?id=build-your-own">Build your own</a></div>
+      <div class="footer-col"><h4>Account</h4><a href="account.html">My account</a><a href="subscriptions.html">Manage subscriptions</a><a href="checkout.html">Checkout</a></div>
+      <div class="footer-col"><h4>Help</h4><a href="contact.html">Contact us</a><a href="subscription.html#faq">FAQs</a><a href="contact.html">Shipping questions</a></div>
     </div>
+    <div class="container footer-bottom"><p>&copy; 2026 Happy While Away. All rights reserved.</p><p>Made for wagging tails.</p></div>
   </footer>
-
 
   <script>
     (function () {
       function fmt(n) { return "\u20B9" + Number(n || 0).toLocaleString("en-IN"); }
-      function freqLabel(f) { return f === "yearly" ? "Yearly (12 months upfront)" : "Monthly"; }
-      function statusClass(s) { return "sub-status sub-status-" + (s || "active"); }
+      function freqLabel(f) { return f === "yearly" ? "Yearly - 12 months upfront" : "Monthly"; }
       function render(list) {
         var el = document.getElementById("subsList");
         if (!list || !list.length) {
-          el.innerHTML = '<p class="hint">No subscriptions found for that email.</p>';
+          el.innerHTML = '<div class="empty-state"><p>No subscriptions found for that email.</p><p class="hint">Try the email used at checkout, or open your account dashboard for browser-saved subscriptions.</p></div>';
           return;
         }
         el.innerHTML = list.map(function (s) {
@@ -63,8 +98,8 @@
           var addr = s.deliveryAddress ? (s.deliveryAddress.address + (s.deliveryAddress.pincode ? ", " + s.deliveryAddress.pincode : "")) : "-";
           var renewal = s.renewalDate ? new Date(s.renewalDate).toLocaleDateString("en-IN") : "-";
           var amount = s.billing && s.billing.amount != null ? s.billing.amount : s.total;
-          return '<div class="sub-card">' +
-            '<div class="sub-card-head"><span class="sub-name">' + (item.name || "Subscription") + '</span><span class="' + statusClass(s.status) + '">' + (s.status || "active") + '</span></div>' +
+          return '<article class="sub-card">' +
+            '<div class="sub-card-head"><span class="sub-name">' + (item.name || "Subscription") + '</span><span class="sub-status sub-status-' + (s.status || "active") + '">' + (s.status || "active") + '</span></div>' +
             '<div class="sub-id">' + s.id + '</div>' +
             '<div class="sub-grid">' +
               '<div class="sub-field"><label>Billing</label><span>' + freqLabel(s.frequency) + '</span></div>' +
@@ -74,39 +109,43 @@
               '<div class="sub-field"><label>Delivery address</label><span>' + addr + '</span></div>' +
             '</div>' +
             '<div class="sub-actions">' +
-              '<button class="btn btn-outline" data-action="pause" data-id="' + s.id + '">Pause</button>' +
-              '<button class="btn btn-outline" data-action="resume" data-id="' + s.id + '">Resume</button>' +
-              '<button class="btn btn-outline" data-action="cancel" data-id="' + s.id + '">Cancel</button>' +
+              '<button class="btn btn-outline btn-sm" type="button" data-action="pause" data-id="' + s.id + '">Pause</button>' +
+              '<button class="btn btn-outline btn-sm" type="button" data-action="resume" data-id="' + s.id + '">Resume</button>' +
+              '<button class="btn btn-outline btn-sm" type="button" data-action="cancel" data-id="' + s.id + '">Cancel</button>' +
             '</div>' +
-            '<p class="hint">Billing frequency and subscription box cannot be changed after purchase.</p>' +
-          '</div>';
+            '<p class="hint">Billing frequency and box type cannot be changed after purchase. Yearly subscriptions can skip a delivery from the account dashboard.</p>' +
+          '</article>';
         }).join("");
         el.querySelectorAll("[data-action]").forEach(function (btn) {
           btn.addEventListener("click", function () {
             var action = btn.getAttribute("data-action");
             var id = btn.getAttribute("data-id");
+            btn.disabled = true;
             fetch("/api/subscribe", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subscriptionId: id, action: action }) })
               .then(function (r) { return r.json(); })
               .then(function () { load(document.getElementById("lookupEmail").value.trim()); })
-              .catch(function () {});
+              .catch(function () { btn.disabled = false; });
           });
         });
       }
       function load(email) {
         var errEl = document.getElementById("lookupError");
+        var btn = document.getElementById("lookupBtn");
         errEl.style.display = "none";
+        btn.disabled = true;
+        btn.textContent = "Looking...";
         fetch("/api/subscribe?email=" + encodeURIComponent(email))
           .then(function (r) { return r.json(); })
           .then(function (data) { render(data.subscriptions || []); })
-          .catch(function () { errEl.textContent = "Could not load subscriptions."; errEl.style.display = "block"; });
+          .catch(function () { errEl.textContent = "Could not load subscriptions."; errEl.style.display = "block"; })
+          .then(function () { btn.disabled = false; btn.textContent = "View subscriptions"; });
       }
       document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("cartOpenBtn").addEventListener("click", function () { window.HWA.openCart(); });
         document.getElementById("lookupForm").addEventListener("submit", function (e) {
           e.preventDefault();
           var email = document.getElementById("lookupEmail").value.trim();
+          var errEl = document.getElementById("lookupError");
           if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            var errEl = document.getElementById("lookupError");
             errEl.textContent = "Please enter a valid email.";
             errEl.style.display = "block";
             return;
@@ -116,6 +155,5 @@
       });
     })();
   </script>
-
 </body>
 </html>
