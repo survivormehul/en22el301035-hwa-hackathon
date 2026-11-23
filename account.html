@@ -148,8 +148,9 @@
   <script>
     (function () {
       var account = null;
-      var loginCode = null;
+var loginCode = null;
       var loginEmail = "";
+      var COMMON_BREEDS = ["", "Labrador Retriever", "German Shepherd", "Golden Retriever", "Beagle", "Pug", "Shih Tzu", "Indie / Indian Pariah", "Rottweiler", "Doberman", "Husky", "Cocker Spaniel", "Dachshund", "Boxer", "Great Dane", "Maltese", "Pomeranian", "Other"];
 
       function fmt(n) { return "\u20B9" + Math.round(Number(n) || 0).toLocaleString("en-IN"); }
       function store() { try { return JSON.parse(localStorage.getItem("hwa_accounts") || "{}"); } catch (e) { return {}; } }
@@ -219,17 +220,38 @@ function loadAccount(email) {
         document.getElementById("accPincode").value = account.address && account.address.pincode ? account.address.pincode : "";
       }
 
+function breedOptions(selected) {
+        var isOther = selected && COMMON_BREEDS.indexOf(selected) === -1;
+        return COMMON_BREEDS.map(function (b) {
+          var label = b === "" ? "Select breed" : b;
+          var sel = (b !== "" && b === selected) || (b === "Other" && isOther) ? " selected" : "";
+          return '<option value="' + b + '"' + sel + '>' + label + '</option>';
+        }).join("");
+      }
+      function isOtherBreed(selected) { return !!selected && COMMON_BREEDS.indexOf(selected) === -1; }
+
       function renderDogs() {
         var el = document.getElementById("accDogs");
         if (!account.dogs.length) { el.innerHTML = '<p class="hint">No dog profiles yet.</p>'; return; }
         el.innerHTML = account.dogs.map(function (d, i) {
+          var breed = d.breed || "";
+          var otherValue = isOtherBreed(breed) ? breed : "";
+          var selectValue = isOtherBreed(breed) ? "Other" : breed;
           return '<div class="dog-row form-grid" data-dog-index="' + i + '">' +
             '<div class="form-field"><label for="accDogName' + i + '">Name</label><input id="accDogName' + i + '" class="acc-dog-name" value="' + (d.name || "") + '"></div>' +
-            '<div class="form-field"><label for="accDogBreed' + i + '">Breed</label><input id="accDogBreed' + i + '" class="acc-dog-breed" value="' + (d.breed || "") + '"></div>' +
+            '<div class="form-field"><label for="accDogBreed' + i + '">Breed</label><select id="accDogBreed' + i + '" class="acc-dog-breed">' + breedOptions(selectValue) + '</select></div>' +
+            '<div class="form-field acc-breed-other-wrap" style="display:' + (selectValue === "Other" ? "block" : "none") + ';"><label for="accDogBreedOther' + i + '">Custom breed</label><input id="accDogBreedOther' + i + '" class="acc-dog-breed-other" value="' + otherValue + '"></div>' +
             '<div class="form-field"><label for="accDogSize' + i + '">Size</label><select id="accDogSize' + i + '" class="acc-dog-size"><option' + (d.size === "Small" ? " selected" : "") + '>Small</option><option' + (d.size === "Medium" ? " selected" : "") + '>Medium</option><option' + (d.size === "Large" ? " selected" : "") + '>Large</option></select></div>' +
             '<div class="form-field"><label>&nbsp;</label><button type="button" class="btn btn-outline acc-remove-dog" data-index="' + i + '">Remove</button></div>' +
           '</div>';
         }).join("");
+        el.querySelectorAll(".acc-dog-breed").forEach(function (sel) {
+          sel.addEventListener("change", function () {
+            var wrap = sel.closest(".dog-row");
+            var otherWrap = wrap ? wrap.querySelector(".acc-breed-other-wrap") : null;
+            if (otherWrap) { otherWrap.style.display = sel.value === "Other" ? "block" : "none"; }
+          });
+        });
         el.querySelectorAll(".acc-remove-dog").forEach(function (btn) {
           btn.addEventListener("click", function () {
             account.dogs.splice(parseInt(btn.getAttribute("data-index"), 10), 1);
@@ -494,11 +516,17 @@ document.getElementById("loginVerifyBtn").addEventListener("click", function () 
           persist(); renderDogs(); renderSubs();
         });
         document.getElementById("saveDogsBtn").addEventListener("click", function () {
-          document.querySelectorAll("#accDogs .dog-row").forEach(function (row) {
+document.querySelectorAll("#accDogs .dog-row").forEach(function (row) {
             var d = account.dogs[parseInt(row.getAttribute("data-dog-index"), 10)];
             if (!d) { return; }
             d.name = row.querySelector(".acc-dog-name").value.trim();
-            d.breed = row.querySelector(".acc-dog-breed").value.trim();
+            var breedSelect = row.querySelector(".acc-dog-breed");
+            var breed = breedSelect ? breedSelect.value : "";
+            if (breed === "Other") {
+              var otherInput = row.querySelector(".acc-dog-breed-other");
+              breed = otherInput ? otherInput.value.trim() : "";
+            }
+            d.breed = breed;
             d.size = row.querySelector(".acc-dog-size").value;
           });
           persist();

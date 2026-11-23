@@ -165,12 +165,21 @@
       var SHIPPING_ZONES = [];
       var DEFAULT_SHIPPING_RATE = 0;
 
-      var dogSeq = 0;
+var dogSeq = 0;
       var promo = { code: null, type: null, percent: 0 };
       var demoCode = null;
       var verified = false;
+      var COMMON_BREEDS = ["", "Labrador Retriever", "German Shepherd", "Golden Retriever", "Beagle", "Pug", "Shih Tzu", "Indie / Indian Pariah", "Rottweiler", "Doberman", "Husky", "Cocker Spaniel", "Dachshund", "Boxer", "Great Dane", "Maltese", "Pomeranian", "Other"];
 
       function newDogId() { dogSeq += 1; return "dog-" + Date.now() + "-" + dogSeq; }
+      function breedOptions(selected) {
+        var isOther = selected && COMMON_BREEDS.indexOf(selected) === -1;
+        return COMMON_BREEDS.map(function (b) {
+          var label = b === "" ? "Select breed" : b;
+          var sel = (b !== "" && b === selected) || (b === "Other" && isOther) ? " selected" : "";
+          return '<option value="' + b + '"' + sel + '>' + label + '</option>';
+        }).join("");
+      }
       function fmt(n) { return "\u20B9" + Math.round(n).toLocaleString("en-IN"); }
       function amountFor(item) {
         if (window.HWA && window.HWA.Cart && typeof window.HWA.Cart.amountFor === "function") { return window.HWA.Cart.amountFor(item); }
@@ -193,9 +202,10 @@ var months = (item.productId === "build-your-own") ? 12 : 10;
         var wrap = document.createElement("div");
         wrap.className = "dog-row form-grid";
         wrap.setAttribute("data-dog-id", id);
-        wrap.innerHTML =
+wrap.innerHTML =
           '<div class="form-field"><label for="' + id + '-name">Dog Name</label><input id="' + id + '-name" class="dog-name"></div>' +
-          '<div class="form-field"><label for="' + id + '-breed">Breed</label><input id="' + id + '-breed" class="dog-breed"></div>' +
+          '<div class="form-field"><label for="' + id + '-breed">Breed</label><select id="' + id + '-breed" class="dog-breed">' + breedOptions("") + '</select></div>' +
+          '<div class="form-field dog-breed-other-wrap" id="' + id + '-breed-other-wrap" style="display:none;"><label for="' + id + '-breed-other">Custom breed</label><input id="' + id + '-breed-other" class="dog-breed-other"></div>' +
           '<div class="form-field"><label for="' + id + '-size">Size</label><select id="' + id + '-size" class="dog-size"><option>Small</option><option selected>Medium</option><option>Large</option></select></div>' +
           '<div class="form-field"><label>&nbsp;</label><button type="button" class="btn btn-outline remove-dog">Remove</button></div>';
         wrap.querySelector(".remove-dog").addEventListener("click", function () {
@@ -203,15 +213,29 @@ var months = (item.productId === "build-your-own") ? 12 : 10;
           renderItems();
         });
         wrap.querySelector(".dog-name").addEventListener("input", renderItems);
+        var breedSelect = wrap.querySelector(".dog-breed");
+        if (breedSelect) {
+          breedSelect.addEventListener("change", function () {
+            var otherWrap = document.getElementById(id + "-breed-other-wrap");
+            if (otherWrap) { otherWrap.style.display = breedSelect.value === "Other" ? "block" : "none"; }
+            renderItems();
+          });
+        }
         wrap.querySelector(".dog-size").addEventListener("change", renderItems);
         document.getElementById("dogList").appendChild(wrap);
         renderItems();
       }
       function dogs() {
         var out = [];
-        document.querySelectorAll("#dogList .dog-row").forEach(function (row) {
+document.querySelectorAll("#dogList .dog-row").forEach(function (row) {
           var name = row.querySelector(".dog-name").value.trim();
-          if (name) { out.push({ id: row.getAttribute("data-dog-id"), name: name, breed: row.querySelector(".dog-breed").value.trim(), size: row.querySelector(".dog-size").value }); }
+          var breedSelect = row.querySelector(".dog-breed");
+          var breed = breedSelect ? breedSelect.value : "";
+          if (breed === "Other") {
+            var otherInput = row.querySelector(".dog-breed-other");
+            breed = otherInput ? otherInput.value.trim() : "";
+          }
+          if (name) { out.push({ id: row.getAttribute("data-dog-id"), name: name, breed: breed, size: row.querySelector(".dog-size").value }); }
         });
         return out;
       }
