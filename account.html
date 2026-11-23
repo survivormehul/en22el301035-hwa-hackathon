@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy While Away - My Account</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/cart.js"></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">Happy While Away</a>
+      <nav class="main-nav" id="mainNav">
+        <a href="index.html">Home</a>
+        <a href="products.html">Boxes</a>
+        <a href="subscription.html">Subscription</a>
+        <a href="account.html" class="active">My Account</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <button class="btn btn-outline cart-open-btn" id="cartOpenBtn">Cart <span id="hwaCartBadge">0</span></button>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <h1>My Account</h1>
+
+      <section class="form-section" id="loginSection">
+        <h3>Verify your account</h3>
+        <p class="hint">Enter the email you used at checkout. A demo verification code will be shown on screen.</p>
+        <div class="lookup-form">
+          <div class="form-field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" placeholder="you@example.com"></div>
+          <button type="button" class="btn btn-outline" id="sendLoginCodeBtn">Send Code</button>
+        </div>
+        <div id="loginCodeBox" style="display:none;">
+          <p class="hint" id="loginDemoNotice"></p>
+          <div class="lookup-form">
+            <div class="form-field"><label for="loginCode">6-digit code</label><input id="loginCode" maxlength="6"></div>
+            <button type="button" class="btn btn-primary" id="loginVerifyBtn">Verify</button>
+          </div>
+        </div>
+        <div class="error-msg" id="loginError" style="display:none;"></div>
+      </section>
+
+      <div id="dashboard" style="display:none;">
+        <section class="form-section">
+          <h3>Personal Details</h3>
+          <div class="sub-grid" id="personalDetails"></div>
+        </section>
+
+        <section class="form-section">
+          <h3>Delivery Address</h3>
+          <div class="form-grid">
+            <div class="form-field full"><label>Address</label><input id="accAddress"></div>
+            <div class="form-field"><label>City</label><input id="accCity"></div>
+            <div class="form-field"><label>Pincode</label><input id="accPincode"></div>
+          </div>
+          <button type="button" class="btn btn-outline" id="saveAddressBtn">Save Address</button>
+        </section>
+
+        <section class="form-section">
+          <h3>Dog Profiles</h3>
+          <div id="accDogs"></div>
+          <button type="button" class="btn btn-outline" id="accAddDogBtn">+ Add Dog</button>
+          <button type="button" class="btn btn-outline" id="saveDogsBtn">Save Dogs</button>
+        </section>
+
+        <section class="form-section">
+          <h3>Order History</h3>
+          <div id="orderHistory"></div>
+        </section>
+
+        <section class="form-section">
+          <h3>Active Subscriptions</h3>
+          <div id="activeSubs"></div>
+        </section>
+
+        <section class="form-section">
+          <h3>Past Subscriptions</h3>
+          <div id="pastSubs"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Happy While Away. Happiness, delivered monthly.</p>
+    </div>
+  </footer>
+
+  <script src="js/cart.js"></script>
+  <script>
+    (function () {
+      var account = null;
+      var loginCode = null;
+      var loginEmail = "";
+
+      function fmt(n) { return "\u20B9" + Math.round(Number(n) || 0).toLocaleString("en-IN"); }
+      function store() { try { return JSON.parse(localStorage.getItem("hwa_accounts") || "{}"); } catch (e) { return {}; } }
+      function persist() { if (!account) { return; } var s = store(); s[account.email.toLowerCase()] = account; try { localStorage.setItem("hwa_accounts", JSON.stringify(s)); } catch (e) {} }
+      function dateStr(iso) { return iso ? new Date(iso).toLocaleDateString("en-IN") : "-"; }
+      function patch(subId, payload) {
+        return fetch("/api/subscribe", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.assign({ subscriptionId: subId }, payload)) })
+          .then(function (r) { return r.json(); }).catch(function () { return { ok: false }; });
+      }
+
+      function buildFromApi(email, subs) {
+         var first = subs[0];
+        return {
+          email: email,
+          name: first.customer ? first.customer.name : "",
+          phone: first.customer ? first.customer.phone : "",
+          address: first.deliveryAddress || { address: "", city: "", pincode: "" },
+          dogs: first.dog ? [first.dog] : [],
+          orders: [],
+          subscriptions: subs.map(function (s) {
+            var it = s.items && s.items[0] ? s.items[0] : {};
+            return {
+              id: s.id, orderId: s.orderId, createdAt: s.createdAt, frequency: s.frequency,
+              productId: it.productId, name: it.name || "Subscription", unitAmount: s.unitAmount != null ? s.unitAmount : (s.billing ? s.billing.amount : s.total),
+              qty: it.qty || 1, amount: s.total, config: it.config || null,
+              dogId: s.dog ? s.dog.id : null, dogName: s.dog ? s.dog.name : null,
+              deliveryAddress: s.deliveryAddress, deliveryPreferences: s.deliveryPreferences || {},
+              billing: s.billing, renewalDate: s.renewalDate, nextDeliveryDate: s.nextDeliveryDate,
+              skippedDeliveries: s.skippedDeliveries || [], status: s.status || "active", paymentStatus: s.paymentStatus || "pending"
+            };
+          })
+        };
+      }
+
+      function loadAccount(email) {
+        var acc = store()[email.toLowerCase()];
+        if (acc) { account = acc; renderDashboard(); return; }
+        fetch("/api/subscribe?email=" + encodeURIComponent(email))
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.subscriptions && data.subscriptions.length) { account = buildFromApi(email, data.subscriptions); persist(); renderDashboard(); }
+            else { showLoginError("No account found for that email."); }
+          })
+          .catch(function () { showLoginError("Could not load account."); });
+      }
+
+      function showLoginError(msg) { var el = document.getElementById("loginError"); el.textContent = msg; el.style.display = "block"; }
+
+      function renderPersonal() {
+        document.getElementById("personalDetails").innerHTML =
+          '<div class="sub-field"><label>Name</label><span>' + (account.name || "-") + '</span></div>' +
+          '<div class="sub-field"><label>Email</label><span>' + account.email + '</span></div>' +
+          '<div class="sub-field"><label>Mobile</label><span>' + (account.phone || "-") + '</span></div>';
+      }
+
+      function renderAddress() {
+        document.getElementById("accAddress").value = account.address && account.address.address ? account.address.address : "";
+        document.getElementById("accCity").value = account.address && account.address.city ? account.address.city : "";
+        document.getElementById("accPincode").value = account.address && account.address.pincode ? account.address.pincode : "";
+      }
+
+      function renderDogs() {
+        var el = document.getElementById("accDogs");
+        if (!account.dogs.length) { el.innerHTML = '<p class="hint">No dog profiles yet.</p>'; return; }
+        el.innerHTML = account.dogs.map(function (d, i) {
+          return '<div class="dog-row form-grid" data-dog-index="' + i + '">' +
+            '<div class="form-field"><label>Name</label><input class="acc-dog-name" value="' + (d.name || "") + '"></div>' +
+            '<div class="form-field"><label>Breed</label><input class="acc-dog-breed" value="' + (d.breed || "") + '"></div>' +
+            '<div class="form-field"><label>Size</label><select class="acc-dog-size"><option' + (d.size === "Small" ? " selected" : "") + '>Small</option><option' + (d.size === "Medium" ? " selected" : "") + '>Medium</option><option' + (d.size === "Large" ? " selected" : "") + '>Large</option></select></div>' +
+            '<div class="form-field"><label>&nbsp;</label><button type="button" class="btn btn-outline acc-remove-dog" data-index="' + i + '">Remove</button></div>' +
+          '</div>';
+        }).join("");
+        el.querySelectorAll(".acc-remove-dog").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            account.dogs.splice(parseInt(btn.getAttribute("data-index"), 10), 1);
+            persist(); renderDogs(); renderSubs();
+          });
+        });
+      }
+
+      function renderOrders() {
+        var el = document.getElementById("orderHistory");
+        if (!account.orders || !account.orders.length) { el.innerHTML = '<p class="hint">No orders yet.</p>'; return; }
+        el.innerHTML = account.orders.map(function (o) {
+          var items = (o.items || []).map(function (it) { return it.name + " x " + it.qty; }).join(", ");
+          return '<div class="sub-card"><div class="sub-card-head"><span class="sub-name">' + o.orderId + '</span><span class="sub-status sub-status-paused">' + (o.paymentStatus || "pending").toUpperCase() + '</span></div>' +
+            '<div class="sub-id">' + dateStr(o.createdAt) + '</div>' +
+            '<div class="sub-grid"><div class="sub-field"><label>Items</label><span>' + items + '</span></div>' +
+            '<div class="sub-field"><label>Amount</label><span>' + fmt(o.total) + '</span></div>' +
+            '<div class="sub-field"><label>Payment method</label><span>' + (o.paymentMethod || "-") + '</span></div></div></div>';
+        }).join("");
+      }
+
+      function subCard(s, index) {
+        var lockedNote = '<p class="hint">Billing frequency and subscription product cannot be changed after purchase.</p>';
+        var skipHtml = s.frequency === "yearly"
+          ? '<button type="button" class="btn btn-outline" data-skip="' + index + '">Skip Upcoming Delivery</button>'
+          : '<p class="hint">Skipping a delivery is only available for yearly subscriptions.</p>';
+        var dogsOptions = '<option value="">Unassigned</option>' + account.dogs.map(function (d) {
+          return '<option value="' + d.id + '"' + (s.dogId === d.id ? " selected" : "") + '>' + d.name + '</option>';
+        }).join("");
+        var skipped = (s.skippedDeliveries || []).map(dateStr).join(", ");
+        return '<div class="sub-card">' +
+          '<div class="sub-card-head"><span class="sub-name">' + s.name + '</span><span class="sub-status sub-status-' + s.status + '">' + s.status + '</span></div>' +
+          '<div class="sub-id">' + s.id + ' &middot; Order ' + (s.orderId || "-") + '</div>' +
+          '<div class="sub-grid">' +
+            '<div class="sub-field"><label>Billing</label><span>' + (s.frequency === "yearly" ? "Yearly (12 months upfront)" : "Monthly") + '</span></div>' +
+            '<div class="sub-field"><label>Amount</label><span>' + fmt(s.amount) + '</span></div>' +
+            '<div class="sub-field"><label>Renews</label><span>' + dateStr(s.renewalDate) + '</span></div>' +
+            '<div class="sub-field"><label>Next delivery</label><span>' + dateStr(s.nextDeliveryDate) + '</span></div>' +
+            '<div class="sub-field"><label>Payment status</label><span>' + (s.paymentStatus || "pending").toUpperCase() + '</span></div>' +
+            (skipped ? '<div class="sub-field"><label>Skipped deliveries</label><span>' + skipped + '</span></div>' : '') +
+            '<div class="sub-field"><label>Delivery address</label><span>' + (account.address ? account.address.address + ", " + account.address.pincode : "-") + '</span></div>' +
+          '</div>' +
+          '<div class="form-grid">' +
+            '<div class="form-field"><label>Quantity</label><div class="hwa-qty-stepper"><button type="button" class="hwa-qty-btn" data-qdown="' + index + '">-</button><span class="hwa-qty-val" data-qval="' + index + '">' + s.qty + '</span><button type="button" class="hwa-qty-btn" data-qup="' + index + '">+</button></div></div>' +
+            '<div class="form-field"><label>Assigned dog</label><select data-dogsel="' + index + '">' + dogsOptions + '</select></div>' +
+            '<div class="form-field full"><label>Delivery preference notes</label><input data-notes="' + index + '" value="' + ((s.deliveryPreferences && s.deliveryPreferences.notes) || "") + '"></div>' +
+          '</div>' +
+          '<div class="sub-actions">' +
+            '<button type="button" class="btn btn-outline" data-pause="' + index + '">Pause</button>' +
+            '<button type="button" class="btn btn-outline" data-resume="' + index + '">Resume</button>' +
+            '<button type="button" class="btn btn-outline" data-cancel="' + index + '">Cancel</button>' +
+            '<button type="button" class="btn btn-outline" data-saveprefs="' + index + '">Save Preferences</button>' +
+            skipHtml +
+          '</div>' +
+          lockedNote +
+        '</div>';
+      }
+
+      function renderSubs() {
+        var active = account.subscriptions.filter(function (s) { return s.status !== "cancelled"; });
+        var past = account.subscriptions.filter(function (s) { return s.status === "cancelled"; });
+        document.getElementById("activeSubs").innerHTML = active.length ? active.map(function (s) { return subCard(s, account.subscriptions.indexOf(s)); }).join("") : '<p class="hint">No active subscriptions.</p>';
+        document.getElementById("pastSubs").innerHTML = past.length ? past.map(function (s) { return subCard(s, account.subscriptions.indexOf(s)); }).join("") : '<p class="hint">No past subscriptions.</p>';
+        document.querySelectorAll("#activeSubs [data-pause], #pastSubs [data-pause]").forEach(wire);
+        document.querySelectorAll("#activeSubs [data-resume], #pastSubs [data-resume]").forEach(wire);
+        document.querySelectorAll("#activeSubs [data-cancel], #pastSubs [data-cancel]").forEach(wire);
+        document.querySelectorAll("#activeSubs [data-skip], #pastSubs [data-skip]").forEach(wire);
+        document.querySelectorAll("#activeSubs [data-saveprefs], #pastSubs [data-saveprefs]").forEach(wire);
+        document.querySelectorAll("#activeSubs [data-qup], #pastSubs [data-qup]").forEach(wire);
+        document.querySelectorAll("#activeSubs [data-qdown], #pastSubs [data-qdown]").forEach(wire);
+        document.querySelectorAll("#activeSubs [data-dogsel], #pastSubs [data-dogsel]").forEach(wire);
+      }
+
+      function wire(btn) {
+        if (btn.hasAttribute("data-dogsel")) {
+          btn.addEventListener("change", function () {
+            var idx = parseInt(btn.getAttribute("data-dogsel"), 10);
+            var s = account.subscriptions[idx];
+            var dog = account.dogs.filter(function (d) { return d.id === btn.value; })[0] || null;
+            s.dogId = dog ? dog.id : null; s.dogName = dog ? dog.name : null;
+            persist();
+            patch(s.id, { action: "setDog", dog: dog });
+            renderSubs();
+          });
+          return;
+        }
+        btn.addEventListener("click", function () {
+          var idx = parseInt(btn.getAttribute("data-pause") || btn.getAttribute("data-resume") || btn.getAttribute("data-cancel") || btn.getAttribute("data-skip") || btn.getAttribute("data-saveprefs") || btn.getAttribute("data-qup") || btn.getAttribute("data-qdown") || "0", 10);
+          var s = account.subscriptions[idx];
+          if (!s) { return; }
+          if (btn.hasAttribute("data-pause")) { s.status = "paused"; patch(s.id, { action: "pause" }); }
+          else if (btn.hasAttribute("data-resume")) { s.status = "active"; patch(s.id, { action: "resume" }); }
+          else if (btn.hasAttribute("data-cancel")) { s.status = "cancelled"; patch(s.id, { action: "cancel" }); }
+          else if (btn.hasAttribute("data-skip")) {
+            if (s.frequency !== "yearly") { return; }
+            s.skippedDeliveries = s.skippedDeliveries || [];
+            s.skippedDeliveries.push(s.nextDeliveryDate);
+            var d = new Date(s.nextDeliveryDate || new Date());
+            d.setMonth(d.getMonth() + 1); s.nextDeliveryDate = d.toISOString();
+            patch(s.id, { action: "skipDelivery" });
+          }
+          else if (btn.hasAttribute("data-saveprefs")) {
+            var notesEl = document.querySelector("[data-notes='" + idx + "']");
+            s.deliveryPreferences = { notes: notesEl ? notesEl.value.trim() : "" };
+            patch(s.id, { action: "setDeliveryPreferences", deliveryPreferences: s.deliveryPreferences });
+          }
+          else if (btn.hasAttribute("data-qup")) { s.qty += 1; s.amount = Math.round(s.unitAmount * s.qty); if (s.billing) { s.billing.amount = s.amount; } patch(s.id, { action: "setQty", qty: s.qty }); }
+          else if (btn.hasAttribute("data-qdown")) { if (s.qty > 1) { s.qty -= 1; s.amount = Math.round(s.unitAmount * s.qty); if (s.billing) { s.billing.amount = s.amount; } patch(s.id, { action: "setQty", qty: s.qty }); } }
+          persist();
+          renderSubs();
+        });
+      }
+
+      function renderDashboard() {
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        renderPersonal(); renderAddress(); renderDogs(); renderOrders(); renderSubs();
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("cartOpenBtn").addEventListener("click", function () { window.HWA.openCart(); });
+        document.getElementById("sendLoginCodeBtn").addEventListener("click", function () {
+          var email = document.getElementById("loginEmail").value.trim();
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showLoginError("Please enter a valid email."); return; }
+          document.getElementById("loginError").style.display = "none";
+          loginEmail = email.toLowerCase();
+          loginCode = String(Math.floor(100000 + Math.random() * 900000));
+          document.getElementById("loginDemoNotice").textContent = "Demo verification code: " + loginCode + " (no real message is sent)";
+          document.getElementById("loginCodeBox").style.display = "block";
+        });
+        document.getElementById("loginVerifyBtn").addEventListener("click", function () {
+          var code = document.getElementById("loginCode").value.trim();
+          if (code !== loginCode) { showLoginError("Incorrect code."); return; }
+          document.getElementById("loginError").style.display = "none";
+          loadAccount(loginEmail);
+        });
+        document.getElementById("saveAddressBtn").addEventListener("click", function () {
+          account.address = { address: document.getElementById("accAddress").value.trim(), city: document.getElementById("accCity").value.trim(), pincode: document.getElementById("accPincode").value.trim() };
+          persist(); renderSubs();
+        });
+        document.getElementById("accAddDogBtn").addEventListener("click", function () {
+          account.dogs.push({ id: "dog-" + Date.now(), name: "New Dog", breed: "", size: "Medium" });
+          persist(); renderDogs(); renderSubs();
+        });
+        document.getElementById("saveDogsBtn").addEventListener("click", function () {
+          document.querySelectorAll("#accDogs .dog-row").forEach(function (row) {
+            var d = account.dogs[parseInt(row.getAttribute("data-dog-index"), 10)];
+            if (!d) { return; }
+            d.name = row.querySelector(".acc-dog-name").value.trim();
+            d.breed = row.querySelector(".acc-dog-breed").value.trim();
+            d.size = row.querySelector(".acc-dog-size").value;
+          });
+          persist(); renderDogs(); renderSubs();
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>

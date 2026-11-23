@@ -31,11 +31,10 @@ function addMonths(date, months) {
   return d;
 }
 
-function computeAmount(item) {
+function computeUnit(item) {
   const price = Number(item.price) || 0;
-  const qty = Number(item.qty) || 1;
-  const unit = item.amount != null ? Number(item.amount) : (item.freq === 'yearly' ? price * 12 : price);
-  return Math.round(unit * qty);
+  if (item.amount != null) return Number(item.amount);
+  return item.freq === 'yearly' ? price * 12 : price;
 }
 
 module.exports = async (req, res) => {
@@ -74,8 +73,26 @@ module.exports = async (req, res) => {
       if (action === 'pause') { record.status = 'paused'; }
       else if (action === 'resume') { record.status = 'active'; }
       else if (action === 'cancel') { record.status = 'cancelled'; }
+      else if (action === 'setQty') {
+        const qty = Math.max(1, parseInt(payload.qty, 10) || 1);
+        const unit = record.unitAmount != null ? record.unitAmount : computeUnit(record.items[0]);
+        record.items[0].qty = qty;
+        record.total = Math.round(unit * qty);
+        if (record.billing) record.billing.amount = record.total;
+      }
+      else if (action === 'setDog') { record.dog = payload.dog || null; }
+      else if (action === 'setDeliveryPreferences') { record.deliveryPreferences = payload.deliveryPreferences || {}; }
+      else if (action === 'skipDelivery') {
+        if (record.frequency !== 'yearly') {
+          res.status(400).json({ ok: false, error: 'Skipping a delivery is only available for yearly subscriptions' });
+          return;
+        }
+        record.skippedDeliveries = record.skippedDeliveries || [];
+        record.skippedDeliveries.push(record.nextDeliveryDate || record.renewalDate);
+        record.nextDeliveryDate = addMonths(record.nextDeliveryDate ? new Date(record.nextDeliveryDate) : new Date(record.renewalDate), 1).toISOString();
+      }
       else {
-        res.status(400).json({ ok: false, error: 'Unsupported action. Frequency and box changes are not allowed.' });
+        res.status(400).json({ ok: false, error: 'Unsupported action. Billing frequency and product changes are not allowed.' });
         return;
       }
       record.updatedAt = new Date().toISOString();
@@ -136,33 +153,39 @@ module.exports = async (req, res) => {
     const now = new Date();
     const orderId = 'HWA-ORD-' + now.getTime();
     let orderInitial = 0;
-    for (const item of items) orderInitial += computeAmount(item);
+    for (const item of items) orderInitial += Math.round(computeUnit(item) * (Number(item.qty) || 1));
 
     const created = [];
     items.forEach((item, idx) => {
-      const amount = computeAmount(item);
+      const unit = computeUnit(item);
+      const qty = Number(item.qty) || 1;
+      const amount = Math.round(unit * qty);
       const dog = (sub.dogs || []).find((d) => d.id && item.dogId && d.id === item.dogId) || (sub.dog || null);
       const renewal = item.freq === 'yearly' ? addMonths(now, 12) : addMonths(now, 1);
+      const nextDelivery = addMonths(now, 1);
       const record = {
         id: 'HWA-SUB-' + now.getTime() + '-' + (idx + 1),
         orderId: orderId,
         createdAt: now.toISOString(),
         frequency: item.freq,
         planType: item.productId === 'build-your-own' ? 'build-your-own' : 'curated',
-        items: [{ productId: item.productId, name: item.name, price: Number(item.price) || 0, qty: Number(item.qty) || 1, freq: item.freq, config: item.config || null }],
+        items: [{ productId: item.productId, name: item.name, price: Number(item.price) || 0, qty: qty, freq: item.freq, config: item.config || null }],
+        unitAmount: unit,
         total: amount,
         initialPayment: orderInitial,
-        billing: {
-          type: item.freq,
-          amount: amount,
-          nextDueDate: renewal.toISOString(),
-          chargedUpfrontMonths: item.freq === 'yearly' ? 12 : 1
-        },
+        billing: { type: item.freq, amount: amount, nextDueDate: renewal.toISOString(), chargedUpfrontMonths: item.freq === 'yearly' ? 12 : 1 },
         renewalDate: renewal.toISOString(),
+        nextDeliveryDate: nextDelivery.toISOString(),
+        skippedDeliveries: [],
+        deliveryPreferences: sub.deliveryPreferences || {},
         deliveryAddress: address,
         customer: { name: sub.customer.name, email: sub.customer.email, phone: sub.customer.phone },
         dog: dog,
-        editable: { billingFrequency: false, product: false },
+        editable: { billingFrequency: false, product: false, quantity: true, dog: true },
+        paymentMethod: sub.paymentMethod || 'unspecified',
+        paymentStatus: 'pending',
+        promoCode: sub.promoCode || null,
+        promoDiscount: Number(sub.promoDiscount) || 0,
         status: 'active'
       };
       subs.push(record);
@@ -170,7 +193,7 @@ module.exports = async (req, res) => {
     });
     saveSubs();
 
-    res.status(200).json({ ok: true, orderId: orderId, initialPayment: orderInitial, subscriptions: created });
+    res.status(200).json({ ok: true, orderId: orderId, initialPayment: orderInitial, paymentStatus: 'pending', subscriptions: created });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message || 'Server error' });
   }
