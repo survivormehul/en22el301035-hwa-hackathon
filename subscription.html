@@ -46,7 +46,7 @@
         </div>
         <div class="plans-summary">
           <div><strong>5</strong><span>ways to happy</span></div>
-          <div><strong>2&ndash;3</strong><span>categories in BYO</span></div>
+          <div><strong>2&ndash;4</strong><span>categories in BYO</span></div>
           <div><strong>0</strong><span>lock-in contracts</span></div>
         </div>
       </div>
@@ -78,9 +78,9 @@
             <p class="byo-count" id="byo-count">0 categories selected</p>
             <div class="byo-action">
               <button type="button" class="btn btn-primary btn-large" id="byoAddBtn">Add your box to cart</button>
-              <p class="hint">Minimum two categories. Maximum three available; you can change your picks on future boxes.</p>
+              <p class="hint">Select 2 to 4 categories. You can change your picks on future boxes.</p>
             </div>
-            <div class="error-msg" id="byoError" style="display:none;">Please select at least two categories.</div>
+            <div class="error-msg" id="byoError" style="display:none;">Please select between 2 and 4 categories.</div>
           </div>
           <aside class="byo-side">
             <span class="byo-side-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 18l16-8 16 8v16l-16 8-16-8V18z"/><path d="M8 18l16 8 16-8M24 26v16"/><path d="M16 14l16 8"/></svg></span>
@@ -153,9 +153,12 @@
         { id: "calm-box", name: "The Calm Box", tagline: "Peace for paws", image: "the%20calm%20box.webp", price: 1499, desc: "Gentle enrichment, snuffle toys and soothing routines for anxious, senior or restful dogs.", benefits: ["Calming enrichment", "Snuffle and soothe toys", "Low-arousal activities", "Anxiety-friendly picks"] }
       ];
       var BYO_CATEGORIES = [
-        { id: "toys-enrichment", name: "Toys & Enrichment", desc: "Brain-boosting toys and puzzles", icon: "M8 18l16-8 16 8v16l-16 8-16-8V18z" },
-        { id: "food-treats", name: "Food & Treats", desc: "Treats and chews chosen with care", icon: "M12 6c8 0 14 6 14 14H8L12 6z" },
-        { id: "clothing-accessories", name: "Clothing & Accessories", desc: "Comfort-first apparel and accessories", icon: "M10 6l6 2 2 6-4 2-2-2-2 2-4-2 2-6 6-2z" }
+        { id: "toys", name: "Toys", desc: "Playful toys for everyday fun", icon: "M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z" },
+        { id: "enrichment-puzzles", name: "Enrichment Puzzles", desc: "Brain games and puzzle feeders", icon: "M6 6h12v12H6zM10 10h4v4h-4z" },
+        { id: "food-bags", name: "Food Bags", desc: "Meal toppers and food bags", icon: "M8 10h16v12H8zM10 10V8a6 6 0 0 1 12 0v2" },
+        { id: "small-treats", name: "Small Treats", desc: "Bite-sized rewards and chews", icon: "M12 6c3 0 6 2 6 5s-3 5-6 5-6-2-6-5 3-5 6-5zM8 16h8v4H8z" },
+        { id: "clothing-options", name: "Clothing Options", desc: "Comfort wear and apparel", icon: "M10 6l4-2 4 2 2 6-3 1v9H9v-9l-3-1 4-6z" },
+        { id: "accessories", name: "Accessories", desc: "Bandanas, collars and extras", icon: "M8 12a4 4 0 1 0 8 0 4 4 0 0 0-8 0zM16 12h8" }
       ];
       var BYO_PRICE = 3499;
       var frequency = "monthly";
@@ -218,6 +221,7 @@ try {
           var isOn = selected.indexOf(c.id) !== -1;
           return '<label class="category' + (isOn ? ' selected' : '') + '">' +
             '<input type="checkbox" value="' + c.id + '"' + (isOn ? ' checked' : '') + '>' +
+            '<span class="cat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + c.icon + '"/></svg></span>' +
             '<span class="cat-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/></svg></span>' +
             '<span class="cat-text"><strong>' + c.name + '</strong><small>' + c.desc + '</small></span>' +
           '</label>';
@@ -226,7 +230,15 @@ try {
           cb.addEventListener("change", function () {
             var v = cb.value;
             var idx = selected.indexOf(v);
-            if (cb.checked && idx === -1) { selected.push(v); }
+            if (cb.checked && idx === -1) {
+              if (selected.length >= 4) {
+                cb.checked = false;
+                var err = document.getElementById("byoError");
+                if (err) { err.style.display = "block"; err.textContent = "You can select up to 4 categories."; }
+                return;
+              }
+              selected.push(v);
+            }
             if (!cb.checked && idx !== -1) { selected.splice(idx, 1); }
             renderCategories();
             updateByoState();
@@ -237,7 +249,15 @@ try {
       }
       function updateByoState() {
         var err = document.getElementById("byoError");
-        if (err && selected.length >= 2) { err.style.display = "none"; }
+        if (err) {
+          if (selected.length >= 2 && selected.length <= 4) {
+            err.style.display = "none";
+            err.textContent = "Please select between 2 and 4 categories.";
+          } else {
+            err.style.display = "block";
+            err.textContent = selected.length > 4 ? "You can select up to 4 categories." : "Please select between 2 and 4 categories.";
+          }
+        }
       }
       function updateByoPrice() {
         var priceEl = document.getElementById("byo-price");
@@ -263,9 +283,9 @@ try {
         document.getElementById("toggle-monthly").addEventListener("click", function () { setFrequency("monthly"); });
         document.getElementById("toggle-yearly").addEventListener("click", function () { setFrequency("yearly"); });
         document.getElementById("byoAddBtn").addEventListener("click", function () {
-          if (selected.length < 2) {
+          if (selected.length < 2 || selected.length > 4) {
             var err = document.getElementById("byoError");
-            if (err) { err.style.display = "block"; }
+            if (err) { err.style.display = "block"; err.textContent = selected.length > 4 ? "You can select up to 4 categories." : "Please select between 2 and 4 categories."; }
             return;
           }
           window.HWA.addToCart("build-your-own", { freq: frequency, qty: 1, config: { categories: selected.slice() } });

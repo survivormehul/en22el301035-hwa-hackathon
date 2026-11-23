@@ -227,7 +227,7 @@
           row.className = "checkout-item";
           row.innerHTML =
             '<div class="checkout-item-main">' +
-              '<div class="checkout-item-name">' + it.name + (it.config && it.config.categories ? ' [BYO: ' + it.config.categories.join(", ") + ']' : '') + '</div>' +
+              '<div class="checkout-item-name">' + it.name + (it.config && it.config.categories ? ' [BYO: ' + it.config.categories.map(function (c) { return (window.HWA && window.HWA.categoryLabel) ? window.HWA.categoryLabel(c) : c; }).join(", ") + ']' : '') + '</div>' +
               '<div class="checkout-item-sub">Qty ' + it.qty + ' &middot; ' + fmt(amountFor(it) * it.qty) + (it.freq === "yearly" ? ' upfront' : ' / month') + '</div>' +
             '</div>' +
             '<div class="checkout-item-controls">' +

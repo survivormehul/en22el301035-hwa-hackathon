@@ -25,6 +25,16 @@
   window.HWA_CONFIG.yearlyMonths = Number(window.HWA_CONFIG.yearlyMonths) || 12;
   window.HWA_CONFIG.annualDiscountPercent = typeof window.HWA_CONFIG.annualDiscountPercent === "number" ? window.HWA_CONFIG.annualDiscountPercent : 0;
 
+  var CATEGORY_LABELS = {
+  "toys": "Toys",
+  "enrichment-puzzles": "Enrichment Puzzles",
+  "food-bags": "Food Bags",
+  "small-treats": "Small Treats",
+  "clothing-options": "Clothing Options",
+  "accessories": "Accessories"
+};
+function categoryLabel(id) { return CATEGORY_LABELS[id] || id; }
+
   var PRODUCTS = {
     "happy-box": { id: "happy-box", name: "The Happy Box", price: 1999, image: "The%20Happy%20box.webp" },
     "food-club": { id: "food-club", name: "The Food Club", price: 1499, image: "the%20food%20club.webp" },
@@ -138,7 +148,7 @@
 
   function itemLabel(item) {
     if (item.productId === "build-your-own" && item.config && item.config.categories) {
-      return item.name + " <span>[" + item.config.categories.join(", ") + "]</span>";
+      return item.name + " <span>[" + item.config.categories.map(categoryLabel).join(", ") + "]</span>";
     }
     return item.name;
   }
@@ -319,6 +329,8 @@
     products: PRODUCTS
   };
   window.HWA.shippingFor = shippingFor;
+  window.HWA.categoryLabel = categoryLabel;
+  window.HWA.categoryLabels = CATEGORY_LABELS;
   window.HWA.couponFor = couponFor;
   window.HWA.coupons = window.HWA_CONFIG.coupons;
   window.HWA.addToCart = addToCart;

@@ -1439,3 +1439,6 @@ p { color: var(--ink-soft); }
   .detail-gallery-thumbs { grid-template-columns: repeat(3, 1fr); }
   .detail-gallery-nav { width: 36px; height: 36px; font-size: 1.4rem; }
 }
+.cat-icon { display: grid; place-items: center; flex-shrink: 0; width: 34px; height: 34px; border-radius: 12px; background: var(--cream-deep); color: var(--forest); }
+.cat-icon svg { width: 18px; height: 18px; }
+.category .cat-icon { margin-bottom: 4px; }

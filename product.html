@@ -89,9 +89,12 @@
   <script>
     (function () {
       var BYO_CATEGORIES = [
-        { id: "toys-enrichment", name: "Toys & Enrichment", desc: "Brain-boosting toys and puzzles" },
-        { id: "food-treats", name: "Food & Treats", desc: "Treats and chews chosen with care" },
-        { id: "clothing-accessories", name: "Clothing & Accessories", desc: "Comfort-first apparel and accessories" }
+        { id: "toys", name: "Toys", desc: "Playful toys for everyday fun", icon: "M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z" },
+        { id: "enrichment-puzzles", name: "Enrichment Puzzles", desc: "Brain games and puzzle feeders", icon: "M6 6h12v12H6zM10 10h4v4h-4z" },
+        { id: "food-bags", name: "Food Bags", desc: "Meal toppers and food bags", icon: "M8 10h16v12H8zM10 10V8a6 6 0 0 1 12 0v2" },
+        { id: "small-treats", name: "Small Treats", desc: "Bite-sized rewards and chews", icon: "M12 6c3 0 6 2 6 5s-3 5-6 5-6-2-6-5 3-5 6-5zM8 16h8v4H8z" },
+        { id: "clothing-options", name: "Clothing Options", desc: "Comfort wear and apparel", icon: "M10 6l4-2 4 2 2 6-3 1v9H9v-9l-3-1 4-6z" },
+        { id: "accessories", name: "Accessories", desc: "Bandanas, collars and extras", icon: "M8 12a4 4 0 1 0 8 0 4 4 0 0 0-8 0zM16 12h8" }
       ];
       var PRODUCTS = {
         "happy-box": {
@@ -227,13 +230,14 @@ try {
                   var checked = selectedCats.indexOf(c.id) !== -1;
                   return '<label class="product-category' + (checked ? ' selected' : '') + '">' +
                     '<input type="checkbox" name="byo-cat" value="' + c.id + '"' + (checked ? ' checked' : '') + '>' +
+                    '<span class="cat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + c.icon + '"/></svg></span>' +
                     '<span class="cat-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/></svg></span>' +
                     '<span class="cat-text"><strong>' + c.name + '</strong><small>' + c.desc + '</small></span>' +
                   '</label>';
                 }).join("") +
               '</div>' +
-              '<p class="hint">Choose at least two categories. We curate the actual products as a surprise.</p>' +
-              '<div class="error-msg" id="byoError" style="display:none;">Please select at least 2 categories.</div>' +
+              '<p class="hint">Select 2 to 4 categories. We curate the actual products as a surprise.</p>' +
+              '<div class="error-msg" id="byoError" style="display:none;">Please select between 2 and 4 categories.</div>' +
             '</div>';
         }
         grid.innerHTML =
@@ -315,8 +319,11 @@ var addBtn = document.getElementById("detailAddBtn");
           var addQty = parseInt(document.getElementById("detailQtyVal").textContent, 10) || 1;
           if (p.id === "build-your-own") {
             var errEl = document.getElementById("byoError");
-            if (selectedCats.length < 2) {
-              if (errEl) { errEl.style.display = "block"; }
+            if (selectedCats.length < 2 || selectedCats.length > 4) {
+              if (errEl) {
+                errEl.style.display = "block";
+                errEl.textContent = selectedCats.length > 4 ? "You can select up to 4 categories." : "Please select between 2 and 4 categories.";
+              }
               return;
             }
             window.HWA.addToCart("build-your-own", { qty: addQty, freq: freq, config: { categories: selectedCats.slice() } });
@@ -336,20 +343,36 @@ var addBtn = document.getElementById("detailAddBtn");
           });
         });
         if (p.id === "build-your-own") {
-          grid.querySelectorAll("#byoCategories input[name='byo-cat']").forEach(function (cb) {
-            cb.addEventListener("change", function () {
-              var v = cb.value;
-              var idx = selectedCats.indexOf(v);
-              if (cb.checked && idx === -1) { selectedCats.push(v); }
-              if (!cb.checked && idx !== -1) { selectedCats.splice(idx, 1); }
-              var count = document.getElementById("byoCount");
-              if (count) { count.textContent = selectedCats.length + " selected"; }
-              var label = cb.closest(".product-category");
-              if (label) { label.classList.toggle("selected", cb.checked); }
-              var errEl = document.getElementById("byoError");
-              if (errEl && selectedCats.length >= 2) { errEl.style.display = "none"; }
+grid.querySelectorAll("#byoCategories input[name='byo-cat']").forEach(function (cb) {
+              cb.addEventListener("change", function () {
+                var v = cb.value;
+                var idx = selectedCats.indexOf(v);
+                if (cb.checked && idx === -1) {
+                  if (selectedCats.length >= 4) {
+                    cb.checked = false;
+                    var errEl = document.getElementById("byoError");
+                    if (errEl) { errEl.style.display = "block"; errEl.textContent = "You can select up to 4 categories."; }
+                    return;
+                  }
+                  selectedCats.push(v);
+                }
+                if (!cb.checked && idx !== -1) { selectedCats.splice(idx, 1); }
+                var count = document.getElementById("byoCount");
+                if (count) { count.textContent = selectedCats.length + " selected"; }
+                var label = cb.closest(".product-category");
+                if (label) { label.classList.toggle("selected", cb.checked); }
+                var errEl2 = document.getElementById("byoError");
+                if (errEl2) {
+                  if (selectedCats.length >= 2 && selectedCats.length <= 4) {
+                    errEl2.style.display = "none";
+                    errEl2.textContent = "Please select between 2 and 4 categories.";
+                  } else {
+                    errEl2.style.display = "block";
+                    errEl2.textContent = selectedCats.length > 4 ? "You can select up to 4 categories." : "Please select between 2 and 4 categories.";
+                  }
+                }
+              });
             });
-          });
         }
         var qtyVal = document.getElementById("detailQtyVal");
         qtyVal.textContent = String(qty);
