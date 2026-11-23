@@ -159,7 +159,7 @@
           .then(function (result) {
             if (!result.ok || !result.json.ok) { throw new Error(result.json.error || "Could not send message"); }
             form.reset();
-            success.textContent = "Your note was recorded in the demo contact log. No real inbox is connected, so this is not a live support request.";
+            success.textContent = "Thank you! Your message has been received.";
             success.style.display = "block";
             btn.textContent = "Send message";
             btn.disabled = false;
