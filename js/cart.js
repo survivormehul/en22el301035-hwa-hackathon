@@ -233,7 +233,9 @@ function yearlyMultiplier(item) {
     var overlay = document.createElement("div");
     overlay.id = "hwaCartOverlay";
     overlay.className = "hwa-cart-overlay";
-    overlay.addEventListener("click", closeCart);
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) { closeCart(); }
+    });
     var drawer = document.createElement("aside");
     drawer.id = "hwaCartDrawer";
     drawer.className = "hwa-cart-drawer";
