@@ -36,11 +36,11 @@
 function categoryLabel(id) { return CATEGORY_LABELS[id] || id; }
 
   var PRODUCTS = {
-    "happy-box": { id: "happy-box", name: "The Happy Box", price: 1999, image: "The%20Happy%20box.webp" },
-    "food-club": { id: "food-club", name: "The Food Club", price: 1499, image: "the%20food%20club.webp" },
-    "style-club": { id: "style-club", name: "The Style Club", price: 999, image: "The%20style%20club.webp" },
-    "calm-box": { id: "calm-box", name: "The Calm Box", price: 1499, image: "the%20calm%20box.webp" },
-    "build-your-own": { id: "build-your-own", name: "Build Your Happy Box", price: 3499, image: "The%20Happy%20box.webp" }
+    "happy-box": { id: "happy-box", name: "The Happy Box", price: 1999, image: "images/happy-box.webp" },
+    "food-club": { id: "food-club", name: "The Food Club", price: 1499, image: "images/food-club.webp" },
+    "style-club": { id: "style-club", name: "The Style Club", price: 999, image: "images/style-club.webp" },
+    "calm-box": { id: "calm-box", name: "The Calm Box", price: 1499, image: "images/calm-box.webp" },
+    "build-your-own": { id: "build-your-own", name: "Build Your Happy Box", price: 3499, image: "images/happy-box.webp" }
   };
 
   function discountPercent() {

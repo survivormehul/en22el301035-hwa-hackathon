@@ -130,29 +130,29 @@
       };
 var IMAGES = {
   "happy-box": [
-    { src: "The%20Happy%20box.webp", alt: "The Happy Box shown from the front", label: "Front view", position: "center", zoom: 1 },
-    { src: "The%20Happy%20box.webp", alt: "A close look at The Happy Box contents", label: "Inside the box", position: "center 38%", zoom: 1.22 },
-    { src: "The%20Happy%20box.webp", alt: "The Happy Box ready for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
+    { src: "images/happy-box.webp", alt: "The Happy Box shown from the front", label: "Front view", position: "center", zoom: 1 },
+    { src: "images/happy-box.webp", alt: "A close look at The Happy Box contents", label: "Inside the box", position: "center 38%", zoom: 1.22 },
+    { src: "images/happy-box.webp", alt: "The Happy Box ready for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
   ],
   "food-club": [
-    { src: "the%20food%20club.webp", alt: "The Food Club shown from the front", label: "Front view", position: "center", zoom: 1 },
-    { src: "the%20food%20club.webp", alt: "A close look at The Food Club treats", label: "Inside the box", position: "center 40%", zoom: 1.22 },
-    { src: "the%20food%20club.webp", alt: "The Food Club prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
+    { src: "images/food-club.webp", alt: "The Food Club shown from the front", label: "Front view", position: "center", zoom: 1 },
+    { src: "images/food-club.webp", alt: "A close look at The Food Club treats", label: "Inside the box", position: "center 40%", zoom: 1.22 },
+    { src: "images/food-club.webp", alt: "The Food Club prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
   ],
   "style-club": [
-    { src: "The%20style%20club.webp", alt: "The Style Club shown from the front", label: "Front view", position: "center", zoom: 1 },
-    { src: "The%20style%20club.webp", alt: "A close look at The Style Club accessories", label: "Inside the box", position: "center 38%", zoom: 1.22 },
-    { src: "The%20style%20club.webp", alt: "The Style Club prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
+    { src: "images/style-club.webp", alt: "The Style Club shown from the front", label: "Front view", position: "center", zoom: 1 },
+    { src: "images/style-club.webp", alt: "A close look at The Style Club accessories", label: "Inside the box", position: "center 38%", zoom: 1.22 },
+    { src: "images/style-club.webp", alt: "The Style Club prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
   ],
   "calm-box": [
-    { src: "the%20calm%20box.webp", alt: "The Calm Box shown from the front", label: "Front view", position: "center", zoom: 1 },
-    { src: "the%20calm%20box.webp", alt: "A close look at The Calm Box soothing items", label: "Inside the box", position: "center 40%", zoom: 1.22 },
-    { src: "the%20calm%20box.webp", alt: "The Calm Box prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
+    { src: "images/calm-box.webp", alt: "The Calm Box shown from the front", label: "Front view", position: "center", zoom: 1 },
+    { src: "images/calm-box.webp", alt: "A close look at The Calm Box soothing items", label: "Inside the box", position: "center 40%", zoom: 1.22 },
+    { src: "images/calm-box.webp", alt: "The Calm Box prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
   ],
   "build-your-own": [
-    { src: "The%20Happy%20box.webp", alt: "Build Your Own Happy Box shown from the front", label: "Front view", position: "center", zoom: 1 },
-    { src: "The%20Happy%20box.webp", alt: "A close look at a custom Happy Box", label: "Inside the box", position: "center 38%", zoom: 1.22 },
-    { src: "The%20Happy%20box.webp", alt: "A custom Happy Box prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
+    { src: "images/happy-box.webp", alt: "Build Your Own Happy Box shown from the front", label: "Front view", position: "center", zoom: 1 },
+    { src: "images/happy-box.webp", alt: "A close look at a custom Happy Box", label: "Inside the box", position: "center 38%", zoom: 1.22 },
+    { src: "images/happy-box.webp", alt: "A custom Happy Box prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
   ]
 };
 var DETAILS = {
@@ -196,7 +196,7 @@ try {
 
       function money(n) { return "\u20B9" + Math.round(Number(n) || 0).toLocaleString("en-IN"); }
       function imageFor(id) {
-        var map = { "happy-box": "The%20Happy%20box.webp", "food-club": "the%20food%20club.webp", "style-club": "The%20style%20club.webp", "calm-box": "the%20calm%20box.webp", "build-your-own": "The%20Happy%20box.webp" };
+        var map = { "happy-box": "images/happy-box.webp", "food-club": "images/food-club.webp", "style-club": "images/style-club.webp", "calm-box": "images/calm-box.webp", "build-your-own": "images/happy-box.webp" };
         return map[id] || map["happy-box"];
       }
       function yearlyTotal(price, id) {
