@@ -56,12 +56,23 @@
           <div class="form-field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" placeholder="you@example.com"></div>
           <button type="button" class="btn btn-outline" id="sendLoginCodeBtn">Send Code</button>
         </div>
-        <div id="loginCodeBox" style="display:none;">
+<div id="loginCodeBox" style="display:none;">
           <p class="hint" id="loginDemoNotice"></p>
           <div class="lookup-form">
             <div class="form-field"><label for="loginCode">6-digit code</label><input id="loginCode" maxlength="6"></div>
             <button type="button" class="btn btn-primary" id="loginVerifyBtn">Verify</button>
           </div>
+        </div>
+        <div id="createAccountBox" style="display:none;">
+          <p class="hint">No account found for that email. Create one to save your details for future orders.</p>
+          <div class="form-grid">
+            <div class="form-field"><label for="createName">Name</label><input id="createName"></div>
+            <div class="form-field"><label for="createPhone">Phone</label><input id="createPhone"></div>
+            <div class="form-field full"><label for="createAddress">Address</label><input id="createAddress"></div>
+            <div class="form-field"><label for="createCity">City</label><input id="createCity"></div>
+            <div class="form-field"><label for="createPincode">Pincode</label><input id="createPincode"></div>
+          </div>
+          <button type="button" class="btn btn-primary" id="createAccountBtn">Create Account</button>
         </div>
         <div class="error-msg" id="loginError" style="display:none;"></div>
       </section>
@@ -173,14 +184,22 @@
         };
       }
 
-      function loadAccount(email) {
+function loadAccount(email) {
         var acc = store()[email.toLowerCase()];
-        if (acc) { account = acc; renderDashboard(); return; }
+        if (acc) { account = acc; document.getElementById("createAccountBox").style.display = "none"; renderDashboard(); return; }
         fetch("/api/subscribe?email=" + encodeURIComponent(email))
           .then(function (r) { return r.json(); })
           .then(function (data) {
-            if (data.subscriptions && data.subscriptions.length) { account = buildFromApi(email, data.subscriptions); persist(); renderDashboard(); }
-            else { showLoginError("No account found for that email."); }
+            if (data.subscriptions && data.subscriptions.length) { account = buildFromApi(email, data.subscriptions); persist(); document.getElementById("createAccountBox").style.display = "none"; renderDashboard(); }
+            else {
+              showLoginError("No account found for that email.");
+              var box = document.getElementById("createAccountBox");
+              if (box) {
+                box.style.display = "block";
+                var nameEl = document.getElementById("createName");
+                if (nameEl) { nameEl.focus(); }
+              }
+            }
           })
           .catch(function () { showLoginError("Could not load account."); });
       }
@@ -420,21 +439,50 @@
 
       document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("cartOpenBtn").addEventListener("click", function () { window.HWA.openCart(); });
-        document.getElementById("sendLoginCodeBtn").addEventListener("click", function () {
+document.getElementById("sendLoginCodeBtn").addEventListener("click", function () {
           var email = document.getElementById("loginEmail").value.trim();
           if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showLoginError("Please enter a valid email."); return; }
           document.getElementById("loginError").style.display = "none";
+          document.getElementById("createAccountBox").style.display = "none";
           loginEmail = email.toLowerCase();
           loginCode = String(Math.floor(100000 + Math.random() * 900000));
           document.getElementById("loginDemoNotice").textContent = "Demo verification code: " + loginCode + " (no real message is sent)";
           document.getElementById("loginCodeBox").style.display = "block";
         });
-        document.getElementById("loginVerifyBtn").addEventListener("click", function () {
+document.getElementById("loginVerifyBtn").addEventListener("click", function () {
           var code = document.getElementById("loginCode").value.trim();
           if (code !== loginCode) { showLoginError("Incorrect code."); return; }
           document.getElementById("loginError").style.display = "none";
           loadAccount(loginEmail);
         });
+        var createAccountBtn = document.getElementById("createAccountBtn");
+        if (createAccountBtn) {
+          createAccountBtn.addEventListener("click", function () {
+            var name = document.getElementById("createName").value.trim();
+            var phone = document.getElementById("createPhone").value.trim();
+            var address = document.getElementById("createAddress").value.trim();
+            var city = document.getElementById("createCity").value.trim();
+            var pincode = document.getElementById("createPincode").value.trim();
+            if (!name) { showLoginError("Please enter your name."); return; }
+            if (phone && !/^[0-9]{10}$/.test(phone)) { showLoginError("Please enter a valid 10-digit phone number."); return; }
+            if (pincode && !/^[0-9]{6}$/.test(pincode)) { showLoginError("Please enter a valid 6-digit pincode."); return; }
+            document.getElementById("loginError").style.display = "none";
+            account = {
+              email: loginEmail,
+              name: name,
+              phone: phone,
+              address: { address: address, city: city, pincode: pincode },
+              dogs: [],
+              orders: [],
+              subscriptions: [],
+              notifications: [],
+              usedCoupons: []
+            };
+            persist();
+            document.getElementById("createAccountBox").style.display = "none";
+            renderDashboard();
+          });
+        }
         document.getElementById("saveAddressBtn").addEventListener("click", function () {
           account.address = { address: document.getElementById("accAddress").value.trim(), city: document.getElementById("accCity").value.trim(), pincode: document.getElementById("accPincode").value.trim() };
           persist();
