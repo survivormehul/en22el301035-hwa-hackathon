@@ -1413,4 +1413,29 @@ p { color: var(--ink-soft); }
     transition-duration: 0.001ms !important;
   }
   .has-js .reveal { opacity: 1; transform: none; }
+}.detail-back-link { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px; font-size: 0.78rem; font-weight: 700; color: var(--forest); text-decoration: none; }
+.detail-back-link:hover { color: var(--coral); }
+.detail-gallery { position: relative; }
+.detail-gallery-stage { position: relative; overflow: hidden; aspect-ratio: 1 / 1.02; border-radius: 24px; background: var(--paper); }
+.detail-gallery-image { width: 100%; height: 100%; object-fit: cover; transform-origin: center; transition: transform 0.45s ease, opacity 0.25s ease; }
+.detail-gallery-nav { position: absolute; top: 50%; z-index: 3; width: 42px; height: 42px; border: 0; border-radius: 999px; background: rgba(255, 253, 249, 0.9); color: var(--forest-dark); font-size: 1.7rem; line-height: 1; cursor: pointer; transform: translateY(-50%); box-shadow: var(--shadow-s); }
+.detail-gallery-nav:hover { background: var(--paper); }
+.detail-gallery-prev { left: 14px; }
+.detail-gallery-next { right: 14px; }
+.detail-gallery-count { position: absolute; right: 16px; bottom: 16px; z-index: 3; padding: 6px 10px; border-radius: 999px; background: rgba(34, 54, 42, 0.72); color: var(--cream); font-size: 0.72rem; font-weight: 700; }
+.detail-gallery-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+.detail-gallery-thumb { padding: 0; border: 2px solid transparent; border-radius: 14px; overflow: hidden; background: var(--paper); cursor: pointer; aspect-ratio: 4 / 3; }
+.detail-gallery-thumb img { width: 100%; height: 100%; object-fit: cover; transform-origin: center; }
+.detail-gallery-thumb.active { border-color: var(--forest); }
+.detail-content-block { padding: 14px 16px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); }
+.detail-content-block h3 { margin-bottom: 8px; font-size: 0.95rem; color: var(--forest-dark); }
+.plan-card { cursor: pointer; }
+.plan-card-link { position: absolute; inset: 0; z-index: 1; }
+.plan-card-link:focus-visible { outline: 3px solid var(--coral); outline-offset: 4px; border-radius: 26px; }
+.plan-media, .plan-body, .plan-badge { position: relative; z-index: 2; }
+.plan-actions { position: relative; z-index: 3; }
+.plan-actions .btn, .plan-actions .text-link { position: relative; z-index: 3; }
+@media (max-width: 560px) {
+  .detail-gallery-thumbs { grid-template-columns: repeat(3, 1fr); }
+  .detail-gallery-nav { width: 36px; height: 36px; font-size: 1.4rem; }
 }

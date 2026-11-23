@@ -159,6 +159,11 @@
       ];
       var BYO_PRICE = 3499;
       var frequency = "monthly";
+try {
+  var planParams = new URLSearchParams(window.location.search);
+  var requestedFreq = planParams.get("freq");
+  if (requestedFreq === "monthly" || requestedFreq === "yearly") { frequency = requestedFreq; }
+} catch (e) {}
       var selected = [];
 
       function money(n) { return "\u20B9" + Math.round(Number(n) || 0).toLocaleString("en-IN"); }
@@ -176,9 +181,10 @@
           var featured = p.id === "happy-box";
           var price = priceFor(p.price);
           var saving = p.price * 12 - yearlyTotal(p.price);
-          return '<article class="plan-card' + (featured ? ' featured' : '') + '">' +
+          return '<article class="plan-card' + (featured ? ' featured' : '') + '" data-plan="' + p.id + '">' +
             (featured ? '<span class="plan-badge">Most popular</span>' : '') +
-            '<a class="plan-media" href="product.html?id=' + p.id + '" aria-label="View ' + p.name + '"><img src="' + p.image + '" alt="" loading="lazy"></a>' +
+            '<a class="plan-card-link" href="product.html?id=' + p.id + '&freq=' + frequency + '" aria-label="View ' + p.name + ' details"></a>' +
+            '<div class="plan-media"><img src="' + p.image + '" alt="" loading="lazy"></div>' +
             '<div class="plan-body">' +
               '<span class="plan-tagline">' + p.tagline + '</span>' +
               '<h2 class="plan-name">' + p.name + '</h2>' +
@@ -188,7 +194,7 @@
               '<ul class="plan-benefits">' + p.benefits.map(function (b) { return '<li>' + b + '</li>'; }).join("") + '</ul>' +
               '<div class="plan-actions">' +
                 '<button type="button" class="btn btn-primary plan-add" data-plan="' + p.id + '">Add to cart</button>' +
-                '<a class="text-link" href="product.html?id=' + p.id + '">Details <span aria-hidden="true">&rarr;</span></a>' +
+                '<a class="text-link plan-details-link" href="product.html?id=' + p.id + '&freq=' + frequency + '">Details <span aria-hidden="true">&rarr;</span></a>' +
               '</div>' +
             '</div>' +
           '</article>';
@@ -243,6 +249,11 @@
         document.getElementById("toggle-yearly").classList.toggle("active", f === "yearly");
         renderPlans();
         updateByoPrice();
+        try {
+          var url = new URL(window.location.href);
+          url.searchParams.set("freq", f);
+          window.history.replaceState({}, "", url.toString());
+        } catch (e) {}
       }
 
       document.addEventListener("DOMContentLoaded", function () {

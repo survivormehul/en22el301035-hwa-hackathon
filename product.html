@@ -125,10 +125,71 @@
           bestFor: "Dogs with very particular tastes - and humans who know them best."
         }
       };
-      var freq = "monthly";
-      var qty = 1;
-      var selectedCats = [];
-      var currentId = "happy-box";
+var IMAGES = {
+  "happy-box": [
+    { src: "The%20Happy%20box.webp", alt: "The Happy Box shown from the front", label: "Front view", position: "center", zoom: 1 },
+    { src: "The%20Happy%20box.webp", alt: "A close look at The Happy Box contents", label: "Inside the box", position: "center 38%", zoom: 1.22 },
+    { src: "The%20Happy%20box.webp", alt: "The Happy Box ready for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
+  ],
+  "food-club": [
+    { src: "the%20food%20club.webp", alt: "The Food Club shown from the front", label: "Front view", position: "center", zoom: 1 },
+    { src: "the%20food%20club.webp", alt: "A close look at The Food Club treats", label: "Inside the box", position: "center 40%", zoom: 1.22 },
+    { src: "the%20food%20club.webp", alt: "The Food Club prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
+  ],
+  "style-club": [
+    { src: "The%20style%20club.webp", alt: "The Style Club shown from the front", label: "Front view", position: "center", zoom: 1 },
+    { src: "The%20style%20club.webp", alt: "A close look at The Style Club accessories", label: "Inside the box", position: "center 38%", zoom: 1.22 },
+    { src: "The%20style%20club.webp", alt: "The Style Club prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
+  ],
+  "calm-box": [
+    { src: "the%20calm%20box.webp", alt: "The Calm Box shown from the front", label: "Front view", position: "center", zoom: 1 },
+    { src: "the%20calm%20box.webp", alt: "A close look at The Calm Box soothing items", label: "Inside the box", position: "center 40%", zoom: 1.22 },
+    { src: "the%20calm%20box.webp", alt: "The Calm Box prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
+  ],
+  "build-your-own": [
+    { src: "The%20Happy%20box.webp", alt: "Build Your Own Happy Box shown from the front", label: "Front view", position: "center", zoom: 1 },
+    { src: "The%20Happy%20box.webp", alt: "A close look at a custom Happy Box", label: "Inside the box", position: "center 38%", zoom: 1.22 },
+    { src: "The%20Happy%20box.webp", alt: "A custom Happy Box prepared for delivery", label: "Ready to ship", position: "center bottom", zoom: 1.1 }
+  ]
+};
+var DETAILS = {
+  "happy-box": {
+    contents: ["Enrichment toys and puzzle feeders", "Treats and interactive games", "Size-matched activity cards", "A monthly surprise element"],
+    unique: ["Our most-loved all-round box", "Balanced across toys, treats and problem solving", "Personalised to your dog's profile after checkout"]
+  },
+  "food-club": {
+    contents: ["Small-batch baked treats", "Long-lasting chews", "Flavour rotation card", "Portion guidance for your dog"],
+    unique: ["Chef-crafted recipes", "Allergy-aware selections", "Built around taste and texture"]
+  },
+  "style-club": {
+    contents: ["Monthly apparel or accessory", "Fit and size guide", "Seasonal colour theme", "Comfort-first fabric details"],
+    unique: ["Real-dog fit focus", "Seasonal styling", "Everyday comfort over novelty"]
+  },
+  "calm-box": {
+    contents: ["Snuffle and soothe toys", "Calming enrichment activities", "Low-arousal routine cards", "Gentle treat rewards"],
+    unique: ["Designed for anxious or senior dogs", "Lower stimulation by default", "Routine-led enrichment"]
+  },
+  "build-your-own": {
+    contents: ["At least two chosen categories", "Curated surprise products", "Category-specific enrichment", "Monthly delivery with your picks"],
+    unique: ["You choose the categories", "Fixed price regardless of mix", "Change picks for future boxes"]
+  }
+};
+var galleryIndex = 0;
+var galleryImages = [];
+
+var freq = "monthly";
+try {
+  var productParams = new URLSearchParams(window.location.search);
+  var requestedFreq = productParams.get("freq");
+  if (requestedFreq === "monthly" || requestedFreq === "yearly") { freq = requestedFreq; }
+} catch (e) {}
+var qty = 1;
+var selectedCats = [];
+var currentId = "happy-box";
+try {
+  var idParam = new URLSearchParams(window.location.search).get("id");
+  if (idParam && PRODUCTS[idParam]) { currentId = idParam; }
+} catch (e) {}
 
       function money(n) { return "\u20B9" + Math.round(Number(n) || 0).toLocaleString("en-IN"); }
       function imageFor(id) {
@@ -177,16 +238,31 @@
         }
         grid.innerHTML =
           '<div class="product-detail-media">' +
-            '<div class="detail-media-frame"><img src="' + imageFor(p.id) + '" alt="' + p.name + '"></div>' +
+            '<div class="detail-gallery" id="detailGallery">' +
+              '<div class="detail-gallery-stage">' +
+                '<button class="detail-gallery-nav detail-gallery-prev" type="button" aria-label="Previous image">&#8249;</button>' +
+                '<img id="detailGalleryImage" class="detail-gallery-image" src="' + ((IMAGES[p.id] || IMAGES["happy-box"])[0].src) + '" alt="' + ((IMAGES[p.id] || IMAGES["happy-box"])[0].alt) + '" style="object-position:' + ((IMAGES[p.id] || IMAGES["happy-box"])[0].position || "center") + ';transform:scale(' + ((IMAGES[p.id] || IMAGES["happy-box"])[0].zoom || 1) + ');">' +
+                '<button class="detail-gallery-nav detail-gallery-next" type="button" aria-label="Next image">&#8250;</button>' +
+                '<span class="detail-gallery-count" id="detailGalleryCount">1 / ' + ((IMAGES[p.id] || IMAGES["happy-box"]).length) + '</span>' +
+              '</div>' +
+              '<div class="detail-gallery-thumbs" id="detailGalleryThumbs">' +
+                ((IMAGES[p.id] || IMAGES["happy-box"]).map(function (img, idx) {
+                  return '<button type="button" class="detail-gallery-thumb' + (idx === 0 ? ' active' : '') + '" data-gallery-index="' + idx + '" aria-label="Show image ' + (idx + 1) + '"><img src="' + img.src + '" alt="" style="object-position:' + (img.position || "center") + ';transform:scale(' + (img.zoom || 1) + ');"></button>';
+                }).join("")) +
+              '</div>' +
+            '</div>' +
             '<span class="detail-media-badge">' + p.flag + '</span>' +
           '</div>' +
           '<div class="product-detail-info">' +
+            '<a class="detail-back-link" href="subscription.html?freq=' + freq + '">&larr; Back to plans &amp; pricing</a>' +
             '<span class="pill pill-soft">Subscription box</span>' +
             '<h1 class="product-detail-name">' + p.name + '</h1>' +
             '<p class="detail-tagline">' + p.tagline + '</p>' +
             '<div id="detailPriceBlock">' + priceHtml(p) + '</div>' +
             '<p class="product-description">' + p.description + '</p>' +
             '<div class="detail-bestfor"><span>Best for</span><p>' + p.bestFor + '</p></div>' +
+            '<div class="detail-content-block"><h3>What is inside</h3><ul class="product-benefits">' + (DETAILS[p.id] && DETAILS[p.id].contents ? DETAILS[p.id].contents : p.benefits).map(function (b) { return '<li>' + b + '</li>'; }).join("") + '</ul></div>' +
+            '<div class="detail-content-block"><h3>What makes it unique</h3><ul class="product-benefits">' + (DETAILS[p.id] && DETAILS[p.id].unique ? DETAILS[p.id].unique : []).map(function (b) { return '<li>' + b + '</li>'; }).join("") + '</ul></div>' +
             '<ul class="product-benefits">' + p.benefits.map(function (b) { return '<li>' + b + '</li>'; }).join("") + '</ul>' +
             '<div class="billing-toggle" role="group" aria-label="Billing frequency">' +
               '<button type="button" class="billing-btn' + (freq === "monthly" ? " active" : "") + '" data-freq="monthly">Monthly</button>' +
@@ -204,7 +280,37 @@
             '<p class="detail-demo-note">Demo storefront: checkout creates a pending-payment order. No real charge is made.</p>' +
           '</div>';
 
-        var addBtn = document.getElementById("detailAddBtn");
+        galleryImages = IMAGES[p.id] || IMAGES["happy-box"];
+galleryIndex = 0;
+function updateGallery() {
+  var img = document.getElementById("detailGalleryImage");
+  var count = document.getElementById("detailGalleryCount");
+  var current = galleryImages[galleryIndex] || galleryImages[0];
+  if (img && current) {
+    img.src = current.src;
+    img.alt = current.alt;
+    img.style.objectPosition = current.position || "center";
+    img.style.transform = "scale(" + (current.zoom || 1) + ")";
+  }
+  if (count) { count.textContent = (galleryIndex + 1) + " / " + galleryImages.length; }
+  var thumbs = document.querySelectorAll("#detailGalleryThumbs .detail-gallery-thumb");
+  thumbs.forEach(function (thumb, idx) {
+    thumb.classList.toggle("active", idx === galleryIndex);
+  });
+}
+updateGallery();
+var prevBtn = document.querySelector(".detail-gallery-prev");
+var nextBtn = document.querySelector(".detail-gallery-next");
+if (prevBtn) { prevBtn.addEventListener("click", function () { galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length; updateGallery(); }); }
+if (nextBtn) { nextBtn.addEventListener("click", function () { galleryIndex = (galleryIndex + 1) % galleryImages.length; updateGallery(); }); }
+document.querySelectorAll("#detailGalleryThumbs .detail-gallery-thumb").forEach(function (thumb) {
+  thumb.addEventListener("click", function () {
+    galleryIndex = Number(thumb.getAttribute("data-gallery-index")) || 0;
+    updateGallery();
+  });
+});
+
+var addBtn = document.getElementById("detailAddBtn");
         addBtn.addEventListener("click", function () {
           var addQty = parseInt(document.getElementById("detailQtyVal").textContent, 10) || 1;
           if (p.id === "build-your-own") {
@@ -221,6 +327,11 @@
         grid.querySelectorAll(".billing-btn").forEach(function (btn) {
           btn.addEventListener("click", function () {
             freq = btn.getAttribute("data-freq");
+            try {
+              var url = new URL(window.location.href);
+              url.searchParams.set("freq", freq);
+              window.history.replaceState({}, "", url.toString());
+            } catch (e) {}
             render();
           });
         });
