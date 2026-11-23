@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Happy While Away - Product</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/cart.js"></script>
 </head>
 <body>
 
@@ -17,13 +18,22 @@
         <a href="subscription.html">Subscription</a>
         <a href="contact.html">Contact</a>
       </nav>
+      <button class="btn btn-outline cart-open-btn" id="cartOpenBtn">Cart <span id="hwaCartBadge">0</span></button>
     </div>
   </header>
 
   <main>
-    <section class="section product-detail-section" id="productDetail">
+    <section class="section product-detail-section">
       <div class="container">
         <div class="product-detail-grid" id="productDetailGrid"></div>
+        <div class="product-buy" style="margin-top:24px;">
+          <div class="hwa-qty-stepper">
+            <button class="hwa-qty-btn" id="detailQtyDown">-</button>
+            <span class="hwa-qty-val" id="detailQtyVal">1</span>
+            <button class="hwa-qty-btn" id="detailQtyUp">+</button>
+          </div>
+          <button class="btn btn-primary btn-lg" id="detailAddBtn">Add to Cart</button>
+        </div>
       </div>
     </section>
   </main>
@@ -34,101 +44,47 @@
     </div>
   </footer>
 
+  <script src="js/cart.js"></script>
   <script>
-    const PRODUCTS = {
-      "happy-box": {
-        id: "happy-box",
-        name: "The Happy Box",
-        tagline: "Fun that keeps wagging.",
-        flag: "Most Popular",
-        price: 1999,
-        yearlyPrice: 19990,
-        benefits: ["Daily enrichment toys", "Treats & games", "Mixed-age friendly"],
-        description: "The Happy Box is our signature monthly happiness delivery. Every box brings a fresh mix of enrichment toys, tasty games and treats tailored to keep your dog wagging, sniffing and smiling all month long.",
-        subscription: "Monthly or yearly subscription. Pause, skip or cancel anytime."
-      },
-      "food-club": {
-        id: "food-club",
-        name: "The Food Club",
-        tagline: "Chef-crafted happiness.",
-        price: 1499,
-        yearlyPrice: 14990,
-        benefits: ["Fresh-baked treats monthly", "Small-batch recipes", "Dog-safe ingredients"],
-        description: "The Food Club delivers chef-crafted, small-batch treats every month. Baked in small batches with dog-safe ingredients, each delivery is a tasty adventure your dog will love.",
-        subscription: "Monthly or yearly subscription. Pause, skip or cancel anytime."
-      },
-      "style-club": {
-        id: "style-club",
-        name: "The Style Club",
-        tagline: "Cozy comfort wear.",
-        price: 999,
-        yearlyPrice: 9990,
-        benefits: ["Apparel & accessories monthly", "Fitted for size & breed", "Comfort-first designs"],
-        description: "The Style Club sends monthly apparel and accessories designed for comfort and fit. Cozy, playful and made for real dogs.",
-        subscription: "Monthly or yearly subscription. Pause, skip or cancel anytime."
-      },
-      "calm-box": {
-        id: "calm-box",
-        name: "The Calm Box",
-        tagline: "Serenity in a box.",
-        price: 1499,
-        yearlyPrice: 14990,
-        benefits: ["Calming aids & enrichment", "Snuffle & soothe toys", "Anxiety-friendly routines"],
-        description: "The Calm Box is a serenity-focused subscription with calming aids, soothe toys and gentle enrichment routines for dogs who need a calmer life.",
-        subscription: "Monthly or yearly subscription. Pause, skip or cancel anytime."
-      },
-      "build-your-own": {
-        id: "build-your-own",
-        name: "Build Your Own Happy Box",
-        tagline: "Curate your own happiness.",
-        price: 3499,
-        yearlyPrice: 34990,
-        benefits: ["Pick 2-4 categories", "Toys, food, apparel", "Surprise merchandise"],
-        description: "Design your own Happy Box. Pick 2-4 categories from toys & enrichment, food & treats, and clothing & accessories, and we will build a personalised box around your dog's tastes.",
-        subscription: "Monthly or yearly subscription. Pick your categories once, change them anytime."
-      }
+    var PRODUCTS = {
+      "happy-box": { id: "happy-box", name: "The Happy Box", tagline: "Fun that keeps wagging.", flag: "Most Popular", price: 1999, yearlyPrice: 19990, benefits: ["Daily enrichment toys", "Treats & games", "Mixed-age friendly"], description: "The Happy Box is our signature monthly happiness delivery. Every box brings a fresh mix of enrichment toys, tasty games and treats tailored to keep your dog wagging, sniffing and smiling all month long.", subscription: "Monthly or yearly subscription. Pause, skip or cancel anytime." },
+      "food-club": { id: "food-club", name: "The Food Club", tagline: "Chef-crafted happiness.", price: 1499, yearlyPrice: 14990, benefits: ["Fresh-baked treats monthly", "Small-batch recipes", "Dog-safe ingredients"], description: "The Food Club delivers chef-crafted, small-batch treats every month. Baked in small batches with dog-safe ingredients, each delivery is a tasty adventure your dog will love.", subscription: "Monthly or yearly subscription. Pause, skip or cancel anytime." },
+      "style-club": { id: "style-club", name: "The Style Club", tagline: "Cozy comfort wear.", price: 999, yearlyPrice: 9990, benefits: ["Apparel & accessories monthly", "Fitted for size & breed", "Comfort-first designs"], description: "The Style Club sends monthly apparel and accessories designed for comfort and fit. Cozy, playful and made for real dogs.", subscription: "Monthly or yearly subscription. Pause, skip or cancel anytime." },
+      "calm-box": { id: "calm-box", name: "The Calm Box", tagline: "Serenity in a box.", price: 1499, yearlyPrice: 14990, benefits: ["Calming aids & enrichment", "Snuffle & soothe toys", "Anxiety-friendly routines"], description: "The Calm Box is a serenity-focused subscription with calming aids, soothe toys and gentle enrichment routines for dogs who need a calmer life.", subscription: "Monthly or yearly subscription. Pause, skip or cancel anytime." },
+      "build-your-own": { id: "build-your-own", name: "Build Your Own Happy Box", tagline: "Curate your own happiness.", price: 3499, yearlyPrice: 34990, benefits: ["Pick 2-4 categories", "Toys, food, apparel", "Surprise merchandise"], description: "Design your own Happy Box. Pick 2-4 categories from toys & enrichment, food & treats, and clothing & accessories, and we will build a personalised box around your dog's tastes.", subscription: "Monthly or yearly subscription. Pick your categories once, change them anytime." }
     };
-
-    function money(n) {
-      return "\u20B9" + n.toLocaleString("en-IN");
-    }
-
+    function money(n) { return "\u20B9" + n.toLocaleString("en-IN"); }
+    function imageFor(id) { var map = { "happy-box": "The%20Happy%20box.webp", "food-club": "the%20food%20club.webp", "style-club": "The%20style%20club.webp", "calm-box": "the%20calm%20box.webp", "build-your-own": "The%20Happy%20box.webp" }; return map[id] || "The%20Happy%20box.webp"; }
     function renderProduct(id) {
-      const p = PRODUCTS[id];
-      const grid = document.getElementById("productDetailGrid");
+      var p = PRODUCTS[id];
+      var grid = document.getElementById("productDetailGrid");
       grid.innerHTML =
-        '<div class="product-detail-media"><img src="' + imageFor(p.id) + '" alt="' + p.name + '"></div>' +
+        '<div class="product-detail-media"><img src="' + imageFor(id) + '" alt="' + p.name + '"></div>' +
         '<div class="product-detail-info">' +
           '<span class="product-flag">' + p.flag + '</span>' +
           '<h1 class="product-detail-name">' + p.name + '</h1>' +
           '<p class="product-tagline">' + p.tagline + '</p>' +
           '<div class="product-price product-price-lg">' + money(p.price) + ' <span>/month</span></div>' +
-          '<div class="product-price product-price-lg product-price-old">' + money(p.yearlyPrice) + ' <span>/month billed yearly</span></div>' +
+          '<div class="product-price product-price-old">' + money(p.yearlyPrice) + ' <span>/month billed yearly</span></div>' +
           '<p class="product-description">' + p.description + '</p>' +
-          '<ul class="product-benefits">' +
-            (p.benefits || []).map(function(b) { return "<li>" + b + "</li>"; }).join("") +
-          '</ul>' +
+          '<ul class="product-benefits">' + (p.benefits || []).map(function (b) { return "<li>" + b + "</li>"; }).join("") + '</ul>' +
           '<p class="product-subscription-info">' + p.subscription + '</p>' +
-          '<a class="btn btn-primary btn-lg" href="subscription.html">Subscribe Now</a>' +
         '</div>';
       window.currentProductId = p.id;
+      var qtyVal = document.getElementById("detailQtyVal");
+      var addBtn = document.getElementById("detailAddBtn");
+      qtyVal.setAttribute("data-product", p.id);
+      qtyVal.textContent = "1";
+      addBtn.setAttribute("data-product", p.id);
+      addBtn.setAttribute("data-qty", "1");
+      addBtn.addEventListener("click", function () { window.HWA.addToCart(p.id, { qty: parseInt(qtyVal.textContent, 10) || 1 }); });
+      document.getElementById("detailQtyUp").addEventListener("click", function () { var v = parseInt(qtyVal.textContent, 10) || 1; v = v + 1; qtyVal.textContent = String(v); qtyVal.setAttribute("data-product", p.id); });
+      document.getElementById("detailQtyDown").addEventListener("click", function () { var v = parseInt(qtyVal.textContent, 10) || 1; v = v - 1; if (v < 1) { v = 1; } qtyVal.textContent = String(v); qtyVal.setAttribute("data-product", p.id); });
     }
-
-    function imageFor(id) {
-      var map = {
-        "happy-box": "The%20Happy%20box.webp",
-        "food-club": "the%20food%20club.webp",
-        "style-club": "The%20style%20club.webp",
-        "calm-box": "the%20calm%20box.webp",
-        "build-your-own": "The%20Happy%20box.webp"
-      };
-      return map[id] || "The%20Happy%20box.webp";
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       var params = new URLSearchParams(window.location.search);
-      var id = params.get("id");
-      renderProduct(id || "happy-box");
+      renderProduct(params.get("id") || "happy-box");
+      document.getElementById("cartOpenBtn").addEventListener("click", function () { window.HWA.openCart(); });
     });
   </script>
 

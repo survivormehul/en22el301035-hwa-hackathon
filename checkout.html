@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy While Away - Checkout</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">Happy While Away</a>
+      <nav class="main-nav" id="mainNav">
+        <a href="index.html">Home</a>
+        <a href="products.html" class="active">Boxes</a>
+        <a href="subscription.html">Subscription</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <button class="btn btn-outline cart-open-btn" id="cartOpenBtn">Cart <span id="hwaCartBadge">0</span></button>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <h1>Checkout</h1>
+      <div class="checkout-grid" id="checkoutGrid">
+        <div class="checkout-summary" id="checkoutSummary"></div>
+        <div class="checkout-payment">
+          <h2>Payment</h2>
+          <p class="hint">This is a demo checkout. No real payment is processed.</p>
+          <button class="btn btn-primary btn-lg" id="payNowBtn">Pay &amp; Subscribe</button>
+          <a class="btn btn-outline" href="products.html">Continue Shopping</a>
+        </div>
+      </div>
+      <div class="order-success" id="orderSuccess" style="display:none;">
+        <span class="success-icon">&#10003;</span>
+        <h2>Order Placed!</h2>
+        <p>Your subscription(s) have been created. Happiness is on the way.</p>
+        <a class="btn btn-primary" href="products.html">Back to Boxes</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Happy While Away. Happiness, delivered monthly.</p>
+    </div>
+  </footer>
+
+  <script src="js/cart.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var cart = window.HWA.Cart;
+      var summaryEl = document.getElementById("checkoutSummary");
+      var successEl = document.getElementById("orderSuccess");
+      var payBtn = document.getElementById("payNowBtn");
+      function render() {
+        var t = cart.totals(cart.get().items);
+        var html = '<div class="order-summary">';
+        html += '<div class="row"><span>Items</span><span>' + t.count + '</span></div>';
+        html += '<div class="row"><span>Subtotal</span><span>\u20B9' + t.subtotal.toLocaleString("en-IN") + '</span></div>';
+        html += '<div class="row"><span>Shipping</span><span>' + (t.shipping === 0 ? "FREE" : "\u20B9" + t.shipping) + '</span></div>';
+        html += '<div class="row"><span>Total</span><span>\u20B9' + t.total.toLocaleString("en-IN") + '</span></div>';
+        html += '</div>';
+        summaryEl.innerHTML = html;
+      }
+      render();
+      document.getElementById("cartOpenBtn").addEventListener("click", function () { window.HWA.openCart(); });
+      payBtn.addEventListener("click", function () {
+        var items = cart.get().items;
+        if (!items || items.length === 0) { return; }
+        var payload = { items: items.map(function (it) { return { productId: it.productId, name: it.name, price: it.price, qty: it.qty, freq: it.freq, config: it.config }; }) };
+        fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+          .then(function (r) { return r.json(); })
+          .then(function () {
+            cart.clear();
+            successEl.style.display = "block";
+          })
+          .catch(function () {});
+      });
+    });
+  </script>
+
+</body>
+</html>

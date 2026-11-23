@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Happy While Away - Subscription Boxes</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/cart.js"></script>
 </head>
 <body>
 
@@ -17,6 +18,7 @@
         <a href="subscription.html">Subscription</a>
         <a href="contact.html">Contact</a>
       </nav>
+      <button class="btn btn-outline cart-open-btn" id="cartOpenBtn">Cart <span id="hwaCartBadge">0</span></button>
     </div>
   </header>
 
@@ -42,7 +44,14 @@
                 <li>Treats &amp; games</li>
                 <li>Mixed-age friendly</li>
               </ul>
-              <a class="btn btn-primary" href="product.html?id=happy-box">View &amp; Subscribe</a>
+              <div class="product-buy">
+                <div class="hwa-qty-stepper">
+                  <button class="hwa-qty-btn" data-action="qty-down" data-product="happy-box">-</button>
+                  <span class="hwa-qty-val" data-product="happy-box">1</span>
+                  <button class="hwa-qty-btn" data-action="qty-up" data-product="happy-box">+</button>
+                </div>
+                <button class="btn btn-primary" data-action="add" data-product="happy-box">Add to Cart</button>
+              </div>
             </div>
           </article>
 
@@ -57,7 +66,14 @@
                 <li>Small-batch recipes</li>
                 <li>Dog-safe ingredients</li>
               </ul>
-              <a class="btn btn-primary" href="product.html?id=food-club">View &amp; Subscribe</a>
+              <div class="product-buy">
+                <div class="hwa-qty-stepper">
+                  <button class="hwa-qty-btn" data-action="qty-down" data-product="food-club">-</button>
+                  <span class="hwa-qty-val" data-product="food-club">1</span>
+                  <button class="hwa-qty-btn" data-action="qty-up" data-product="food-club">+</button>
+                </div>
+                <button class="btn btn-primary" data-action="add" data-product="food-club">Add to Cart</button>
+              </div>
             </div>
           </article>
 
@@ -72,7 +88,14 @@
                 <li>Fitted for size &amp; breed</li>
                 <li>Comfort-first designs</li>
               </ul>
-              <a class="btn btn-primary" href="product.html?id=style-club">View &amp; Subscribe</a>
+              <div class="product-buy">
+                <div class="hwa-qty-stepper">
+                  <button class="hwa-qty-btn" data-action="qty-down" data-product="style-club">-</button>
+                  <span class="hwa-qty-val" data-product="style-club">1</span>
+                  <button class="hwa-qty-btn" data-action="qty-up" data-product="style-club">+</button>
+                </div>
+                <button class="btn btn-primary" data-action="add" data-product="style-club">Add to Cart</button>
+              </div>
             </div>
           </article>
 
@@ -87,7 +110,14 @@
                 <li>Snuffle &amp; soothe toys</li>
                 <li>Anxiety-friendly routines</li>
               </ul>
-              <a class="btn btn-primary" href="product.html?id=calm-box">View &amp; Subscribe</a>
+              <div class="product-buy">
+                <div class="hwa-qty-stepper">
+                  <button class="hwa-qty-btn" data-action="qty-down" data-product="calm-box">-</button>
+                  <span class="hwa-qty-val" data-product="calm-box">1</span>
+                  <button class="hwa-qty-btn" data-action="qty-up" data-product="calm-box">+</button>
+                </div>
+                <button class="btn btn-primary" data-action="add" data-product="calm-box">Add to Cart</button>
+              </div>
             </div>
           </article>
 
@@ -102,7 +132,14 @@
                 <li>Toys, food, apparel</li>
                 <li>Surprise merchandise</li>
               </ul>
-              <a class="btn btn-primary" href="product.html?id=build-your-own">View &amp; Subscribe</a>
+              <div class="product-buy">
+                <div class="hwa-qty-stepper">
+                  <button class="hwa-qty-btn" data-action="qty-down" data-product="build-your-own">-</button>
+                  <span class="hwa-qty-val" data-product="build-your-own">1</span>
+                  <button class="hwa-qty-btn" data-action="qty-up" data-product="build-your-own">+</button>
+                </div>
+                <button class="btn btn-primary" data-action="add" data-product="build-your-own">Add to Cart</button>
+              </div>
             </div>
           </article>
         </div>
