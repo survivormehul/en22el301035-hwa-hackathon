@@ -19,18 +19,71 @@ function saveSubs() {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(DATA_FILE, JSON.stringify(subs, null, 2));
   } catch (e) {
-    // best-effort persistence on serverless (read-only FS); response still returned
   }
 }
 loadSubs();
 
+function addMonths(date, months) {
+  const d = new Date(date.getTime());
+  const day = d.getDate();
+  d.setMonth(d.getMonth() + months);
+  if (d.getDate() < day) d.setDate(0);
+  return d;
+}
+
+function computeAmount(item) {
+  const price = Number(item.price) || 0;
+  const qty = Number(item.qty) || 1;
+  const unit = item.amount != null ? Number(item.amount) : (item.freq === 'yearly' ? price * 12 : price);
+  return Math.round(unit * qty);
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     res.status(204).end();
+    return;
+  }
+
+  if (req.method === 'GET') {
+    const url = new URL(req.url, 'http://localhost');
+    const email = (url.searchParams.get('email') || '').toLowerCase();
+    if (!email) {
+      res.status(400).json({ ok: false, error: 'Email is required' });
+      return;
+    }
+    const found = subs.filter((s) => s.customer && (s.customer.email || '').toLowerCase() === email);
+    res.status(200).json({ ok: true, subscriptions: found });
+    return;
+  }
+
+  if (req.method === 'PATCH') {
+    try {
+      let body = '';
+      for await (const chunk of req) body += chunk;
+      const payload = JSON.parse(body || '{}');
+      const record = subs.find((s) => s.id === payload.subscriptionId);
+      if (!record) {
+        res.status(404).json({ ok: false, error: 'Subscription not found' });
+        return;
+      }
+      const action = payload.action;
+      if (action === 'pause') { record.status = 'paused'; }
+      else if (action === 'resume') { record.status = 'active'; }
+      else if (action === 'cancel') { record.status = 'cancelled'; }
+      else {
+        res.status(400).json({ ok: false, error: 'Unsupported action. Frequency and box changes are not allowed.' });
+        return;
+      }
+      record.updatedAt = new Date().toISOString();
+      saveSubs();
+      res.status(200).json({ ok: true, subscription: record });
+    } catch (e) {
+      res.status(500).json({ ok: false, error: e.message || 'Server error' });
+    }
     return;
   }
 
@@ -44,38 +97,80 @@ module.exports = async (req, res) => {
     for await (const chunk of req) body += chunk;
     const sub = JSON.parse(body || '{}');
 
-    if (!sub.customer || !sub.customer.name || !sub.customer.email || !sub.customer.phone || !sub.customer.address || !sub.customer.pincode) {
+    if (!sub.customer || !sub.customer.name || !sub.customer.email || !sub.customer.phone) {
       res.status(400).json({ ok: false, error: 'Missing required customer details' });
       return;
     }
-    if (!sub.dog || !sub.dog.name || !sub.dog.breed || !sub.dog.size) {
-      res.status(400).json({ ok: false, error: 'Missing required dog profile details' });
-      return;
-    }
-    if (!sub.planType || (sub.planType === 'curated' && !sub.items) || (sub.planType === 'build-your-own' && !sub.items)) {
-      res.status(400).json({ ok: false, error: 'Invalid plan selection' });
-      return;
-    }
-    if (sub.frequency !== 'monthly' && sub.frequency !== 'yearly') {
-      res.status(400).json({ ok: false, error: 'Frequency must be monthly or yearly' });
+
+    const address = sub.deliveryAddress || (sub.customer && sub.customer.address ? { address: sub.customer.address, pincode: sub.customer.pincode } : null);
+    if (!address || !address.address || !address.pincode) {
+      res.status(400).json({ ok: false, error: 'A common delivery address is required' });
       return;
     }
 
-    const record = {
-      id: 'HWA-SUB-' + Date.now(),
-      createdAt: new Date().toISOString(),
-      frequency: sub.frequency,
-      planType: sub.planType,
-      items: sub.items,
-      total: sub.total,
-      customer: sub.customer,
-      dog: sub.dog,
-      status: 'active'
-    };
-    subs.push(record);
+    const rawItems = Array.isArray(sub.items) ? sub.items : [];
+    const items = rawItems.map(function (raw) {
+      if (typeof raw === 'string') { return { productId: raw, name: raw, price: 0, qty: 1, freq: sub.frequency }; }
+      return {
+        productId: raw.productId || raw.id || sub.planType || 'plan',
+        name: raw.name || raw.title || 'Subscription',
+        price: Number(raw.price) || 0,
+        qty: Number(raw.qty) || 1,
+        freq: raw.freq || sub.frequency,
+        config: raw.config || null,
+        dogId: raw.dogId || null,
+        amount: raw.amount
+      };
+    });
+    if (items.length === 0) {
+      res.status(400).json({ ok: false, error: 'No items to subscribe' });
+      return;
+    }
+    for (const item of items) {
+      if (item.freq !== 'monthly' && item.freq !== 'yearly') {
+        res.status(400).json({ ok: false, error: 'Each item must have monthly or yearly billing' });
+        return;
+      }
+    }
+
+    const now = new Date();
+    const orderId = 'HWA-ORD-' + now.getTime();
+    let orderInitial = 0;
+    for (const item of items) orderInitial += computeAmount(item);
+
+    const created = [];
+    items.forEach((item, idx) => {
+      const amount = computeAmount(item);
+      const dog = (sub.dogs || []).find((d) => d.id && item.dogId && d.id === item.dogId) || (sub.dog || null);
+      const renewal = item.freq === 'yearly' ? addMonths(now, 12) : addMonths(now, 1);
+      const record = {
+        id: 'HWA-SUB-' + now.getTime() + '-' + (idx + 1),
+        orderId: orderId,
+        createdAt: now.toISOString(),
+        frequency: item.freq,
+        planType: item.productId === 'build-your-own' ? 'build-your-own' : 'curated',
+        items: [{ productId: item.productId, name: item.name, price: Number(item.price) || 0, qty: Number(item.qty) || 1, freq: item.freq, config: item.config || null }],
+        total: amount,
+        initialPayment: orderInitial,
+        billing: {
+          type: item.freq,
+          amount: amount,
+          nextDueDate: renewal.toISOString(),
+          chargedUpfrontMonths: item.freq === 'yearly' ? 12 : 1
+        },
+        renewalDate: renewal.toISOString(),
+        deliveryAddress: address,
+        customer: { name: sub.customer.name, email: sub.customer.email, phone: sub.customer.phone },
+        dog: dog,
+        editable: { billingFrequency: false, product: false },
+        status: 'active'
+      };
+      subs.push(record);
+      created.push(record);
+    });
     saveSubs();
 
-    res.status(200).json({ ok: true, subscriptionId: record.id, total: record.total, frequency: record.frequency });
+    res.status(200).json({ ok: true, orderId: orderId, initialPayment: orderInitial, subscriptions: created });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message || 'Server error' });
   }

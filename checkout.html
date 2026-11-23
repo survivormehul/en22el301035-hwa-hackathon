@@ -16,6 +16,7 @@
         <a href="index.html">Home</a>
         <a href="products.html" class="active">Boxes</a>
         <a href="subscription.html">Subscription</a>
+        <a href="subscriptions.html">My Subscriptions</a>
         <a href="contact.html">Contact</a>
       </nav>
       <button class="btn btn-outline cart-open-btn" id="cartOpenBtn">Cart <span id="hwaCartBadge">0</span></button>
@@ -25,20 +26,54 @@
   <main class="section">
     <div class="container">
       <h1>Checkout</h1>
-      <div class="checkout-grid" id="checkoutGrid">
-        <div class="checkout-summary" id="checkoutSummary"></div>
-        <div class="checkout-payment">
-          <h2>Payment</h2>
-          <p class="hint">This is a demo checkout. No real payment is processed.</p>
-          <button class="btn btn-primary btn-lg" id="payNowBtn">Pay &amp; Subscribe</button>
-          <a class="btn btn-outline" href="products.html">Continue Shopping</a>
+      <form id="checkoutForm">
+        <div class="checkout-grid">
+          <div class="checkout-left">
+            <section class="form-section">
+              <h3>Customer Details</h3>
+              <div class="form-grid">
+                <div class="form-field"><label for="custName">Full Name</label><input id="custName" required></div>
+                <div class="form-field"><label for="custEmail">Email Address</label><input id="custEmail" type="email" required></div>
+                <div class="form-field"><label for="custPhone">Mobile Number</label><input id="custPhone" required></div>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <h3>Delivery Address (common for this checkout)</h3>
+              <div class="form-grid">
+                <div class="form-field full"><label for="addrAddress">Address</label><input id="addrAddress" required></div>
+                <div class="form-field"><label for="addrCity">City</label><input id="addrCity"></div>
+                <div class="form-field"><label for="addrPincode">Pincode</label><input id="addrPincode" required></div>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <h3>Dog Profiles</h3>
+              <div id="dogList"></div>
+              <button type="button" class="btn btn-outline" id="addDogBtn">+ Add Another Dog</button>
+            </section>
+          </div>
+
+          <div class="checkout-right">
+            <section class="form-section">
+              <h3>Your Subscriptions</h3>
+              <div id="checkoutItems"></div>
+              <div id="checkoutTotals"></div>
+            </section>
+            <p class="hint">One combined payment now. Monthly subscriptions renew independently; yearly subscriptions are paid for 12 months upfront and delivered monthly.</p>
+            <button type="submit" class="btn btn-primary btn-lg" id="payNowBtn">Pay &amp; Subscribe</button>
+            <a class="btn btn-outline" href="products.html">Continue Shopping</a>
+            <div class="error-msg" id="checkoutError" style="display:none;"></div>
+          </div>
         </div>
-      </div>
+      </form>
+
       <div class="order-success" id="orderSuccess" style="display:none;">
         <span class="success-icon">&#10003;</span>
         <h2>Order Placed!</h2>
-        <p>Your subscription(s) have been created. Happiness is on the way.</p>
-        <a class="btn btn-primary" href="products.html">Back to Boxes</a>
+        <p>Your subscriptions are now active and independently manageable.</p>
+        <div id="createdSubs"></div>
+        <a class="btn btn-primary" href="subscriptions.html">Manage Subscriptions</a>
       </div>
     </div>
   </main>
@@ -51,43 +86,169 @@
 
   <script src="js/cart.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      var cart = window.HWA.Cart;
-      var summaryEl = document.getElementById("checkoutSummary");
-      var successEl = document.getElementById("orderSuccess");
-      var payBtn = document.getElementById("payNowBtn");
-      function render() {
-        var items = cart.get().items;
-        var t = cart.totals(items);
-        var html = '<div class="order-summary">';
-        html += '<div class="row"><span>Items</span><span>' + t.count + '</span></div>';
-        html += '<div class="row"><span>Subtotal</span><span>\u20B9' + t.subtotal.toLocaleString("en-IN") + '</span></div>';
-        html += '<div class="row"><span>Shipping</span><span>' + (t.shipping === 0 ? "FREE" : "\u20B9" + t.shipping) + '</span></div>';
-        html += '<div class="row"><span>Total</span><span>\u20B9' + t.total.toLocaleString("en-IN") + '</span></div>';
-        html += '</div>';
-        summaryEl.innerHTML = html;
+    (function () {
+      var dogSeq = 0;
+      function newDogId() { dogSeq += 1; return "dog-" + Date.now() + "-" + dogSeq; }
+      function fmt(n) { return "\u20B9" + n.toLocaleString("en-IN"); }
+      function amountFor(item) {
+        var gross = item.price;
+        if (item.freq === "yearly") {
+          var d = window.HWA_CONFIG && typeof window.HWA_CONFIG.annualDiscountPercent === "number" ? window.HWA_CONFIG.annualDiscountPercent : 0;
+          gross = Math.round(item.price * 12 * (1 - d / 100));
+        }
+        return gross;
       }
-      render();
-      document.getElementById("cartOpenBtn").addEventListener("click", function () { window.HWA.openCart(); });
-      payBtn.addEventListener("click", function () {
+      function addDog() {
+        var id = newDogId();
+        var wrap = document.createElement("div");
+        wrap.className = "dog-row form-grid";
+        wrap.setAttribute("data-dog-id", id);
+        wrap.innerHTML =
+          '<div class="form-field"><label>Dog Name</label><input class="dog-name" required></div>' +
+          '<div class="form-field"><label>Breed</label><input class="dog-breed" required></div>' +
+          '<div class="form-field"><label>Size</label><select class="dog-size"><option value="Small">Small</option><option value="Medium" selected>Medium</option><option value="Large">Large</option></select></div>' +
+          '<div class="form-field"><label>&nbsp;</label><button type="button" class="btn btn-outline remove-dog">Remove</button></div>';
+        wrap.querySelector(".remove-dog").addEventListener("click", function () {
+          wrap.parentNode.removeChild(wrap);
+          renderItems();
+        });
+        document.getElementById("dogList").appendChild(wrap);
+        renderItems();
+      }
+      function dogs() {
+        var out = [];
+        var rows = document.querySelectorAll("#dogList .dog-row");
+        rows.forEach(function (row) {
+          var name = row.querySelector(".dog-name").value.trim();
+          var breed = row.querySelector(".dog-breed").value.trim();
+          var size = row.querySelector(".dog-size").value;
+          if (name) { out.push({ id: row.getAttribute("data-dog-id"), name: name, breed: breed, size: size }); }
+        });
+        return out;
+      }
+      function renderItems() {
+        var cart = window.HWA.Cart;
         var items = cart.get().items;
-        if (!items || items.length === 0) { return; }
-        var hasByo = false;
-        for (var i = 0; i < items.length; i++) { if (items[i].productId === "build-your-own") { hasByo = true; break; } }
-        var payload = {
-          planType: hasByo ? "build-your-own" : "curated",
-          items: items.map(function (it) { return { productId: it.productId, name: it.name, price: it.price, qty: it.qty, freq: it.freq, config: it.config }; }),
-          frequency: items.length ? (items[0].freq || "monthly") : "monthly",
-          total: cart.totals(items).total,
-          customer: { name: "Happy Customer", email: "happy@happywhileaway.example", phone: "+919000000000", address: "Happy Street", pincode: "560001" },
-          dog: { name: "Buddy", breed: "Golden Retriever", size: "Medium" }
-        };
-        fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
-          .then(function (r) { return r.json(); })
-          .then(function () { cart.clear(); successEl.style.display = "block"; })
-          .catch(function () {});
+        var container = document.getElementById("checkoutItems");
+        if (!items.length) { container.innerHTML = '<p class="hint">Your cart is empty. <a href="products.html">Browse boxes</a>.</p>'; }
+        else {
+          container.innerHTML = "";
+          items.forEach(function (it, i) {
+            var dogList = dogs();
+            var row = document.createElement("div");
+            row.className = "checkout-item";
+            row.innerHTML =
+              '<div class="checkout-item-main">' +
+                '<div class="checkout-item-name">' + it.name + (it.config && it.config.categories ? ' [BYO: ' + it.config.categories.join(", ") + ']' : '') + '</div>' +
+                '<div class="checkout-item-sub">Qty ' + it.qty + ' &middot; ' + fmt(amountFor(it)) + (it.freq === "yearly" ? ' / 12 months upfront' : ' / month') + '</div>' +
+              '</div>' +
+              '<div class="checkout-item-controls">' +
+                '<select class="checkout-freq" data-index="' + i + '">' +
+                  '<option value="monthly"' + (it.freq === "monthly" ? " selected" : "") + '>Monthly</option>' +
+                  '<option value="yearly"' + (it.freq === "yearly" ? " selected" : "") + '>Yearly</option>' +
+                '</select>' +
+                '<select class="checkout-dog" data-index="' + i + '">' +
+                  '<option value="">Assign dog (optional)</option>' +
+                  dogList.map(function (d) { return '<option value="' + d.id + '"' + (it.dogId === d.id ? " selected" : "") + '>' + d.name + '</option>'; }).join("") +
+                '</select>' +
+              '</div>';
+            container.appendChild(row);
+            row.querySelector(".checkout-freq").addEventListener("change", function () {
+              cart.get().items[i].freq = this.value;
+              cart.get().save();
+              renderItems();
+              renderTotals();
+              renderSubCount();
+            });
+            row.querySelector(".checkout-dog").addEventListener("change", function () {
+              cart.get().items[i].dogId = this.value || null;
+              cart.get().save();
+            });
+          });
+        }
+        renderTotals();
+        renderSubCount();
+      }
+      function renderTotals() {
+        var cart = window.HWA.Cart;
+        var items = cart.get().items;
+        var subtotal = 0;
+        items.forEach(function (it) { subtotal += amountFor(it) * it.qty; });
+        var shipping = subtotal === 0 || subtotal >= 2999 ? 0 : 99;
+        var total = subtotal + shipping;
+        document.getElementById("checkoutTotals").innerHTML =
+          '<div class="order-summary">' +
+            '<div class="row"><span>Subtotal</span><span>' + fmt(subtotal) + '</span></div>' +
+            '<div class="row"><span>Shipping</span><span>' + (shipping === 0 ? "FREE" : fmt(shipping)) + '</span></div>' +
+            '<div class="row"><span>Initial Payable</span><span>' + fmt(total) + '</span></div>' +
+          '</div>';
+        document.getElementById("hwaCartBadge").textContent = String(cart.totals(items).count);
+      }
+      function renderSubCount() {
+        var el = document.getElementById("subCount");
+        if (el) { el.textContent = String(window.HWA.Cart.get().items.length); }
+      }
+      function showError(msg) {
+        var el = document.getElementById("checkoutError");
+        el.textContent = msg;
+        el.style.display = "block";
+      }
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("cartOpenBtn").addEventListener("click", function () { window.HWA.openCart(); });
+        document.getElementById("addDogBtn").addEventListener("click", addDog);
+        addDog();
+        renderItems();
+        document.querySelectorAll("#dogList .dog-name, #dogList .dog-breed").forEach(function (input) { input.addEventListener("input", renderItems); });
+        document.querySelectorAll("#dogList .dog-size").forEach(function (sel) { sel.addEventListener("change", renderItems); });
+
+        document.getElementById("checkoutForm").addEventListener("submit", function (e) {
+          e.preventDefault();
+          var errEl = document.getElementById("checkoutError");
+          errEl.style.display = "none";
+          var cart = window.HWA.Cart;
+          var items = cart.get().items;
+          if (!items.length) { showError("Your cart is empty."); return; }
+          var name = document.getElementById("custName").value.trim();
+          var email = document.getElementById("custEmail").value.trim();
+          var phone = document.getElementById("custPhone").value.trim();
+          var address = document.getElementById("addrAddress").value.trim();
+          var city = document.getElementById("addrCity").value.trim();
+          var pincode = document.getElementById("addrPincode").value.trim();
+          if (!/^[A-Za-z\s]+$/.test(name)) { showError("Please enter a valid full name."); return; }
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError("Please enter a valid email."); return; }
+          if (!/^[0-9]{10}$/.test(phone)) { showError("Please enter a valid 10-digit mobile number."); return; }
+          if (!address) { showError("Please enter a delivery address."); return; }
+          if (!/^[0-9]{6}$/.test(pincode)) { showError("Please enter a valid 6-digit pincode."); return; }
+          var dogProfiles = dogs();
+          if (!dogProfiles.length) { showError("Please add at least one dog profile."); return; }
+          var payloadItems = items.map(function (it) {
+            return { productId: it.productId, name: it.name, price: it.price, qty: it.qty, freq: it.freq, dogId: it.dogId || null, config: it.config || null, amount: amountFor(it) };
+          });
+          var payload = {
+            customer: { name: name, email: email, phone: phone },
+            deliveryAddress: { address: address, city: city, pincode: pincode },
+            dogs: dogProfiles,
+            items: payloadItems
+          };
+          document.getElementById("payNowBtn").disabled = true;
+          fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+              if (!data.ok) { showError(data.error || "Could not complete the order. Please try again."); document.getElementById("payNowBtn").disabled = false; return; }
+              cart.clear();
+              document.getElementById("checkoutForm").style.display = "none";
+              var createdEl = document.getElementById("createdSubs");
+              createdEl.innerHTML = (data.subscriptions || []).map(function (s) {
+                return '<div class="order-summary"><div class="row"><span>' + s.items[0].name + '</span><span>' + s.id + '</span></div>' +
+                  '<div class="row"><span>Billing</span><span>' + s.frequency + '</span></div>' +
+                  '<div class="row"><span>Renews</span><span>' + new Date(s.renewalDate).toLocaleDateString("en-IN") + '</span></div></div>';
+              }).join("");
+              document.getElementById("orderSuccess").style.display = "block";
+            })
+            .catch(function () { showError("Could not complete the order. Please try again."); document.getElementById("payNowBtn").disabled = false; });
+        });
       });
-    });
+    })();
   </script>
 
 </body>

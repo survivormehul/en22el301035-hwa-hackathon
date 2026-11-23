@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy While Away - My Subscriptions</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/cart.js"></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">Happy While Away</a>
+      <nav class="main-nav" id="mainNav">
+        <a href="index.html">Home</a>
+        <a href="products.html">Boxes</a>
+        <a href="subscription.html">Subscription</a>
+        <a href="subscriptions.html" class="active">My Subscriptions</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <button class="btn btn-outline cart-open-btn" id="cartOpenBtn">Cart <span id="hwaCartBadge">0</span></button>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <h1>My Subscriptions</h1>
+      <form id="lookupForm" class="lookup-form">
+        <div class="form-field">
+          <label for="lookupEmail">Email used at checkout</label>
+          <input id="lookupEmail" type="email" required placeholder="you@example.com">
+        </div>
+        <button type="submit" class="btn btn-primary">View Subscriptions</button>
+      </form>
+      <div class="error-msg" id="lookupError" style="display:none;"></div>
+      <div id="subsList"></div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Happy While Away. Happiness, delivered monthly.</p>
+    </div>
+  </footer>
+
+  <script src="js/cart.js"></script>
+  <script>
+    (function () {
+      function fmt(n) { return "\u20B9" + Number(n || 0).toLocaleString("en-IN"); }
+      function freqLabel(f) { return f === "yearly" ? "Yearly (12 months upfront)" : "Monthly"; }
+      function statusClass(s) { return "sub-status sub-status-" + (s || "active"); }
+      function render(list) {
+        var el = document.getElementById("subsList");
+        if (!list || !list.length) {
+          el.innerHTML = '<p class="hint">No subscriptions found for that email.</p>';
+          return;
+        }
+        el.innerHTML = list.map(function (s) {
+          var item = (s.items && s.items[0]) || {};
+          var dog = s.dog ? s.dog.name : "Not assigned";
+          var addr = s.deliveryAddress ? (s.deliveryAddress.address + (s.deliveryAddress.pincode ? ", " + s.deliveryAddress.pincode : "")) : "-";
+          var renewal = s.renewalDate ? new Date(s.renewalDate).toLocaleDateString("en-IN") : "-";
+          var amount = s.billing && s.billing.amount != null ? s.billing.amount : s.total;
+          return '<div class="sub-card">' +
+            '<div class="sub-card-head"><span class="sub-name">' + (item.name || "Subscription") + '</span><span class="' + statusClass(s.status) + '">' + (s.status || "active") + '</span></div>' +
+            '<div class="sub-id">' + s.id + '</div>' +
+            '<div class="sub-grid">' +
+              '<div class="sub-field"><label>Billing</label><span>' + freqLabel(s.frequency) + '</span></div>' +
+              '<div class="sub-field"><label>Amount</label><span>' + fmt(amount) + '</span></div>' +
+              '<div class="sub-field"><label>Renews / next due</label><span>' + renewal + '</span></div>' +
+              '<div class="sub-field"><label>Dog</label><span>' + dog + '</span></div>' +
+              '<div class="sub-field"><label>Delivery address</label><span>' + addr + '</span></div>' +
+            '</div>' +
+            '<div class="sub-actions">' +
+              '<button class="btn btn-outline" data-action="pause" data-id="' + s.id + '">Pause</button>' +
+              '<button class="btn btn-outline" data-action="resume" data-id="' + s.id + '">Resume</button>' +
+              '<button class="btn btn-outline" data-action="cancel" data-id="' + s.id + '">Cancel</button>' +
+            '</div>' +
+            '<p class="hint">Billing frequency and subscription box cannot be changed after purchase.</p>' +
+          '</div>';
+        }).join("");
+        el.querySelectorAll("[data-action]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var action = btn.getAttribute("data-action");
+            var id = btn.getAttribute("data-id");
+            fetch("/api/subscribe", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subscriptionId: id, action: action }) })
+              .then(function (r) { return r.json(); })
+              .then(function () { load(document.getElementById("lookupEmail").value.trim()); })
+              .catch(function () {});
+          });
+        });
+      }
+      function load(email) {
+        var errEl = document.getElementById("lookupError");
+        errEl.style.display = "none";
+        fetch("/api/subscribe?email=" + encodeURIComponent(email))
+          .then(function (r) { return r.json(); })
+          .then(function (data) { render(data.subscriptions || []); })
+          .catch(function () { errEl.textContent = "Could not load subscriptions."; errEl.style.display = "block"; });
+      }
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("cartOpenBtn").addEventListener("click", function () { window.HWA.openCart(); });
+        document.getElementById("lookupForm").addEventListener("submit", function (e) {
+          e.preventDefault();
+          var email = document.getElementById("lookupEmail").value.trim();
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            var errEl = document.getElementById("lookupError");
+            errEl.textContent = "Please enter a valid email.";
+            errEl.style.display = "block";
+            return;
+          }
+          load(email);
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>
