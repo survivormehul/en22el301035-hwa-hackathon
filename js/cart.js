@@ -42,8 +42,7 @@
       count += it.qty;
       if (it.freq === "yearly") { yearlyCount += it.qty; } else { monthlyCount += it.qty; }
     }
-    var shipping = subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
-    return { subtotal: subtotal, shipping: shipping, total: subtotal + shipping, count: count, monthlyCount: monthlyCount, yearlyCount: yearlyCount };
+    return { subtotal: subtotal, shipping: null, total: subtotal, count: count, monthlyCount: monthlyCount, yearlyCount: yearlyCount };
   }
 
   function Cart() { this.items = []; }
@@ -126,8 +125,8 @@
     var t = computeTotals(cart.items);
     summaryEl.innerHTML =
       '<div class="hwa-cart-row"><span>Subtotal</span><span>' + fmt(t.subtotal) + '</span></div>' +
-      '<div class="hwa-cart-row"><span>Shipping</span><span>' + (t.shipping === 0 ? "FREE" : fmt(t.shipping)) + '</span></div>' +
-      '<div class="hwa-cart-row hwa-cart-total"><span>Initial Payable</span><span>' + fmt(t.total) + '</span></div>' +
+      '<div class="hwa-cart-row"><span>Shipping</span><span>Calculated at checkout</span></div>' +
+      '<div class="hwa-cart-row hwa-cart-total"><span>Estimated Total</span><span>' + fmt(t.subtotal) + '</span></div>' +
       (t.yearlyCount > 0 ? '<div class="hwa-cart-note">Yearly items are charged for 12 months upfront and delivered monthly.</div>' : '') +
       (t.monthlyCount > 1 ? '<div class="hwa-cart-note">' + t.monthlyCount + ' monthly subscriptions renew independently.</div>' : '');
     var badge = document.getElementById("hwaCartBadge");

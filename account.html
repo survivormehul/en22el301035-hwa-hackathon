@@ -73,6 +73,12 @@
         </section>
 
         <section class="form-section">
+          <h3>Notifications</h3>
+          <p class="hint">Order confirmation, shipping updates, delivery confirmation and per-subscription renewal reminders. No real messages are sent in this demo.</p>
+          <div id="notificationsList"></div>
+        </section>
+
+        <section class="form-section">
           <h3>Active Subscriptions</h3>
           <div id="activeSubs"></div>
         </section>
@@ -91,7 +97,7 @@
     </div>
   </footer>
 
-  <script src="js/cart.js"></script>
+
   <script>
     (function () {
       var account = null;
@@ -177,16 +183,104 @@
         });
       }
 
+      var ORDER_STATUSES = [
+        { key: "order_placed", label: "Order Placed" },
+        { key: "processing", label: "Processing" },
+        { key: "shipped", label: "Shipped" },
+        { key: "delivered", label: "Delivered" }
+      ];
+      var DEMO_STEP_MS = 2 * 60 * 1000;
+
+      function statusIndex(key) {
+        for (var i = 0; i < ORDER_STATUSES.length; i++) { if (ORDER_STATUSES[i].key === key) { return i; } }
+        return 0;
+      }
+      function statusLabel(key) { return ORDER_STATUSES[statusIndex(key)].label; }
+      function demoStatusFor(o) {
+        var elapsed = Date.now() - new Date(o.createdAt).getTime();
+        var idx = Math.floor(elapsed / DEMO_STEP_MS);
+        if (!isFinite(idx) || idx < 0) { idx = 0; }
+        if (idx > ORDER_STATUSES.length - 1) { idx = ORDER_STATUSES.length - 1; }
+        return ORDER_STATUSES[idx].key;
+      }
+      function notifyApi(type, data) {
+        return fetch("/api/notify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: type, to: account.email, data: data }) })
+          .then(function (r) { return r.json(); }).catch(function () { return { ok: false }; });
+      }
+      function recordNotification(type, order, resp) {
+        if (!resp || !resp.notification) { return; }
+        account.notifications = account.notifications || [];
+        account.notifications.unshift({ type: type, subject: resp.notification.subject, createdAt: resp.notification.createdAt, simulated: resp.simulated });
+        persist();
+        if (document.getElementById("notificationsList")) { renderNotifications(); }
+      }
+      function advanceOrders() {
+        var changed = false;
+        (account.orders || []).forEach(function (o) {
+          var target = demoStatusFor(o);
+          if (statusIndex(target) > statusIndex(o.status)) {
+            o.status = target;
+            o.statusUpdatedAt = new Date().toISOString();
+            o.notifiedStatuses = o.notifiedStatuses || [];
+            changed = true;
+            var itemsSummary = (o.items || []).map(function (it) { return it.name + " x " + it.qty; }).join(", ");
+            if (target === "shipped" && o.notifiedStatuses.indexOf("shipped") === -1) {
+              o.notifiedStatuses.push("shipped");
+              notifyApi("shipping_update", { orderId: o.orderId, itemsSummary: itemsSummary, status: "shipped" })
+                .then(function (resp) { recordNotification("shipping_update", o, resp); });
+            }
+            if (target === "delivered" && o.notifiedStatuses.indexOf("delivered") === -1) {
+              o.notifiedStatuses.push("delivered");
+              notifyApi("delivery_confirmation", { orderId: o.orderId, itemsSummary: itemsSummary, status: "delivered" })
+                .then(function (resp) { recordNotification("delivery_confirmation", o, resp); });
+            }
+          }
+        });
+        if (changed) { persist(); }
+      }
+      function checkRenewalReminders() {
+        var now = Date.now();
+        var windowMs = 7 * 24 * 60 * 60 * 1000;
+        (account.subscriptions || []).forEach(function (s) {
+          if (s.status !== "active" || !s.renewalDate) { return; }
+          var due = new Date(s.renewalDate).getTime();
+          if (isNaN(due) || due - now > windowMs) { return; }
+          s.renewalReminders = s.renewalReminders || [];
+          if (s.renewalReminders.indexOf(s.renewalDate) !== -1) { return; }
+          s.renewalReminders.push(s.renewalDate);
+          persist();
+          notifyApi("renewal_reminder", { subscriptionId: s.id, name: s.name, renewalDate: s.renewalDate, amount: s.amount })
+            .then(function (resp) { recordNotification("renewal_reminder", null, resp); });
+        });
+      }
+      function renderNotifications() {
+        var el = document.getElementById("notificationsList");
+        var list = account.notifications || [];
+        if (!list.length) { el.innerHTML = '<p class="hint">No notifications yet.</p>'; return; }
+        el.innerHTML = list.map(function (n) {
+          return '<div class="sub-card"><div class="sub-card-head"><span class="sub-name">' + n.subject + '</span><span class="sub-status sub-status-' + (n.simulated ? "paused" : "active") + '">' + (n.simulated ? "demo" : "sent") + '</span></div>' +
+            '<div class="sub-id">' + new Date(n.createdAt).toLocaleString("en-IN") + '</div></div>';
+        }).join("");
+      }
       function renderOrders() {
         var el = document.getElementById("orderHistory");
         if (!account.orders || !account.orders.length) { el.innerHTML = '<p class="hint">No orders yet.</p>'; return; }
         el.innerHTML = account.orders.map(function (o) {
+          var idx = statusIndex(o.status);
           var items = (o.items || []).map(function (it) { return it.name + " x " + it.qty; }).join(", ");
-          return '<div class="sub-card"><div class="sub-card-head"><span class="sub-name">' + o.orderId + '</span><span class="sub-status sub-status-paused">' + (o.paymentStatus || "pending").toUpperCase() + '</span></div>' +
-            '<div class="sub-id">' + dateStr(o.createdAt) + '</div>' +
+          var timeline = ORDER_STATUSES.map(function (st, i) {
+            var cls = i < idx ? "done" : (i === idx ? "current" : "todo");
+            return '<div class="track-step ' + cls + '"><span class="track-dot"></span><span class="track-label">' + st.label + '</span></div>';
+          }).join("");
+          return '<div class="sub-card">' +
+            '<div class="sub-card-head"><span class="sub-name">' + o.orderId + '</span><span class="sub-status order-status-' + o.status + '">' + statusLabel(o.status) + '</span></div>' +
+            '<div class="sub-id">' + dateStr(o.createdAt) + ' &middot; Order total ' + fmt(o.total) + '</div>' +
+            '<div class="track-timeline">' + timeline + '</div>' +
+            '<p class="hint">Demo tracking: status advances automatically for this demo store.</p>' +
             '<div class="sub-grid"><div class="sub-field"><label>Items</label><span>' + items + '</span></div>' +
-            '<div class="sub-field"><label>Amount</label><span>' + fmt(o.total) + '</span></div>' +
-            '<div class="sub-field"><label>Payment method</label><span>' + (o.paymentMethod || "-") + '</span></div></div></div>';
+            '<div class="sub-field"><label>Shipping</label><span>' + fmt(o.shipping || 0) + '</span></div>' +
+            '<div class="sub-field"><label>Payment</label><span>' + (o.paymentStatus || "pending").toUpperCase() + ' &middot; ' + (o.paymentMethod || "-") + '</span></div>' +
+            '<div class="sub-field"><label>Delivery address</label><span>' + (account.address ? account.address.address + ', ' + account.address.pincode : "-") + '</span></div></div></div>';
         }).join("");
       }
 
@@ -285,7 +379,7 @@
       function renderDashboard() {
         document.getElementById("loginSection").style.display = "none";
         document.getElementById("dashboard").style.display = "block";
-        renderPersonal(); renderAddress(); renderDogs(); renderOrders(); renderSubs();
+        advanceOrders(); renderPersonal(); renderAddress(); renderDogs(); renderOrders(); renderSubs(); renderNotifications(); checkRenewalReminders();
       }
 
       document.addEventListener("DOMContentLoaded", function () {

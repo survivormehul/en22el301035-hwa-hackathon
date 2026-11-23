@@ -45,6 +45,7 @@
                 <div class="form-field"><label for="addrCity">City</label><input id="addrCity"></div>
                 <div class="form-field"><label for="addrPincode">Pincode</label><input id="addrPincode" required maxlength="6"></div>
               </div>
+              <p class="hint" id="shippingHint"></p>
             </section>
 
             <section class="form-section">
@@ -68,7 +69,7 @@
                 <div class="form-field"><label for="promoInput">Promo code</label><input id="promoInput" placeholder="Enter code"></div>
                 <button type="button" class="btn btn-outline" id="applyPromoBtn">Apply</button>
               </div>
-              <p class="hint" id="promoStatus"></p>
+              <p class="hint" id="promoStatus">Demo coupons: <strong>FIRST10</strong> (first order, 10% off) and <strong>FREESHIP</strong> (free delivery).</p>
             </section>
           </div>
 
@@ -126,13 +127,21 @@
     </div>
   </footer>
 
-  <script src="js/cart.js"></script>
+
   <script>
     (function () {
-      var PROMOS = { "HAPPY10": { percent: 10 } };
+      var COUPONS = {
+        "FIRST10": { type: "first_time", percent: 10, label: "10% off your first order" },
+        "FREESHIP": { type: "free_delivery", label: "Free delivery" }
+      };
+      var SHIPPING_ZONES = [
+        { prefixes: ["110", "400", "560", "600", "700"], rate: 49, label: "Metro" },
+        { prefixes: ["18", "19", "78", "79"], rate: 149, label: "Remote" }
+      ];
+      var DEFAULT_SHIPPING_RATE = 99;
+
       var dogSeq = 0;
-      var promo = { code: null, discount: 0 };
-      var pendingOrder = null;
+      var promo = { code: null, type: null, percent: 0 };
       var demoCode = null;
       var verified = false;
 
@@ -145,6 +154,16 @@
           gross = Math.round(item.price * 12 * (1 - d / 100));
         }
         return gross;
+      }
+      function shippingFor(pincode) {
+        if (!/^[0-9]{6}$/.test(pincode)) { return { known: false, rate: 0, zone: null }; }
+        for (var i = 0; i < SHIPPING_ZONES.length; i++) {
+          var z = SHIPPING_ZONES[i];
+          for (var j = 0; j < z.prefixes.length; j++) {
+            if (pincode.indexOf(z.prefixes[j]) === 0) { return { known: true, rate: z.rate, zone: z.label }; }
+          }
+        }
+        return { known: true, rate: DEFAULT_SHIPPING_RATE, zone: "Standard" };
       }
       function addDog() {
         var id = newDogId();
@@ -172,6 +191,7 @@
         return out;
       }
       function cartItems() { return window.HWA.Cart.get().items; }
+      function accountStore() { try { return JSON.parse(localStorage.getItem("hwa_accounts") || "{}"); } catch (e) { return {}; } }
       function renderItems() {
         var items = cartItems();
         var container = document.getElementById("checkoutItems");
@@ -212,23 +232,55 @@
         var items = cartItems();
         var subtotal = 0;
         items.forEach(function (it) { subtotal += amountFor(it) * it.qty; });
-        var discount = Math.round(subtotal * (promo.discount / 100));
-        var shipping = subtotal === 0 || subtotal >= 2999 ? 0 : 99;
-        return { subtotal: subtotal, discount: discount, shipping: shipping, total: Math.max(0, subtotal - discount + shipping) };
+        var discount = promo.type === "first_time" ? Math.round(subtotal * (promo.percent / 100)) : 0;
+        var pin = document.getElementById("addrPincode").value.trim();
+        var ship = shippingFor(pin);
+        var shipping = promo.type === "free_delivery" ? 0 : (ship.known ? ship.rate : 0);
+        var total = Math.max(0, subtotal - discount + shipping);
+        return { subtotal: subtotal, discount: discount, shipping: shipping, shippingKnown: promo.type === "free_delivery" ? true : ship.known, zone: ship.zone, total: total, promoType: promo.type };
       }
       function renderTotals() {
         var t = totals();
+        var shipLabel;
+        if (t.promoType === "free_delivery") { shipLabel = "FREE (coupon)"; }
+        else if (!t.shippingKnown) { shipLabel = "Enter pincode"; }
+        else { shipLabel = fmt(t.shipping) + (t.zone ? " (" + t.zone + ")" : ""); }
         document.getElementById("checkoutTotals").innerHTML =
           '<div class="order-summary">' +
             '<div class="row"><span>Subtotal</span><span>' + fmt(t.subtotal) + '</span></div>' +
-            (t.discount > 0 ? '<div class="row"><span>Promo (' + promo.code + ')</span><span>-' + fmt(t.discount) + '</span></div>' : '') +
-            '<div class="row"><span>Shipping</span><span>' + (t.shipping === 0 ? "FREE" : fmt(t.shipping)) + '</span></div>' +
+            (t.discount > 0 ? '<div class="row"><span>Coupon (' + promo.code + ')</span><span>-' + fmt(t.discount) + '</span></div>' : '') +
+            '<div class="row"><span>Shipping</span><span>' + shipLabel + '</span></div>' +
             '<div class="row"><span>Initial Payable</span><span>' + fmt(t.total) + '</span></div>' +
           '</div>';
+        var pin = document.getElementById("addrPincode").value.trim();
+        var ship = shippingFor(pin);
+        document.getElementById("shippingHint").textContent = ship.known ? "Shipping zone: " + ship.zone + " - " + fmt(ship.rate) : "Enter a valid 6-digit pincode to calculate shipping.";
         document.getElementById("hwaCartBadge").textContent = String(window.HWA.Cart.totals(cartItems()).count);
       }
       function showError(msg) { var el = document.getElementById("checkoutError"); el.textContent = msg; el.style.display = "block"; }
+      function applyPromo() {
+        var code = document.getElementById("promoInput").value.trim().toUpperCase();
+        var status = document.getElementById("promoStatus");
+        promo = { code: null, type: null, percent: 0 };
+        if (!code) { status.textContent = "Enter a promo code."; renderTotals(); return; }
+        var def = COUPONS[code];
+        if (!def) { status.textContent = "Invalid promo code."; renderTotals(); return; }
+        if (def.type === "first_time") {
+          var email = document.getElementById("custEmail").value.trim().toLowerCase();
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { status.textContent = "Enter a valid email to check first-order eligibility."; renderTotals(); return; }
+          var acc = accountStore()[email];
+          if (acc && acc.orders && acc.orders.length > 0) { status.textContent = "This coupon is only for first-time customers."; renderTotals(); return; }
+          if (acc && acc.usedCoupons && acc.usedCoupons.indexOf(code) !== -1) { status.textContent = "You have already used this coupon."; renderTotals(); return; }
+          promo = { code: code, type: "first_time", percent: def.percent };
+          status.textContent = "Applied: " + def.label + ".";
+        } else if (def.type === "free_delivery") {
+          promo = { code: code, type: "free_delivery", percent: 0 };
+          status.textContent = "Applied: free delivery.";
+        }
+        renderTotals();
+      }
       function buildOrder() {
+        document.getElementById("checkoutError").style.display = "none";
         var name = document.getElementById("custName").value.trim();
         var email = document.getElementById("custEmail").value.trim();
         var phone = document.getElementById("custPhone").value.trim();
@@ -244,6 +296,10 @@
         if (!dogProfiles.length) { showError("Please add at least one dog profile."); return null; }
         var items = cartItems();
         if (!items.length) { showError("Your cart is empty."); return null; }
+        if (promo.type === "first_time") {
+          var acc = accountStore()[email.toLowerCase()];
+          if (acc && ((acc.orders && acc.orders.length > 0) || (acc.usedCoupons && acc.usedCoupons.indexOf(promo.code) !== -1))) { showError("This first-time coupon is no longer eligible."); return null; }
+        }
         var pmEl = document.querySelector("input[name='paymentMethod']:checked");
         var t = totals();
         var orderId = "HWA-ORD-" + Date.now();
@@ -261,50 +317,32 @@
           orderId: orderId, email: email,
           customer: { name: name, email: email, phone: phone },
           deliveryAddress: { address: address, city: city, pincode: pincode },
-          dogs: dogProfiles,
-          items: lineItems,
-          subtotal: t.subtotal, promoCode: promo.code, promoDiscount: t.discount, shipping: t.shipping, total: t.total,
+          dogs: dogProfiles, items: lineItems,
+          subtotal: t.subtotal, couponCode: promo.code, couponType: promo.type, couponDiscount: t.discount, shipping: t.shipping, total: t.total,
           paymentMethod: pmEl ? pmEl.value : "upi", paymentStatus: "pending",
-          deliveryPreferences: { notes: document.getElementById("deliveryNotes").value.trim() }
+          deliveryPreferences: { notes: document.getElementById("deliveryNotes").value.trim() },
+          status: "order_placed"
         };
-      }
-      function accountStore() {
-        try { return JSON.parse(localStorage.getItem("hwa_accounts") || "{}"); } catch (e) { return {}; }
       }
       function saveAccount(order) {
         var store = accountStore();
         var key = order.email.toLowerCase();
-        var acc = store[key] || { email: order.email, name: order.customer.name, phone: order.customer.phone, address: order.deliveryAddress, dogs: [], orders: [], subscriptions: [] };
+        var acc = store[key] || { email: order.email, name: order.customer.name, phone: order.customer.phone, address: order.deliveryAddress, dogs: [], orders: [], subscriptions: [], notifications: [], usedCoupons: [] };
         acc.name = order.customer.name; acc.phone = order.customer.phone; acc.address = order.deliveryAddress;
-        order.dogs.forEach(function (d) {
-          var exists = acc.dogs.some(function (x) { return x.id === d.id; });
-          if (!exists) { acc.dogs.push(d); }
-        });
-        acc.orders.unshift({ orderId: order.orderId, createdAt: new Date().toISOString(), items: order.items, subtotal: order.subtotal, promoCode: order.promoCode, promoDiscount: order.promoDiscount, shipping: order.shipping, total: order.total, paymentMethod: order.paymentMethod, paymentStatus: "pending" });
+        acc.notifications = acc.notifications || []; acc.usedCoupons = acc.usedCoupons || [];
+        order.dogs.forEach(function (d) { if (!acc.dogs.some(function (x) { return x.id === d.id; })) { acc.dogs.push(d); } });
+        acc.orders.unshift({ orderId: order.orderId, createdAt: new Date().toISOString(), items: order.items, subtotal: order.subtotal, couponCode: order.couponCode, couponDiscount: order.couponDiscount, shipping: order.shipping, total: order.total, paymentMethod: order.paymentMethod, paymentStatus: "pending", status: "order_placed", statusUpdatedAt: new Date().toISOString(), notifiedStatuses: [] });
+        if (order.couponType === "first_time" && order.couponCode && acc.usedCoupons.indexOf(order.couponCode) === -1) { acc.usedCoupons.push(order.couponCode); }
         order.items.forEach(function (it, idx) {
-          var renewal = new Date();
-          renewal.setMonth(renewal.getMonth() + (it.freq === "yearly" ? 12 : 1));
+          var renewal = new Date(); renewal.setMonth(renewal.getMonth() + (it.freq === "yearly" ? 12 : 1));
+          var nextDelivery = new Date(); nextDelivery.setMonth(nextDelivery.getMonth() + 1);
           acc.subscriptions.push({
-            id: "HWA-SUB-" + Date.now() + "-" + (idx + 1),
-            orderId: order.orderId,
-            createdAt: new Date().toISOString(),
-            frequency: it.freq,
-            productId: it.productId,
-            name: it.name,
-            unitAmount: it.unitAmount,
-            qty: it.qty,
-            amount: it.amount,
-            config: it.config,
-            dogId: it.dogId,
-            dogName: it.dogName,
-            deliveryAddress: order.deliveryAddress,
-            deliveryPreferences: order.deliveryPreferences,
+            id: "HWA-SUB-" + Date.now() + "-" + (idx + 1), orderId: order.orderId, createdAt: new Date().toISOString(),
+            frequency: it.freq, productId: it.productId, name: it.name, unitAmount: it.unitAmount, qty: it.qty, amount: it.amount, config: it.config,
+            dogId: it.dogId, dogName: it.dogName, deliveryAddress: order.deliveryAddress, deliveryPreferences: order.deliveryPreferences,
             billing: { type: it.freq, amount: it.amount, nextDueDate: renewal.toISOString(), chargedUpfrontMonths: it.freq === "yearly" ? 12 : 1 },
-            renewalDate: renewal.toISOString(),
-            nextDeliveryDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
-            skippedDeliveries: [],
-            status: "active",
-            paymentStatus: "pending"
+            renewalDate: renewal.toISOString(), nextDeliveryDate: nextDelivery.toISOString(), skippedDeliveries: [],
+            status: "active", paymentStatus: "pending"
           });
         });
         store[key] = acc;
@@ -313,19 +351,18 @@
       }
       function sendOrder(order) {
         var payload = {
-          customer: order.customer,
-          deliveryAddress: order.deliveryAddress,
-          dogs: order.dogs,
+          customer: order.customer, deliveryAddress: order.deliveryAddress, dogs: order.dogs,
           items: order.items.map(function (it) { return { productId: it.productId, name: it.name, price: it.unitAmount, qty: it.qty, freq: it.freq, config: it.config, dogId: it.dogId, amount: it.unitAmount }; }),
-          paymentMethod: order.paymentMethod,
-          promoCode: order.promoCode,
-          promoDiscount: order.promoDiscount,
-          deliveryPreferences: order.deliveryPreferences,
-          frequency: order.items[0].freq,
-          planType: order.items[0].productId === "build-your-own" ? "build-your-own" : "curated",
-          total: order.total
+          paymentMethod: order.paymentMethod, promoCode: order.couponCode, promoDiscount: order.couponDiscount,
+          deliveryPreferences: order.deliveryPreferences, frequency: order.items[0].freq,
+          planType: order.items[0].productId === "build-your-own" ? "build-your-own" : "curated", total: order.total
         };
         return fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+          .then(function (r) { return r.json(); }).catch(function () { return { ok: false }; });
+      }
+      function notify(type, order, extra) {
+        var data = Object.assign({ orderId: order.orderId, itemsSummary: order.items.map(function (it) { return it.name + " x " + it.qty; }).join(", "), total: order.total }, extra || {});
+        return fetch("/api/notify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: type, to: order.email, data: data }) })
           .then(function (r) { return r.json(); }).catch(function () { return { ok: false }; });
       }
       function showConfirmation(order, backend) {
@@ -337,13 +374,15 @@
         var el = document.getElementById("orderSuccess");
         el.innerHTML =
           '<span class="success-icon">!</span>' +
-          '<h2>Order Placed — Payment Pending</h2>' +
-          '<p>Your order was created and your payment status is <strong>PENDING</strong>. No real payment has been processed.</p>' +
+          '<h2>Order Placed - Payment Pending</h2>' +
+          '<p>Your order was created with payment status <strong>PENDING</strong>. No real payment has been processed.</p>' +
           '<div class="order-summary">' +
             '<div class="row"><span>Order ID</span><span>' + oid + '</span></div>' +
             itemsHtml +
+            '<div class="row"><span>Order status</span><span>Order Placed</span></div>' +
             '<div class="row"><span>Delivery address</span><span>' + order.deliveryAddress.address + ', ' + order.deliveryAddress.pincode + '</span></div>' +
             '<div class="row"><span>Billing frequency</span><span>' + order.items.map(function (it) { return it.freq; }).join(', ') + '</span></div>' +
+            '<div class="row"><span>Shipping</span><span>' + fmt(order.shipping) + '</span></div>' +
             '<div class="row"><span>Initial order amount</span><span>' + fmt(order.total) + '</span></div>' +
             '<div class="row"><span>Payment status</span><span>PENDING</span></div>' +
           '</div>' +
@@ -356,15 +395,20 @@
         if (!order) { return; }
         var btn = document.getElementById("payNowBtn");
         btn.disabled = true;
-        saveAccount(order);
+        var acc = saveAccount(order);
         sendOrder(order).then(function (backend) {
+          notify("order_confirmation", order, { paymentStatus: "pending" }).then(function (resp) {
+            if (resp && resp.notification) {
+              acc.notifications = acc.notifications || [];
+              acc.notifications.unshift({ type: "order_confirmation", subject: resp.notification.subject, createdAt: resp.notification.createdAt, simulated: resp.simulated });
+              try { var store = accountStore(); store[order.email.toLowerCase()] = acc; localStorage.setItem("hwa_accounts", JSON.stringify(store)); } catch (e) {}
+            }
+          });
           window.HWA.Cart.clear();
           showConfirmation(order, backend);
         });
       }
-      function openVerify() {
-        document.getElementById("verifyOverlay").classList.add("open");
-      }
+      function openVerify() { document.getElementById("verifyOverlay").classList.add("open"); }
       function closeVerify() { document.getElementById("verifyOverlay").classList.remove("open"); }
       function verifyTarget() {
         var method = document.querySelector("input[name='verifyMethod']:checked").value;
@@ -375,17 +419,9 @@
         document.getElementById("addDogBtn").addEventListener("click", addDog);
         addDog();
         renderItems();
-        ["custName", "custEmail", "custPhone", "addrAddress", "addrCity", "addrPincode"].forEach(function (id) {
-          document.getElementById(id).addEventListener("input", function () {});
-        });
+        ["addrPincode", "custEmail"].forEach(function (id) { document.getElementById(id).addEventListener("input", renderTotals); });
         renderTotals();
-        document.getElementById("applyPromoBtn").addEventListener("click", function () {
-          var code = document.getElementById("promoInput").value.trim().toUpperCase();
-          var status = document.getElementById("promoStatus");
-          if (PROMOS[code]) { promo = { code: code, discount: PROMOS[code].percent }; status.textContent = "Promo applied: " + PROMOS[code].percent + "% off."; }
-          else { promo = { code: null, discount: 0 }; status.textContent = "Invalid promo code."; }
-          renderTotals();
-        });
+        document.getElementById("applyPromoBtn").addEventListener("click", applyPromo);
         document.querySelectorAll("input[name='verifyMethod']").forEach(function (r) { r.addEventListener("change", function () { document.getElementById("verifyCodeBox").style.display = "none"; }); });
         document.getElementById("sendCodeBtn").addEventListener("click", function () {
           var target = verifyTarget();
@@ -399,8 +435,7 @@
         });
         document.getElementById("verifyBtn").addEventListener("click", function () {
           var errEl = document.getElementById("verifyError");
-          var input = document.getElementById("verifyCodeInput").value.trim();
-          if (input !== demoCode) { errEl.textContent = "Incorrect code. Please try again."; errEl.style.display = "block"; return; }
+          if (document.getElementById("verifyCodeInput").value.trim() !== demoCode) { errEl.textContent = "Incorrect code. Please try again."; errEl.style.display = "block"; return; }
           errEl.style.display = "none";
           verified = true;
           closeVerify();
@@ -408,7 +443,6 @@
         });
         document.getElementById("checkoutForm").addEventListener("submit", function (e) {
           e.preventDefault();
-          document.getElementById("checkoutError").style.display = "none";
           if (!buildOrder()) { return; }
           if (!verified) { openVerify(); return; }
           placeOrder();
