@@ -199,14 +199,14 @@ try {
         var map = { "happy-box": "The%20Happy%20box.webp", "food-club": "the%20food%20club.webp", "style-club": "The%20style%20club.webp", "calm-box": "the%20calm%20box.webp", "build-your-own": "The%20Happy%20box.webp" };
         return map[id] || map["happy-box"];
       }
-      function yearlyTotal(price) {
+      function yearlyTotal(price, id) {
         var d = window.HWA_CONFIG && typeof window.HWA_CONFIG.annualDiscountPercent === "number" ? window.HWA_CONFIG.annualDiscountPercent : 0;
-        var months = window.HWA_CONFIG && window.HWA_CONFIG.yearlyMonths ? window.HWA_CONFIG.yearlyMonths : 12;
+        var months = (id === "build-your-own") ? 12 : 10;
         return Math.round(price * months * (1 - Math.max(0, d) / 100));
       }
       function priceHtml(p) {
         if (freq === "yearly") {
-          var total = yearlyTotal(p.price);
+          var total = yearlyTotal(p.price, p.id);
           var saving = p.price * 12 - total;
           return '<div class="detail-price"><span class="price-now">' + money(total) + '</span><span class="price-period">/year, billed upfront</span></div>' +
             (saving > 0 ? '<p class="detail-saving">Save ' + money(saving) + ' versus 12 monthly payments.</p>' : '<p class="detail-saving">Covers 12 monthly deliveries.</p>');
@@ -270,7 +270,7 @@ try {
             '<ul class="product-benefits">' + p.benefits.map(function (b) { return '<li>' + b + '</li>'; }).join("") + '</ul>' +
             '<div class="billing-toggle" role="group" aria-label="Billing frequency">' +
               '<button type="button" class="billing-btn' + (freq === "monthly" ? " active" : "") + '" data-freq="monthly">Monthly</button>' +
-              '<button type="button" class="billing-btn' + (freq === "yearly" ? " active" : "") + '" data-freq="yearly">Yearly, 12 months upfront</button>' +
+              '<button type="button" class="billing-btn' + (freq === "yearly" ? " active" : "") + '" data-freq="yearly">Yearly, billed upfront</button>' +
             '</div>' +
             byoHtml +
             '<div class="detail-buy">' +

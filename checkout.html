@@ -75,7 +75,7 @@
 
             <section class="form-section">
               <h3>Billing Preferences</h3>
-              <p class="hint">Choose monthly or yearly billing per subscription in the order summary. Yearly subscriptions are paid for 12 months upfront and delivered monthly.</p>
+              <p class="hint">Choose monthly or yearly billing per subscription in the order summary. Yearly subscriptions are paid upfront and delivered monthly.</p>
               <div class="form-field full">
                 <label for="deliveryNotes">Delivery preferences (optional)</label>
                 <input id="deliveryNotes" placeholder="e.g. Leave with guard, call before delivery">
@@ -177,7 +177,8 @@
         var gross = item.price;
         if (item.freq === "yearly") {
           var d = window.HWA_CONFIG && typeof window.HWA_CONFIG.annualDiscountPercent === "number" ? window.HWA_CONFIG.annualDiscountPercent : 0;
-          gross = Math.round(item.price * 12 * (1 - d / 100));
+var months = (item.productId === "build-your-own") ? 12 : 10;
+          gross = Math.round(item.price * months * (1 - d / 100));
         }
         return gross;
       }
@@ -233,7 +234,7 @@
             '<div class="checkout-item-controls">' +
               '<select class="checkout-freq" aria-label="Billing frequency for ' + it.name + '" data-index="' + i + '">' +
                 '<option value="monthly"' + (it.freq === "monthly" ? " selected" : "") + '>Monthly</option>' +
-                '<option value="yearly"' + (it.freq === "yearly" ? " selected" : "") + '>Yearly (12 months upfront)</option>' +
+                '<option value="yearly"' + (it.freq === "yearly" ? " selected" : "") + '>Yearly (billed upfront)</option>' +
               '</select>' +
               '<select class="checkout-dog" aria-label="Assign dog for ' + it.name + '" data-index="' + i + '">' +
                 '<option value="">Assign dog (optional)</option>' +

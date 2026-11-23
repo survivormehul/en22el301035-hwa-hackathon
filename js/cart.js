@@ -48,10 +48,14 @@ function categoryLabel(id) { return CATEGORY_LABELS[id] || id; }
     return typeof d === "number" && d > 0 ? d : 0;
   }
 
+function yearlyMultiplier(item) {
+    return (item && item.productId === "build-your-own") ? 12 : 10;
+  }
   function yearlyUpfront(item) {
-    var months = window.HWA_CONFIG.yearlyMonths || 12;
+    var months = yearlyMultiplier(item);
     var gross = item.price * months;
-    return Math.round(gross * (1 - discountPercent() / 100));
+    var net = gross * (1 - discountPercent() / 100);
+    return Math.round(net);
   }
 
   function effectivePrice(item) {
@@ -209,7 +213,7 @@ function categoryLabel(id) { return CATEGORY_LABELS[id] || id; }
     var t = computeTotals(cart.items);
     var yearlyTotal = window.HWA_CONFIG.yearlyMonths || 12;
     var notes = [];
-    if (t.yearlyCount > 0) { notes.push("Yearly boxes are billed for " + yearlyTotal + " months upfront and delivered monthly."); }
+    if (t.yearlyCount > 0) { notes.push("Yearly boxes are billed upfront and delivered monthly."); }
     if (t.monthlyCount > 1) { notes.push(t.monthlyCount + " monthly boxes renew independently."); }
     summaryEl.innerHTML =
       '<div class="hwa-cart-row"><span>Subtotal</span><span>' + fmt(t.subtotal) + '</span></div>' +

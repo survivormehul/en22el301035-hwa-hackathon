@@ -170,20 +170,20 @@ try {
       var selected = [];
 
       function money(n) { return "\u20B9" + Math.round(Number(n) || 0).toLocaleString("en-IN"); }
-      function yearlyTotal(price) {
+      function yearlyTotal(price, id) {
         var d = window.HWA_CONFIG && typeof window.HWA_CONFIG.annualDiscountPercent === "number" ? window.HWA_CONFIG.annualDiscountPercent : 0;
-        var months = window.HWA_CONFIG && window.HWA_CONFIG.yearlyMonths ? window.HWA_CONFIG.yearlyMonths : 12;
+        var months = (id === "build-your-own") ? 12 : 10;
         return Math.round(price * months * (1 - Math.max(0, d) / 100));
       }
-      function priceFor(price) { return frequency === "yearly" ? yearlyTotal(price) : price; }
+      function priceFor(price, id) { return frequency === "yearly" ? yearlyTotal(price, id) : price; }
       function periodFor() { return frequency === "yearly" ? "/year, upfront" : "/month"; }
 
       function renderPlans() {
         var grid = document.getElementById("plan-grid");
         grid.innerHTML = PLANS.map(function (p) {
           var featured = p.id === "happy-box";
-          var price = priceFor(p.price);
-          var saving = p.price * 12 - yearlyTotal(p.price);
+          var price = priceFor(p.price, p.id);
+          var saving = p.price * 12 - yearlyTotal(p.price, p.id);
           return '<article class="plan-card' + (featured ? ' featured' : '') + '" data-plan="' + p.id + '">' +
             (featured ? '<span class="plan-badge">Most popular</span>' : '') +
             '<a class="plan-card-link" href="product.html?id=' + p.id + '&freq=' + frequency + '" aria-label="View ' + p.name + ' details"></a>' +
@@ -210,7 +210,7 @@ try {
         var note = document.getElementById("billingNote");
         if (note) {
           note.textContent = frequency === "yearly"
-            ? "Yearly billing charges 12 months upfront and includes 12 monthly deliveries."
+            ? "Yearly billing is charged upfront and includes monthly deliveries."
             : "Pay month by month. Switch billing in the cart any time before checkout.";
         }
       }
@@ -261,7 +261,7 @@ try {
       }
       function updateByoPrice() {
         var priceEl = document.getElementById("byo-price");
-        if (priceEl) { priceEl.innerHTML = money(priceFor(BYO_PRICE)) + ' <span class="byo-period" id="byo-period">' + periodFor() + '</span>'; }
+        if (priceEl) { priceEl.innerHTML = money(priceFor(BYO_PRICE, "build-your-own")) + ' <span class="byo-period" id="byo-period">' + periodFor() + '</span>'; }
       }
       function setFrequency(f) {
         frequency = f;

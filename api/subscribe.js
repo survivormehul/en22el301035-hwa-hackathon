@@ -34,7 +34,8 @@ function addMonths(date, months) {
 function computeUnit(item) {
   const price = Number(item.price) || 0;
   if (item.amount != null) return Number(item.amount);
-  return item.freq === 'yearly' ? price * 12 : price;
+  const months = item.productId === 'build-your-own' ? 12 : 10;
+  return item.freq === 'yearly' ? price * months : price;
 }
 
 module.exports = async (req, res) => {

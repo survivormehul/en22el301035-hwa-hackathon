@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -333,7 +333,7 @@
           '<div class="sub-card-head"><span class="sub-name">' + s.name + '</span><span class="sub-status sub-status-' + s.status + '">' + s.status + '</span></div>' +
           '<div class="sub-id">' + s.id + ' &middot; Order ' + (s.orderId || "-") + '</div>' +
           '<div class="sub-grid">' +
-            '<div class="sub-field"><label>Billing</label><span>' + (s.frequency === "yearly" ? "Yearly (12 months upfront)" : "Monthly") + '</span></div>' +
+            '<div class="sub-field"><label>Billing</label><span>' + (s.frequency === "yearly" ? "Yearly (billed upfront)" : "Monthly") + '</span></div>' +
             '<div class="sub-field"><label>Amount</label><span>' + fmt(s.amount) + '</span></div>' +
             '<div class="sub-field"><label>Renews</label><span>' + dateStr(s.renewalDate) + '</span></div>' +
             '<div class="sub-field"><label>Next delivery</label><span>' + dateStr(s.nextDeliveryDate) + '</span></div>' +
