@@ -34,6 +34,7 @@
           </div>
           <button class="btn btn-primary btn-lg" id="detailAddBtn">Add to Cart</button>
         </div>
+        <div class="error-msg" id="byoError">Please select at least 2 categories (max 4).</div>
       </div>
     </section>
   </main>
@@ -46,6 +47,11 @@
 
   <script src="js/cart.js"></script>
   <script>
+    var BYO_CATEGORIES = [
+      { id: "toys-enrichment", name: "Toys & Enrichment" },
+      { id: "food-treats", name: "Food & Treats" },
+      { id: "clothing-accessories", name: "Clothing & Accessories" }
+    ];
     var PRODUCTS = {
       "happy-box": { id: "happy-box", name: "The Happy Box", tagline: "Fun that keeps wagging.", flag: "Most Popular", price: 1999, yearlyPrice: 19990, benefits: ["Daily enrichment toys", "Treats & games", "Mixed-age friendly"], description: "The Happy Box is our signature monthly happiness delivery. Every box brings a fresh mix of enrichment toys, tasty games and treats tailored to keep your dog wagging, sniffing and smiling all month long.", subscription: "Monthly or yearly subscription. Pause, skip or cancel anytime." },
       "food-club": { id: "food-club", name: "The Food Club", tagline: "Chef-crafted happiness.", price: 1499, yearlyPrice: 14990, benefits: ["Fresh-baked treats monthly", "Small-batch recipes", "Dog-safe ingredients"], description: "The Food Club delivers chef-crafted, small-batch treats every month. Baked in small batches with dog-safe ingredients, each delivery is a tasty adventure your dog will love.", subscription: "Monthly or yearly subscription. Pause, skip or cancel anytime." },
@@ -56,8 +62,19 @@
     function money(n) { return "\u20B9" + n.toLocaleString("en-IN"); }
     function imageFor(id) { var map = { "happy-box": "The%20Happy%20box.webp", "food-club": "the%20food%20club.webp", "style-club": "The%20style%20club.webp", "calm-box": "the%20calm%20box.webp", "build-your-own": "The%20Happy%20box.webp" }; return map[id] || "The%20Happy%20box.webp"; }
     function renderProduct(id) {
-      var p = PRODUCTS[id];
       var grid = document.getElementById("productDetailGrid");
+      if (id === "build-your-own") { renderByo(); return; }
+      var p = PRODUCTS[id];
+      window.currentProductId = p.id;
+      var qtyVal = document.getElementById("detailQtyVal");
+      var addBtn = document.getElementById("detailAddBtn");
+      qtyVal.setAttribute("data-product", p.id);
+      qtyVal.textContent = "1";
+      addBtn.setAttribute("data-product", p.id);
+      addBtn.setAttribute("data-qty", "1");
+      addBtn.addEventListener("click", function () { window.HWA.addToCart(p.id, { qty: parseInt(qtyVal.textContent, 10) || 1 }); });
+      document.getElementById("detailQtyUp").addEventListener("click", function () { var v = parseInt(qtyVal.textContent, 10) || 1; v = v + 1; qtyVal.textContent = String(v); qtyVal.setAttribute("data-product", p.id); });
+      document.getElementById("detailQtyDown").addEventListener("click", function () { var v = parseInt(qtyVal.textContent, 10) || 1; v = v - 1; if (v < 1) { v = 1; } qtyVal.textContent = String(v); qtyVal.setAttribute("data-product", p.id); });
       grid.innerHTML =
         '<div class="product-detail-media"><img src="' + imageFor(id) + '" alt="' + p.name + '"></div>' +
         '<div class="product-detail-info">' +
@@ -70,16 +87,42 @@
           '<ul class="product-benefits">' + (p.benefits || []).map(function (b) { return "<li>" + b + "</li>"; }).join("") + '</ul>' +
           '<p class="product-subscription-info">' + p.subscription + '</p>' +
         '</div>';
-      window.currentProductId = p.id;
+    }
+    function renderByo() {
+      var grid = document.getElementById("productDetailGrid");
+      grid.innerHTML =
+        '<div class="product-detail-media"><img src="' + imageFor("build-your-own") + '" alt="Build Your Own Happy Box"></div>' +
+        '<div class="product-detail-info">' +
+          '<h1 class="product-detail-name">Build Your Own Happy Box</h1>' +
+          '<p class="product-tagline">Curate your own happiness.</p>' +
+          '<div class="product-price product-price-lg">' + money(3499) + ' <span>/month</span></div>' +
+          '<div class="product-price product-price-old">' + money(34990) + ' <span>/month billed yearly</span></div>' +
+          '<p class="product-description">Design your own Happy Box. Pick 2-4 categories from toys &amp; enrichment, food &amp; treats, and clothing &amp; accessories, and we will build a personalised box around your dog&rsquo;s tastes.</p>' +
+          '<div class="product-categories" id="byoCategories">' +
+            BYO_CATEGORIES.map(function (c) { return '<label class="product-category"><input type="checkbox" name="byo-cat" value="' + c.id + '"> ' + c.name + '</label>'; }).join("") +
+          '</div>' +
+          '<p class="hint">Select a minimum of 2 and a maximum of 4 categories.</p>' +
+          '<div class="error-msg" id="byoError" style="display:none;">Please select at least 2 categories (max 4).</div>' +
+        '</div>';
+      window.__byoCategories = [];
+      var boxes = document.querySelectorAll("#byoCategories input[name='byo-cat']");
+      var selected = [];
+      boxes.forEach(function (cb) { cb.addEventListener("change", function () { var v = cb.value; if (cb.checked) { if (selected.indexOf(v) === -1) { selected.push(v); } } else { var i = selected.indexOf(v); if (i !== -1) { selected.splice(i, 1); } } renderByoCats(); }); });
+      function renderByoCats() { var el = document.getElementById("byoError"); var cnt = selected.length; if (cnt < 2 || cnt > 4) { el.style.display = "block"; } else { el.style.display = "none"; } }
       var qtyVal = document.getElementById("detailQtyVal");
       var addBtn = document.getElementById("detailAddBtn");
-      qtyVal.setAttribute("data-product", p.id);
+      qtyVal.setAttribute("data-product", "build-your-own");
       qtyVal.textContent = "1";
-      addBtn.setAttribute("data-product", p.id);
+      addBtn.setAttribute("data-product", "build-your-own");
       addBtn.setAttribute("data-qty", "1");
-      addBtn.addEventListener("click", function () { window.HWA.addToCart(p.id, { qty: parseInt(qtyVal.textContent, 10) || 1 }); });
-      document.getElementById("detailQtyUp").addEventListener("click", function () { var v = parseInt(qtyVal.textContent, 10) || 1; v = v + 1; qtyVal.textContent = String(v); qtyVal.setAttribute("data-product", p.id); });
-      document.getElementById("detailQtyDown").addEventListener("click", function () { var v = parseInt(qtyVal.textContent, 10) || 1; v = v - 1; if (v < 1) { v = 1; } qtyVal.textContent = String(v); qtyVal.setAttribute("data-product", p.id); });
+      addBtn.addEventListener("click", function () {
+        var cats = selected.slice();
+        var cnt = cats.length;
+        var errEl = document.getElementById("byoError");
+        if (cnt < 2 || cnt > 4) { errEl.style.display = "block"; return; }
+        errEl.style.display = "none";
+        window.HWA.addToCart("build-your-own", { qty: parseInt(qtyVal.textContent, 10) || 1, config: { categories: cats } });
+      });
     }
     document.addEventListener("DOMContentLoaded", function () {
       var params = new URLSearchParams(window.location.search);

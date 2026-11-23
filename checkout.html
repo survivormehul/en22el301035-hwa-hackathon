@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Happy While Away - Checkout</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/cart.js"></script>
 </head>
 <body>
 
@@ -56,7 +57,8 @@
       var successEl = document.getElementById("orderSuccess");
       var payBtn = document.getElementById("payNowBtn");
       function render() {
-        var t = cart.totals(cart.get().items);
+        var items = cart.get().items;
+        var t = cart.totals(items);
         var html = '<div class="order-summary">';
         html += '<div class="row"><span>Items</span><span>' + t.count + '</span></div>';
         html += '<div class="row"><span>Subtotal</span><span>\u20B9' + t.subtotal.toLocaleString("en-IN") + '</span></div>';
@@ -70,13 +72,19 @@
       payBtn.addEventListener("click", function () {
         var items = cart.get().items;
         if (!items || items.length === 0) { return; }
-        var payload = { items: items.map(function (it) { return { productId: it.productId, name: it.name, price: it.price, qty: it.qty, freq: it.freq, config: it.config }; }) };
+        var hasByo = false;
+        for (var i = 0; i < items.length; i++) { if (items[i].productId === "build-your-own") { hasByo = true; break; } }
+        var payload = {
+          planType: hasByo ? "build-your-own" : "curated",
+          items: items.map(function (it) { return { productId: it.productId, name: it.name, price: it.price, qty: it.qty, freq: it.freq, config: it.config }; }),
+          frequency: items.length ? (items[0].freq || "monthly") : "monthly",
+          total: cart.totals(items).total,
+          customer: { name: "Happy Customer", email: "happy@happywhileaway.example", phone: "+919000000000", address: "Happy Street", pincode: "560001" },
+          dog: { name: "Buddy", breed: "Golden Retriever", size: "Medium" }
+        };
         fetch("/api/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
           .then(function (r) { return r.json(); })
-          .then(function () {
-            cart.clear();
-            successEl.style.display = "block";
-          })
+          .then(function () { cart.clear(); successEl.style.display = "block"; })
           .catch(function () {});
       });
     });
